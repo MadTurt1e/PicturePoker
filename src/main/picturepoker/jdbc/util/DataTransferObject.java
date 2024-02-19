@@ -1,4 +1,4 @@
-package main.picturepoker.util;
+package main.picturepoker.jdbc.util;
 
 public interface DataTransferObject {
     int getID();

@@ -1,8 +1,8 @@
 // this is where the file is located
-package main.picturepoker;
+package main.picturepoker.jdbc;
 
 // this is effectively the C include thing
-import main.picturepoker.util.DataTransferObject;
+import main.picturepoker.jdbc.util.DataTransferObject;
 
 public class Player implements DataTransferObject {
     //Special player ID - not used in the sample code

@@ -1,21 +1,22 @@
-CREATE SEQUENCE player_seq start with 0;
+CREATE SEQUENCE player_seq start with 100;
 
 CREATE TABLE player
 (
-    p_ID int NOT NULL DEFAULT nextval('player_seq'),
-    name varchar(50) NOT NULL UNIQUE,
+    p_id int NOT NULL DEFAULT nextval('player_seq'),
+    p_name varchar(50) NOT NULL UNIQUE,
     password varchar(50) NOT NULL,
-    gamesPlayed int NOT NULL,
-    firsts int NOT NULL,
-    seconds int NOT NULL,
-    thirds  int NOT NULL,
-    fourths int NOT NULL,
-    dollars int NOT NULL,
+    dollars int NOT NULL DEFAULT 50,
+
+    -- User Statistics
+    firsts int NOT NULL DEFAULT 0,
+    seconds int NOT NULL DEFAULT 0,
+    thirds  int NOT NULL DEFAULT 0,
+    fourths int NOT NULL DEFAULT 0,
 
     --Per game info - Zeroed out, and refreshed upon each new game
-    tokens int NOT NULL,
-    bet int NOT NULL,
-    rounds_won int NOT NULL,
+    tokens int NOT NULL DEFAULT 10,
+    bet int NOT NULL DEFAULT 0,
+    rounds_won int NOT NULL DEFAULT 0,
 
-    PRIMARY KEY(p_ID)
+    PRIMARY KEY(p_id)
 );

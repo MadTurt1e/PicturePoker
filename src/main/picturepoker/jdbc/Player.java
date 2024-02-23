@@ -8,13 +8,15 @@ public class Player implements DataTransferObject {
     //Special player ID - not used in the sample code
     private int p_ID;
     private String name;
-    private String password;
-    private int gamesPlayed;
-    private int firsts;
-    private int seconds;
-    private int thirds;
-    private int fourths;
+    private String passcode;
     private int dollars;
+
+    // Per player game statistics
+    private int first_places;
+    private int second_places;
+    private int third_places;
+    private int fourth_places;
+    private int lifetime_tokens;
 
     //Per game info - Zeroed out, and refreshed upon each new game
     private int tokens;
@@ -33,6 +35,7 @@ public class Player implements DataTransferObject {
         this.p_ID = p_ID;
     }
 
+    // Getters and Setters
     public String getName() {
         return name;
     }
@@ -41,12 +44,12 @@ public class Player implements DataTransferObject {
         this.name = name;
     }
 
-    public String getPassword() {
-        return password;
+    public String getPasscode() {
+        return passcode;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPasscode(String passcode) {
+        this.passcode = passcode;
     }
 
     public int getGamesPlayed() {
@@ -57,36 +60,44 @@ public class Player implements DataTransferObject {
         this.gamesPlayed = gamesPlayed;
     }
 
-    public int getFirsts() {
-        return firsts;
+    public int getFirstPlaces() {
+        return first_places;
     }
 
-    public void setFirsts(int firsts) {
-        this.firsts = firsts;
+    public void setFirstPlaces(int first_places) {
+        this.first_places = first_places;
     }
 
-    public int getSeconds() {
-        return seconds;
+    public int getSecondPlaces() {
+        return second_places;
     }
 
-    public void setSeconds(int seconds) {
-        this.seconds = seconds;
+    public void setSecondPlaces(int seconds) {
+        this.second_places = second_places;
     }
 
-    public int getThirds() {
-        return thirds;
+    public int getThirdPlaces() {
+        return thirdPlaces;
     }
 
-    public void setThirds(int thirds) {
-        this.thirds = thirds;
+    public void setThirdPlaces(int thirdPlaces) {
+        this.thirdPlaces = thirdPlaces;
     }
 
-    public int getFourths() {
-        return fourths;
+    public int getFourthPlaces() {
+        return fourth_places;
     }
 
-    public void setFourths(int fourths) {
-        this.fourths = fourths;
+    public void setFourthPlaces(int fourth_places) {
+        this.fourth_places = fourth_places;
+    }
+
+    public int getLifetimeTokens(){
+        return lifetime_tokens;
+    }
+
+    public void setLifetimeTokens(int lifetime_tokens){
+        this.lifetime_tokens = lifetime_tokens;
     }
 
     public int getDollars() {
@@ -121,6 +132,19 @@ public class Player implements DataTransferObject {
         this.rounds_won = rounds_won;
     }
 
+    // Game functions
+    public void raise(){
+        current_bet = getBet();
+        if(current_bet >= 5 || getTokens() < 1){
+            // Invalid bet, do not raise
+            System.out.println("Player: Could not raise- Bet already max or no more tokens")
+        }
+        else{
+            setBet(current_bet + 1);
+            setTokens(getTokens() - 1);
+        }
+    }
+
     //ToString thing
 
     @Override
@@ -129,10 +153,11 @@ public class Player implements DataTransferObject {
                 "name='" + name + '\'' +
                 ", password='" + password + '\'' +
                 ", gamesPlayed=" + gamesPlayed +
-                ", firsts=" + firsts +
-                ", seconds=" + seconds +
-                ", thirds=" + thirds +
-                ", fourths=" + fourths +
+                ", first_places=" + first_places +
+                ", second_places=" + second_places +
+                ", third_places=" + thirds +
+                ", fourth_places=" + fourths +
+                ", lifetime_tokens=" + lifetime_tokens +
                 ", dollars=" + dollars +
                 ", tokens=" + tokens +
                 ", bet=" + bet +

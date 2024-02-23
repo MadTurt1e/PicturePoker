@@ -12,6 +12,7 @@ CREATE TABLE player
     second_places int NOT NULL DEFAULT 0,
     third_places  int NOT NULL DEFAULT 0,
     fourth_places int NOT NULL DEFAULT 0,
+    lifetime_tokens bigint NOT NULL DEFAULT 0,
 
     --Per game info - Zeroed out, and refreshed upon each new game
     tokens int NOT NULL DEFAULT 10,

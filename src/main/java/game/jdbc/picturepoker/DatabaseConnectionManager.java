@@ -1,11 +1,11 @@
-package main.picturepoker.jdbc;
+package game.jdbc.picturepoker;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
-//Fresh from the example
+//Fresh from the inclass example
 public class DatabaseConnectionManager {
     private final String url;
     private final Properties properties;

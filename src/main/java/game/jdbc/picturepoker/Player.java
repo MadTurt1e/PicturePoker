@@ -1,8 +1,8 @@
 // this is where the file is located
-package main.picturepoker.jdbc;
+package game.jdbc.picturepoker;
 
 // this is effectively the C include thing
-import main.picturepoker.jdbc.util.DataTransferObject;
+import game.jdbc.picturepoker.util.DataTransferObject;
 
 public class Player implements DataTransferObject {
     //Special player ID - not used in the sample code
@@ -52,14 +52,6 @@ public class Player implements DataTransferObject {
         this.passcode = passcode;
     }
 
-    public int getGamesPlayed() {
-        return gamesPlayed;
-    }
-
-    public void setGamesPlayed(int gamesPlayed) {
-        this.gamesPlayed = gamesPlayed;
-    }
-
     public int getFirstPlaces() {
         return first_places;
     }
@@ -77,11 +69,11 @@ public class Player implements DataTransferObject {
     }
 
     public int getThirdPlaces() {
-        return thirdPlaces;
+        return third_places;
     }
 
     public void setThirdPlaces(int thirdPlaces) {
-        this.thirdPlaces = thirdPlaces;
+        this.third_places = thirdPlaces;
     }
 
     public int getFourthPlaces() {
@@ -134,13 +126,13 @@ public class Player implements DataTransferObject {
 
     // Game functions
     public void raise(){
-        current_bet = getBet();
-        if(current_bet >= 5 || getTokens() < 1){
+        bet = getBet();
+        if(bet >= 5 || getTokens() < 1){
             // Invalid bet, do not raise
-            System.out.println("Player: Could not raise- Bet already max or no more tokens")
+            System.out.println("Player: Could not raise- Bet already max or no more tokens");
         }
         else{
-            setBet(current_bet + 1);
+            setBet(bet + 1);
             setTokens(getTokens() - 1);
         }
     }
@@ -150,15 +142,15 @@ public class Player implements DataTransferObject {
     @Override
     public String toString() {
         return "Player{" +
-                "name='" + name + '\'' +
-                ", password='" + password + '\'' +
-                ", gamesPlayed=" + gamesPlayed +
+                "p_ID=" + p_ID +
+                ", name='" + name + '\'' +
+                ", passcode='" + passcode + '\'' +
+                ", dollars=" + dollars +
                 ", first_places=" + first_places +
                 ", second_places=" + second_places +
-                ", third_places=" + thirds +
-                ", fourth_places=" + fourths +
+                ", third_places=" + third_places +
+                ", fourth_places=" + fourth_places +
                 ", lifetime_tokens=" + lifetime_tokens +
-                ", dollars=" + dollars +
                 ", tokens=" + tokens +
                 ", bet=" + bet +
                 ", rounds_won=" + rounds_won +

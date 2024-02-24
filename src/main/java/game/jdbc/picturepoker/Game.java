@@ -1,6 +1,6 @@
-package main.picturepoker.jdbc;
+package game.jdbc.picturepoker;
 
-import main.picturepoker.jdbc.util.DataTransferObject;
+import game.jdbc.picturepoker.util.DataTransferObject;
 
 public class Game implements DataTransferObject
 {

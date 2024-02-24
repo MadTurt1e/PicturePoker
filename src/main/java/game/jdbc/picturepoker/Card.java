@@ -1,5 +1,5 @@
 // this is where the file is located
-package main.picturepoker.jdbc;
+package game.jdbc.picturepoker;
 
 public class Card {
     // Final to insure that the suit is not changed after a card is created

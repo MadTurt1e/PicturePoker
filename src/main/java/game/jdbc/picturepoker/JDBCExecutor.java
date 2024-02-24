@@ -1,9 +1,4 @@
-package main.picturepoker.jdbc;
-
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+package game.jdbc.picturepoker;
 
 public class JDBCExecutor {
     public static void main (String[]args){

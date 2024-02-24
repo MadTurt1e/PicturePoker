@@ -4,5 +4,5 @@ WORKDIR /project
 RUN mvn -e package
 
 FROM eclipse-temurin:latest
-COPY --from=build /project/target /app/target
-ENTRYPOINT java -jar /app/target/picture_poker.jar
+COPY --from=build /project/target/picture_poker_alpha.jar /app/picturepoker.jar
+ENTRYPOINT java -jar /app/picturepoker.jar

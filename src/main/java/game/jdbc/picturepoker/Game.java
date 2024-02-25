@@ -4,11 +4,13 @@ import game.jdbc.picturepoker.util.DataTransferObject;
 
 public class Game implements DataTransferObject
 {
-    private int g_id;
-    private String p1;
-    private String p2;
-    private String p3;
-    private String p4;
+    private long g_id;
+
+    //players 1 through 4 will be stored as the player ID from now on.
+    private long p1;
+    private long p2;
+    private long p3;
+    private long p4;
     private int cur_round;
     private int num_rounds;
     private int active_players;
@@ -17,43 +19,43 @@ public class Game implements DataTransferObject
     private String winner;
 
     @Override
-    public int getID() {
+    public long getID() {
         return g_id;
     }
 
-    public void setID(int g_id) {
+    public void setID(long g_id) {
         this.g_id = g_id;
     }
 
-    public String getP1() {
+    public long getP1() {
         return p1;
     }
 
-    public void setP1(String p1) {
+    public void setP1(long p1) {
         this.p1 = p1;
     }
 
-    public String getP2() {
+    public long getP2() {
         return p2;
     }
 
-    public void setP2(String p2) {
+    public void setP2(long p2) {
         this.p2 = p2;
     }
 
-    public String getP3() {
+    public long getP3() {
         return p3;
     }
 
-    public void setP3(String p3) {
+    public void setP3(long p3) {
         this.p3 = p3;
     }
 
-    public String getP4() {
+    public long getP4() {
         return p4;
     }
 
-    public void setP4(String p4) {
+    public void setP4(long p4) {
         this.p4 = p4;
     }
 
@@ -118,7 +120,7 @@ public class Game implements DataTransferObject
                 ", active_players=" + active_players +
                 ", pot_quantity=" + pot_quantity +
                 ", difficulty=" + difficulty +
-                ', winner= ' + winner +
+                ", winner= " + winner +
                 '}';
     }
 

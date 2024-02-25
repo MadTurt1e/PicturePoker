@@ -27,11 +27,11 @@ public class Player implements DataTransferObject {
 
 
     @Override
-    public int getID() {
+    public long getID() {
         return p_ID;
     }
 
-    public void setID(int playerID) {
+    public void setID(long playerID) {
         this.p_ID = p_ID;
     }
 
@@ -142,7 +142,8 @@ public class Player implements DataTransferObject {
         return getFirstPlaces() + getSecondPlaces() + getThirdPlaces() + getFourthPlaces();
     }
 
-    public int getAvgLifetimeTokens(){
+    //Gets the average lifetime tokens - we'd expect this to be a decimal.
+    public double getAvgLifetimeTokens(){
         return (double)getLifetimeTokens()/getGamesPlayed();
     }
 
@@ -152,7 +153,7 @@ public class Player implements DataTransferObject {
     public String toString() {
         return "Player{" +
                 "p_ID=" + p_ID +
-                ", name='" + name + '\'' +
+                ", name='" + p_name + '\'' +
                 ", passcode='" + passcode + '\'' +
                 ", dollars=" + dollars +
                 ", first_places=" + first_places +

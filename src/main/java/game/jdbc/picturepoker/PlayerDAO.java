@@ -11,34 +11,33 @@ public class PlayerDAO extends DataAccessObject<Player>{
     private static final String GET_PLAYER_BY_ID = "SELECT "
     + "p_id, p_name, passcode, dollars, first_places, second_places, third_places, "
     + "fourth_places, lifetime_tokens, tokens, bet, rounds_won FROM player WHERE p_id = ?";
-    private static final String CREATE_NEW_PLAYER = "INSERT INTO player (p_name, password) VALUES (?, ?)"
+    private static final String CREATE_NEW_PLAYER = "INSERT INTO player (p_name, password) VALUES (?, ?)";
     private static final String UPDATE_PLAYER_BY_ID = "UPDATE player SET ? = ? WHERE p_id = ?";
 
     public PlayerDAO(Connection connection){
         super(connection);
     }
 
-    @Override
     public Player findById(long id){
         Player player = new Player();
         try(PreparedStatement statement = this.connection.prepareStatement(GET_PLAYER_BY_ID);){
             statement.setLong(1, id);
             ResultSet rs = statement.executeQuery();
             while(rs.next()){
-                player.setPID(rs.getLong("p_id"));
-                player.setPName(rs.getString("p_name"));
+                player.setID(rs.getLong("p_id"));
+                player.setPlayerName(rs.getString("p_name"));
                 player.setPasscode(rs.getString("passcode"));
-                player.setDollars(rs.getLong("dollars"));
+                player.setDollars(rs.getInt("dollars"));
 
-                player.setFirstPlaces(rs.getLong("first_places"));
-                player.setSecondPlaces(rs.getLong("second_places"));
-                player.setThirdPlaces(rs.getLong("third_places"));
-                player.setFourthPlaces(rs.getLong("fourth_places"));
-                player.setLifetimeTokens(rs.getLong("lifetime_tokens"));
+                player.setFirstPlaces(rs.getInt("first_places"));
+                player.setSecondPlaces(rs.getInt("second_places"));
+                player.setThirdPlaces(rs.getInt("third_places"));
+                player.setFourthPlaces(rs.getInt("fourth_places"));
+                player.setLifetimeTokens(rs.getInt("lifetime_tokens"));
 
-                player.setTokens(rs.getLong("tokens"));
-                player.setBet(rs.getLong("bet"));
-                player.setRounds_won(rs.getLong("rounds_won"));
+                player.setTokens(rs.getInt("tokens"));
+                player.setBet(rs.getInt("bet"));
+                player.setRoundsWon(rs.getInt("rounds_won"));
             }
         }
         catch (SQLException e) {
@@ -67,9 +66,9 @@ public class PlayerDAO extends DataAccessObject<Player>{
         try(PreparedStatement statement = this.connection.prepareStatement(UPDATE_PLAYER_BY_ID)){
             statement.setString(1, attribute);
             statement.setLong(2, value);
-            statement.setLong(3, Player.getID());
+            statement.setLong(3, dto.getID());
             statement.execute();
-            return this.findById(dto);
+            return dto;
         }
         catch(SQLException e){
             e.printStackTrace();
@@ -77,14 +76,14 @@ public class PlayerDAO extends DataAccessObject<Player>{
         }
     }
 
-    @Override
+
     public Player update_string(String attribute, String data, Player dto){
         try(PreparedStatement statement = this.connection.prepareStatement(UPDATE_PLAYER_BY_ID)){
             statement.setString(1, attribute);
             statement.setString(2, data);
-            statement.setLong(3, Player.getID());
+            statement.setLong(3, dto.getID());
             statement.execute();
-            return this.findById(dto);
+            return dto;
         }
         catch(SQLException e){
             e.printStackTrace();

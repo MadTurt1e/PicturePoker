@@ -1,5 +1,6 @@
 INSERT INTO player (p_id, p_name, password)
 VALUES
+(0, NULL, "password")
 (1, "MarioMario", "AhSpaghetti"),
 (2, "WarioMan", "MoneyMoneyMoney"),
 (3, "JeffreyW", "securepassword"),

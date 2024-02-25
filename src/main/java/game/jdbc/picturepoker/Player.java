@@ -7,7 +7,7 @@ import game.jdbc.picturepoker.util.DataTransferObject;
 public class Player implements DataTransferObject {
     //Special player ID - not used in the sample code
     private int p_ID;
-    private String name;
+    private String p_name;
     private String passcode;
     private int dollars;
 
@@ -27,21 +27,21 @@ public class Player implements DataTransferObject {
 
 
     @Override
-    public int getID() {
+    public long getID() {
         return p_ID;
     }
 
-    public void setID(int playerID) {
+    public void setID(long playerID) {
         this.p_ID = p_ID;
     }
 
     // Getters and Setters
-    public String getName() {
-        return name;
+    public String getPlayerName() {
+        return p_name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setPlayerName(String name) {
+        this.p_name = name;
     }
 
     public String getPasscode() {
@@ -116,11 +116,11 @@ public class Player implements DataTransferObject {
         this.bet = bet;
     }
 
-    public int getRounds_won() {
+    public int getRoundsWon() {
         return rounds_won;
     }
 
-    public void setRounds_won(int rounds_won) {
+    public void setRoundsWon(int rounds_won) {
         this.rounds_won = rounds_won;
     }
 
@@ -137,13 +137,23 @@ public class Player implements DataTransferObject {
         }
     }
 
+    // Statistic aggregation functions
+    public int getGamesPlayed(){
+        return getFirstPlaces() + getSecondPlaces() + getThirdPlaces() + getFourthPlaces();
+    }
+
+    //Gets the average lifetime tokens - we'd expect this to be a decimal.
+    public double getAvgLifetimeTokens(){
+        return (double)getLifetimeTokens()/getGamesPlayed();
+    }
+
     //ToString thing
 
     @Override
     public String toString() {
         return "Player{" +
                 "p_ID=" + p_ID +
-                ", name='" + name + '\'' +
+                ", name='" + p_name + '\'' +
                 ", passcode='" + passcode + '\'' +
                 ", dollars=" + dollars +
                 ", first_places=" + first_places +

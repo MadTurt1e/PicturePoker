@@ -13,9 +13,11 @@ public abstract class DataAccessObject <T extends DataTransferObject> {
         this.connection = connection;
     }
 
-    public abstract T findById(T dto);
+    public abstract T findById(long dto);
 
     public abstract T create(T dto);
 
-    public abstract T update(T dto);
+    public abstract T update_long(String attribute, long value, T dto);
+
+    public abstract T update_string(String attribute, String data, T dto);
 }

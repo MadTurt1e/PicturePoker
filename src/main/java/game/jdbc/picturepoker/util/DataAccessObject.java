@@ -1,6 +1,4 @@
-package main.picturepoker.jdbc.util;
-
-import main.picturepoker.jdbc.util.DataTransferObject;
+package game.jdbc.picturepoker.util;
 
 import java.sql.*;
 

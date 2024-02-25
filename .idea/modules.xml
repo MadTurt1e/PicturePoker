@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/PicturePoker.iml" filepath="$PROJECT_DIR$/PicturePoker.iml" />
+      <module fileurl="file://$PROJECT_DIR$/picturepoker_app.iml" filepath="$PROJECT_DIR$/picturepoker_app.iml" />
     </modules>
   </component>
 </project>

@@ -3,7 +3,7 @@ CREATE SEQUENCE player_seq start with 100;
 CREATE TABLE player
 (
     p_id bigint NOT NULL DEFAULT nextval('player_seq'),
-    p_name varchar(50) NOT NULL UNIQUE,
+    p_name varchar(50) UNIQUE,
     passcode varchar(50) NOT NULL,
     dollars int NOT NULL DEFAULT 50,
 

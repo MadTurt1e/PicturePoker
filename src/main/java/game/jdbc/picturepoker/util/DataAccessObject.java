@@ -17,5 +17,7 @@ public abstract class DataAccessObject <T extends DataTransferObject> {
 
     public abstract T create(T dto);
 
-    public abstract T update(T dto);
+    public abstract T update_long(String attribute, long value, T dto);
+
+    public abstract T update_string(String attribute, string data, T dto);
 }

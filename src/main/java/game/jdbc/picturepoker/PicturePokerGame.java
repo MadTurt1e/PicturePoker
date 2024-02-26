@@ -18,10 +18,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @SpringBootApplication
 @RestController
 public class PicturePokerGame {
-    @GetMapping("/helloClass")
-    public String helloClass() {
-        System.out.println("HELLO VAIBHAV");
-        return "Hello Vaibhav";
+    @GetMapping("/helloWorld")
+    public String helloWorld() {
+        System.out.println("Hello, World!");
     }
 
     @GetMapping("/getByPlayerName/{playerName}")

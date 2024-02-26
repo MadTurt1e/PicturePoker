@@ -13,7 +13,7 @@ public class PlayerDAO extends DataAccessObject<Player>{
     + "fourth_places, lifetime_tokens, tokens, bet, rounds_won FROM player WHERE p_id = ?";
     private static final String CREATE_NEW_PLAYER = "INSERT INTO player (p_name, password) VALUES (?, ?)";
     private static final String UPDATE_PLAYER_BY_ID = "UPDATE player SET ? = ? WHERE p_id = ?";
-
+    private static final String GET_ID_BY_NAME = "SELECT p_id FROM player WHERE p_name = ?";
     public PlayerDAO(Connection connection){
         super(connection);
     }
@@ -53,7 +53,23 @@ public class PlayerDAO extends DataAccessObject<Player>{
             statement.setString(1, dto.getPlayerName());
             statement.setString(2, dto.getPasscode());
             statement.execute();
-            return this.findById(dto.getID());
+
+            //this should never go wrong - at this point, the player either is there, or isn't.
+            try(PreparedStatement getNewPlayer = this.connection.prepareStatement(GET_ID_BY_NAME);){
+                // We make a new SQL statement, and we want to go from player name to id
+                statement.setString(1, dto.getPlayerName());
+                ResultSet rs = statement.executeQuery();
+
+                // and this statement gets the player id and returns it.
+                long newPlayerID = rs.getLong("p_id");
+
+                // now we create the player that we're returning
+                Player player = new Player();
+                player.setPlayerName(dto.getPlayerName());
+                player.setPasscode(dto.getPasscode());
+                player.setID(newPlayerID);
+                return player;
+            }
         }
         catch (SQLException e) {
             e.printStackTrace();

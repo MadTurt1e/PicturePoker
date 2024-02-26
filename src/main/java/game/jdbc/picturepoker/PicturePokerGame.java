@@ -28,7 +28,7 @@ public class PicturePokerGame {
     public Player getByPlayerName(@PathVariable("playerName") String playerName) {
         System.out.println(playerName);
         DatabaseConnectionManager dcm = new DatabaseConnectionManager("db",
-                "rps2", "postgres", "password");
+                "picturepoker", "postgres", "password");
         Player player = new Player();
         player.setPlayerName(playerName);
         try {
@@ -57,7 +57,6 @@ public class PicturePokerGame {
             PlayerDAO playerDAO = new PlayerDAO(connection);
             player.setPlayerName(inputMap.get("playerName"));
             player.setPasscode(inputMap.get("password"));
-            player.setRoundsWon(Integer.parseInt(inputMap.get("win")));
             player = playerDAO.create(player);
             System.out.println(player);
         }

@@ -4,14 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f2868c71-a371-4f94-b97f-36b9e72882c0" name="Changes" comment="Springboot sample code fixed, and python files created to create sample picturepoker database">
-      <change afterPath="$PROJECT_DIR$/Database SQL/databaseCreator.py" afterDir="false" />
+    <list default="true" id="f2868c71-a371-4f94-b97f-36b9e72882c0" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Database SQL/game.sql" beforeDir="false" afterPath="$PROJECT_DIR$/Database SQL/game.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Database SQL/setup.sql" beforeDir="false" afterPath="$PROJECT_DIR$/Database SQL/setup.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/PicturePoker/main/picturepoker/jdbc/PicturePokerGame.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/PicturePokerGame.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/PicturePokerGame.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/PlayerDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/PlayerDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Database SQL/suits.sql" beforeDir="false" afterPath="$PROJECT_DIR$/Database SQL/suits.sql" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -92,7 +87,7 @@
       <workItem from="1708910710870" duration="626000" />
       <workItem from="1708911404335" duration="329000" />
       <workItem from="1708922870029" duration="2001000" />
-      <workItem from="1708969599940" duration="3098000" />
+      <workItem from="1708969599940" duration="3506000" />
     </task>
     <task id="LOCAL-00001" summary="Updated player class to have a hand&#10;Updated card to not be final">
       <option name="closed" value="true" />
@@ -118,7 +113,15 @@
       <option name="project" value="LOCAL" />
       <updated>1708924845495</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Springboot sample code fixed, and python files created to create sample picturepoker database&#10;Also, player functionality fixed so it returns an actual working player with an actual working ID.">
+      <option name="closed" value="true" />
+      <created>1708972785036</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1708972785036</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -128,6 +131,8 @@
     <MESSAGE value="Updated player class to have a hand&#10;Updated card to not be final" />
     <MESSAGE value="Dependancies have been auto added to the pom.xml file thanks to IntelliJ. The file will be able to run now." />
     <MESSAGE value="SpringBoot sample code added" />
-    <option name="LAST_COMMIT_MESSAGE" value="SpringBoot sample code added" />
+    <MESSAGE value="Springboot sample code fixed, and python files created to create sample picturepoker database" />
+    <MESSAGE value="Springboot sample code fixed, and python files created to create sample picturepoker database&#10;Also, player functionality fixed so it returns an actual working player with an actual working ID." />
+    <option name="LAST_COMMIT_MESSAGE" value="Springboot sample code fixed, and python files created to create sample picturepoker database&#10;Also, player functionality fixed so it returns an actual working player with an actual working ID." />
   </component>
 </project>

@@ -1,4 +1,4 @@
-DROP TABLE suit;
+
 
 CREATE TABLE suit(
     suit varchar(20) NOT NULL,

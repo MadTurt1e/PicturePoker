@@ -5,7 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f2868c71-a371-4f94-b97f-36b9e72882c0" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/Card.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/Card.java" afterDir="false" />
     </list>
@@ -46,7 +45,7 @@
     <option name="stateVersion" value="1" />
   </component>
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="DEPENDENCY_CHECKER_PROBLEMS_TAB" />
+    <option name="selectedTabId" value="ProjectErrors" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 6
@@ -89,7 +88,7 @@
       <updated>1708895454397</updated>
       <workItem from="1708895455687" duration="55000" />
       <workItem from="1708895678958" duration="2908000" />
-      <workItem from="1708908821832" duration="1600000" />
+      <workItem from="1708908821832" duration="1941000" />
     </task>
     <servers />
   </component>

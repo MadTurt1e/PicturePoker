@@ -14,7 +14,13 @@ public class Card {
         STAR(5), MARIO(4), LUIGI(3), FIRE_FLOWER(2), MUSHROOM(1), CLOUD(0);
         public final int strength;
     }
-
+    
+    // Default constructor- Generates random suit
+    public Card(){
+        this.suit = selectRandomSuit();
+        this.toChange = false;
+    }
+    
     // Constructor
     public Card(Suit suit) {
         this.suit = suit;
@@ -42,20 +48,22 @@ public class Card {
 
     public void changeSuit(){
         if(toChange){
-            int newStrength = (int)(Math.random() * 6);
-            // Mitigate potential out of bounds errors with math.random
-            if(newStrength > 5 || newStrength < 0){
-                newStrength = 0;
-            }
-            for(Suit s : values()){
-                if(s.strength = newStrength){
-                    this.suit = s;
-                    break;
-                }
-            }
+            suit = selectRandomSuit();
             toChange = false;
         }
     }
+    
+    private Suit selectRandomSuit(){
+        int newStrength = (int)(Math.random() * 6);
+        for(Suit s : values()){
+            if(s.strength = newStrength){
+                return s;
+            }
+        }
+        // Mitigate potential out of bounds errors with math.random with failsafe
+        return CLOUD;
+    }
+    
     // String representation of the card
     // Might be useful for UI, if not we can remove it
     @Override

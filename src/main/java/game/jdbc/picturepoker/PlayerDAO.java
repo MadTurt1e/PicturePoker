@@ -47,6 +47,30 @@ public class PlayerDAO extends DataAccessObject<Player>{
         return player;
     }
 
+    public long findIDByName(String name){
+        try(PreparedStatement getNewPlayer = this.connection.prepareStatement(GET_ID_BY_NAME);){
+            // We make a new SQL statement, and we want to go from player name to id
+            statement.setString(1, name);
+            ResultSet rs = statement.executeQuery();
+
+            // and this statement gets the player id and returns it
+            long foundID = rs.getLong("p_id");
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+
+        // returned
+        return foundID;
+    }
+
+    //Way to find the player by name, instead of by ID, which seems to be more "colloquial"
+    public Player findByName(String name){
+        long playerID = findIDByName(name);
+        return findById(playerID);
+    }
+
     @Override
     public Player create(Player dto){
         try(PreparedStatement statement = this.connection.prepareStatement(CREATE_NEW_PLAYER);){
@@ -55,20 +79,14 @@ public class PlayerDAO extends DataAccessObject<Player>{
             statement.execute();
 
             //this should never go wrong - at this point, the player either is there, or isn't.
-            try(PreparedStatement getNewPlayer = this.connection.prepareStatement(GET_ID_BY_NAME);){
-                // We make a new SQL statement, and we want to go from player name to id
-                statement.setString(1, dto.getPlayerName());
-                ResultSet rs = statement.executeQuery();
+            long newPlayerID = findIDByName(dto.getPlayerName);
 
-                // and this statement gets the player id and returns it.
-                long newPlayerID = rs.getLong("p_id");
-
-                // now we create the player that we're returning
-                Player player = new Player();
-                player.setPlayerName(dto.getPlayerName());
-                player.setPasscode(dto.getPasscode());
-                player.setID(newPlayerID);
-                return player;
+            // now we create the player that we're returning
+            Player player = new Player();
+            player.setPlayerName(dto.getPlayerName());
+            player.setPasscode(dto.getPasscode());
+            player.setID(newPlayerID);
+            return player;
             }
         }
         catch (SQLException e) {

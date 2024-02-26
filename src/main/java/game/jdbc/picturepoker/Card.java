@@ -3,7 +3,9 @@ package game.jdbc.picturepoker;
 
 public class Card {
     // Final to insure that the suit is not changed after a card is created
-    private final Suit suit;
+    private Suit suit;
+
+    private boolean toChange;
 
     // Enum for the suit of the card
     public enum Suit {

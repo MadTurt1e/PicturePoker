@@ -1,6 +1,7 @@
 package game.jdbc.picturepoker;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import jdk.internal.misc.InnocuousThread;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @RestController
 public class PicturePokerGame {
     public static void main (String[]args){
-        SpringApplication.run(RpsApplication.class, args);
+        SpringApplication.run(PicturePokerGame.class, args);
     }
 }

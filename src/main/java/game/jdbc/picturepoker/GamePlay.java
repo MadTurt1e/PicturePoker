@@ -1,6 +1,6 @@
 package game.jdbc.picturepoker;
 
-public class gamePlay {
+public class GamePlay {
 
     //Relavant variables - current game, and the list of players
     private Game curGame;
@@ -38,12 +38,12 @@ public class gamePlay {
         }
         return playerList[winner];
     }
-
+    
     private int determinePayout(Player player){
         return 0;
     }
 
-    public Game gameTurn(long gameID) {
+    public Game gameSeq(long gameID) {
         DatabaseConnectionManager dcm = new DatabaseConnectionManager("db", "picturepoker", "postgres", "password");
         Connection connection = dcm.getConnection();
         try {
@@ -73,7 +73,6 @@ public class gamePlay {
                 executeLuigi();
 
                 // we can do a check on the number of rounds at this point to see if the game is ongoing.
-
                 //we should increment the current round and keep on going.
                 curGame.setCurRound(curGame.getCurRound() + 1);
 

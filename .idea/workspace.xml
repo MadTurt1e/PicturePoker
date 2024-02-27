@@ -5,12 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f2868c71-a371-4f94-b97f-36b9e72882c0" name="Changes" comment="Updated files, fixed errors. &#10;Luigi class exists - AI to be completed.">
-      <change afterPath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/Luigi.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/PicturePokerGame.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/PicturePokerGame.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/PlayerDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/PlayerDAO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/gamePlay.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/gamePlay.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/gamePlay.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/GamePlay.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -102,7 +99,7 @@
       <workItem from="1708911404335" duration="329000" />
       <workItem from="1708922870029" duration="2001000" />
       <workItem from="1708969599940" duration="3821000" />
-      <workItem from="1709059331012" duration="2168000" />
+      <workItem from="1709059331012" duration="2563000" />
     </task>
     <task id="LOCAL-00001" summary="Updated player class to have a hand&#10;Updated card to not be final">
       <option name="closed" value="true" />
@@ -144,7 +141,15 @@
       <option name="project" value="LOCAL" />
       <updated>1708973133432</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Updated files, fixed errors. &#10;Luigi class exists - AI to be completed.">
+      <option name="closed" value="true" />
+      <created>1709061511569</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1709061511570</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

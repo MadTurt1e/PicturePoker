@@ -85,9 +85,9 @@ public class PicturePokerGame {
             game.setP3(playerDAO.findIDByName(inputMap.get("p3Name")));
             game.setP4(playerDAO.findIDByName(inputMap.get("p4Name")));
 
-            game.setRounds(Integer.parseInt(inputMap.get("rounds")));
-            game.setBet(Integer.parseInt(inputMap.get("bet")));
-            game = gameDAO.create(game);
+            game.setNumRounds(Integer.parseInt(inputMap.get("rounds")));
+            game.setPotQuantity(Integer.parseInt(inputMap.get("potQuantity")));
+            game = gamedao.create(game);
             //once all the necessary values are created, we can make the game. 
 
             System.out.println(game);
@@ -101,7 +101,11 @@ public class PicturePokerGame {
 
     @PostMapping("/playGame/{gameID}")
     public Game playGame (@PathVariable("gameID") String gameID){
-        
+        GamePlay gamePlay = new GamePlay();
+        Game game = gamePlay.gameSeq(Long.parseLong(gameID));
+
+        System.out.println(game);
+        return game;
     }
     public static void main (String[]args){
         SpringApplication.run(PicturePokerGame.class, args);

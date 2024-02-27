@@ -1,4 +1,4 @@
-CREATE TABLE card(
+CREATE TABLE player_card(
     p_id bigint NOT NULL,
     hand_pos int NOT NULL,
     to_change boolean NOT NULL DEFAULT FALSE,

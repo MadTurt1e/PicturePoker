@@ -12,7 +12,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="picturepoker_app" options="-parameters" />
+      <module name="picturepoker_app" options="-parameters --add-exports java.base/jdk.internal.misc=ALL-UNNAMED" />
     </option>
   </component>
 </project>

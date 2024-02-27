@@ -1,5 +1,12 @@
 package game.jdbc.picturepoker;
 
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Map;
+
 public class GamePlay {
 
     //Relavant variables - current game, and the list of players
@@ -45,8 +52,9 @@ public class GamePlay {
 
     public Game gameSeq(long gameID) {
         DatabaseConnectionManager dcm = new DatabaseConnectionManager("db", "picturepoker", "postgres", "password");
-        Connection connection = dcm.getConnection();
         try {
+            Connection connection = dcm.getConnection();
+
             //in the game, the first thing we want to do is get DAO objects to evyerthing
             GameDAO gamedao = new GameDAO(connection);
             PlayerDAO playerdao = new PlayerDAO(connection);
@@ -90,7 +98,8 @@ public class GamePlay {
                 determinePayout(playerList[i]);
             }
 
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             e.printStackTrace();
         }
 

@@ -97,6 +97,11 @@ public class PicturePokerGame {
 
         return game;
     }
+
+    @PostMapping("/playGame/{gameID}")
+    public Game playGame (@PathVariable("gameID") String gameID){
+        
+    }
     public static void main (String[]args){
         SpringApplication.run(PicturePokerGame.class, args);
     }

@@ -48,13 +48,14 @@ public class PlayerDAO extends DataAccessObject<Player>{
     }
 
     public long findIDByName(String name){
-        try(PreparedStatement getNewPlayer = this.connection.prepareStatement(GET_ID_BY_NAME);){
+        long foundID = 0;
+        try(PreparedStatement statement = this.connection.prepareStatement(GET_ID_BY_NAME);){
             // We make a new SQL statement, and we want to go from player name to id
             statement.setString(1, name);
             ResultSet rs = statement.executeQuery();
 
             // and this statement gets the player id and returns it
-            long foundID = rs.getLong("p_id");
+            foundID = rs.getLong("p_id");
         }
         catch (SQLException e){
             e.printStackTrace();
@@ -79,7 +80,7 @@ public class PlayerDAO extends DataAccessObject<Player>{
             statement.execute();
 
             //this should never go wrong - at this point, the player either is there, or isn't.
-            long newPlayerID = findIDByName(dto.getPlayerName);
+            long newPlayerID = findIDByName(dto.getPlayerName());
 
             // now we create the player that we're returning
             Player player = new Player();
@@ -87,7 +88,6 @@ public class PlayerDAO extends DataAccessObject<Player>{
             player.setPasscode(dto.getPasscode());
             player.setID(newPlayerID);
             return player;
-            }
         }
         catch (SQLException e) {
             e.printStackTrace();

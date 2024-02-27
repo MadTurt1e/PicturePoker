@@ -21,6 +21,7 @@ public class PicturePokerGame {
     @GetMapping("/helloWorld")
     public String helloWorld() {
         System.out.println("Hello, World!");
+        return("HELLO WORLD");
     }
 
     @GetMapping("/getByPlayerName/{playerName}")
@@ -53,11 +54,11 @@ public class PicturePokerGame {
         Player player = new Player();
         try {
             Connection connection = dcm.getConnection();
-            PlayerDAO playerDAO = new PlayerDAO(connection);
+            PlayerDAO playerdao = new PlayerDAO(connection);
             // essentially, a (new) player consists of a player name and a password, and that is it. 
             player.setPlayerName(inputMap.get("playerName"));
             player.setPasscode(inputMap.get("password"));
-            player = playerDAO.create(player);
+            player = playerdao.create(player);
             System.out.println(player);
         }
         catch(SQLException e) {

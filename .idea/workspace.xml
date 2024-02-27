@@ -4,14 +4,25 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f2868c71-a371-4f94-b97f-36b9e72882c0" name="Changes" comment="">
+    <list default="true" id="f2868c71-a371-4f94-b97f-36b9e72882c0" name="Changes" comment="Updated files, fixed errors. &#10;Luigi class exists - AI to be completed.">
+      <change afterPath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/Luigi.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Database SQL/setup.sql" beforeDir="false" afterPath="$PROJECT_DIR$/Database SQL/setup.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/PicturePokerGame.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/PicturePokerGame.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/PlayerDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/PlayerDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/gamePlay.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/gamePlay.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
@@ -24,6 +35,9 @@
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 6
@@ -44,7 +58,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "Spring Boot.PicturePokerGame.executor": "Run",
-    "git-widget-placeholder": "Game__implementation",
+    "git-widget-placeholder": "Game__Turn",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "//wsl.localhost/Ubuntu/home/jeffreyw/picturepoker",
@@ -53,7 +67,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "reference.settings.project.maven.repository.indices",
+    "settings.editor.selected.configurable": "reference.settingsDialog.application.dockerMachine",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -88,6 +102,7 @@
       <workItem from="1708911404335" duration="329000" />
       <workItem from="1708922870029" duration="2001000" />
       <workItem from="1708969599940" duration="3821000" />
+      <workItem from="1709059331012" duration="2168000" />
     </task>
     <task id="LOCAL-00001" summary="Updated player class to have a hand&#10;Updated card to not be final">
       <option name="closed" value="true" />
@@ -135,6 +150,17 @@
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Updated player class to have a hand&#10;Updated card to not be final" />
     <MESSAGE value="Dependancies have been auto added to the pom.xml file thanks to IntelliJ. The file will be able to run now." />
@@ -142,6 +168,7 @@
     <MESSAGE value="Springboot sample code fixed, and python files created to create sample picturepoker database" />
     <MESSAGE value="Springboot sample code fixed, and python files created to create sample picturepoker database&#10;Also, player functionality fixed so it returns an actual working player with an actual working ID." />
     <MESSAGE value="Removed drop table suits&#10;Dropping tables is an exercise left to the reader." />
-    <option name="LAST_COMMIT_MESSAGE" value="Removed drop table suits&#10;Dropping tables is an exercise left to the reader." />
+    <MESSAGE value="Updated files, fixed errors. &#10;Luigi class exists - AI to be completed." />
+    <option name="LAST_COMMIT_MESSAGE" value="Updated files, fixed errors. &#10;Luigi class exists - AI to be completed." />
   </component>
 </project>

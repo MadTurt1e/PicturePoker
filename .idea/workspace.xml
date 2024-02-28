@@ -7,6 +7,11 @@
     <list default="true" id="f2868c71-a371-4f94-b97f-36b9e72882c0" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Database SQL/game.sql" beforeDir="false" afterPath="$PROJECT_DIR$/Database SQL/game.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/Card.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/Card.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/Game.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/Game.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/GameDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/GameDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/PlayerDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/PlayerDAO.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -16,7 +21,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="main" />
+        <entry key="$PROJECT_DIR$" value="Game_implementation" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -61,7 +66,7 @@
     "git-widget-placeholder": "Game__implementation",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "//wsl.localhost/Ubuntu/home/jeffreyw/picturepoker",
+    "last_opened_file_path": "//wsl.localhost/Ubuntu/home/jeffreyw/picturepoker/src/main/java/game/jdbc/picturepoker",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -104,6 +109,8 @@
       <workItem from="1708895678958" duration="2908000" />
       <workItem from="1708908821832" duration="2060000" />
       <workItem from="1708989342494" duration="166000" />
+      <workItem from="1709061698676" duration="950000" />
+      <workItem from="1709141903947" duration="3116000" />
     </task>
     <task id="LOCAL-00001" summary="Updated player class to have a hand&#10;Updated card to not be final">
       <option name="closed" value="true" />

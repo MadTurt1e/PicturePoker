@@ -48,21 +48,20 @@ public class PlayerDAO extends DataAccessObject<Player>{
     }
 
     public long findIDByName(String name){
-        try(PreparedStatement getNewPlayer = this.connection.prepareStatement(GET_ID_BY_NAME);){
+        try(PreparedStatement statement = this.connection.prepareStatement(GET_ID_BY_NAME);){
             // We make a new SQL statement, and we want to go from player name to id
             statement.setString(1, name);
             ResultSet rs = statement.executeQuery();
 
             // and this statement gets the player id and returns it
             long foundID = rs.getLong("p_id");
+            // Return statements can go into the try block
+            return foundID;
         }
         catch (SQLException e){
             e.printStackTrace();
             throw new RuntimeException(e);
         }
-
-        // returned
-        return foundID;
     }
 
     //Way to find the player by name, instead of by ID, which seems to be more "colloquial"
@@ -79,7 +78,7 @@ public class PlayerDAO extends DataAccessObject<Player>{
             statement.execute();
 
             //this should never go wrong - at this point, the player either is there, or isn't.
-            long newPlayerID = findIDByName(dto.getPlayerName);
+            long newPlayerID = findIDByName(dto.getPlayerName());
 
             // now we create the player that we're returning
             Player player = new Player();
@@ -112,7 +111,7 @@ public class PlayerDAO extends DataAccessObject<Player>{
 
 
     public Player update_string(String attribute, String data, Player dto){
-        try(PreparedStatement statement = this.connection.prepareStatement(UPDATE_PLAYER_BY_ID)){
+        try(PreparedStatement statement = this.connection.prepareStatement(UPDATE_PLAYER_BY_ID);){
             statement.setString(1, attribute);
             statement.setString(2, data);
             statement.setLong(3, dto.getID());

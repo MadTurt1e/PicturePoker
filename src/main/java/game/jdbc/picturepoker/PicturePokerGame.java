@@ -24,7 +24,7 @@ public class PicturePokerGame {
         return("HELLO WORLD");
     }
 
-    @GetMapping("/getByPlayerName/{playerName}")
+    @PostMapping("/getByPlayerName/{playerName}")
     public Player getByPlayerName(@PathVariable("playerName") String playerName) {
         System.out.println(playerName);
         DatabaseConnectionManager dcm = new DatabaseConnectionManager("db",

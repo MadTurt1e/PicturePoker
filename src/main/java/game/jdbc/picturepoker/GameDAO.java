@@ -25,7 +25,7 @@ public class GameDAO extends DataAccessObject<Game>{
             statement.setLong(1, id);
             ResultSet rs = statement.executeQuery();
             while(rs.next()){
-                game.setID(rs.getLong("g_id"));
+                game.setID(id);
                 game.setP1(rs.getLong("p1_id"));
                 game.setP2(rs.getLong("p2_id"));
                 game.setP3(rs.getLong("p3_id"));
@@ -35,7 +35,6 @@ public class GameDAO extends DataAccessObject<Game>{
                 game.setActivePlayers(rs.getInt("active_players"));
                 game.setPotQuantity(rs.getInt("pot_quantity"));
                 game.setDifficulty(rs.getInt("difficulty"));
-                game.setWinner(rs.getString("lifetime_tokens")); // TODO: Please check: are you sure this is how we calculate the winner?
             }
         }
         catch (SQLException e) {

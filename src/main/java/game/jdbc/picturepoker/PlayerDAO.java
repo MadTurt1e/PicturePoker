@@ -53,9 +53,10 @@ public class PlayerDAO extends DataAccessObject<Player>{
             // We make a new SQL statement, and we want to go from player name to id
             statement.setString(1, name);
             ResultSet rs = statement.executeQuery();
-
-            // and this statement gets the player id and returns it
-            foundID = rs.getLong("p_id");
+            while(rs.next()) {
+                // and this statement gets the player id and returns it
+                foundID = rs.getLong("p_id");
+            }
         }
         catch (SQLException e){
             e.printStackTrace();

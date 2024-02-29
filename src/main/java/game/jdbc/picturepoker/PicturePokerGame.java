@@ -24,18 +24,17 @@ public class PicturePokerGame {
         return("HELLO WORLD");
     }
 
-    @PostMapping("/getByPlayerName/{playerName}")
+    @GetMapping("/getByPlayerName/{playerName}")
     public Player getByPlayerName(@PathVariable("playerName") String playerName) {
         System.out.println(playerName);
-        DatabaseConnectionManager dcm = new DatabaseConnectionManager("db",
+        DatabaseConnectionManager dcm = new DatabaseConnectionManager("localhost",
                 "picturepoker", "postgres", "password");
         Player player = new Player();
-        player.setPlayerName(playerName);
         try {
             Connection connection = dcm.getConnection();
             PlayerDAO playerDAO = new PlayerDAO(connection);
 
-            player = playerDAO.findById(player.getID());
+            player = playerDAO.findByName(playerName);
             System.out.println(player);
         }
         catch(SQLException e) {
@@ -49,7 +48,7 @@ public class PicturePokerGame {
         System.out.println(json);
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, String> inputMap = objectMapper.readValue(json, Map.class);
-        DatabaseConnectionManager dcm = new DatabaseConnectionManager("db",
+        DatabaseConnectionManager dcm = new DatabaseConnectionManager("localhost",
                 "picturepoker", "postgres", "password");
         Player player = new Player();
         try {
@@ -72,7 +71,7 @@ public class PicturePokerGame {
         System.out.println(json);
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, String> inputMap = objectMapper.readValue(json, Map.class);
-        DatabaseConnectionManager dcm = new DatabaseConnectionManager("db",
+        DatabaseConnectionManager dcm = new DatabaseConnectionManager("localhost",
                 "picturepoker", "postgres", "password");
         Game game = new Game();
         try {
@@ -99,7 +98,7 @@ public class PicturePokerGame {
         return game;
     }
 
-    @PostMapping("/playGame/{gameID}")
+    @GetMapping("/playGame/{gameID}")
     public Game playGame (@PathVariable("gameID") String gameID){
         GamePlay gamePlay = new GamePlay();
         Game game = gamePlay.gameSeq(Long.parseLong(gameID));

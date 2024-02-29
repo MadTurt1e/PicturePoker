@@ -13,8 +13,14 @@ public class GamePlay {
     private Player[] playerList = new Player[4];
 
     private Player executeTurn(Player player) {
+        System.out.println("\n" + player.getPlayerName() + "'s Turn! ");
+
         // Step 1: Deal cards at random
         Card[] hand = new Card[5];
+        //initialize values
+        for (int i = 0; i < hand.length; ++i){
+            hand[i] = new Card();
+        }
 
         //update the hand of the player
         player.setHand(hand);
@@ -28,6 +34,7 @@ public class GamePlay {
 
 
         // Prints out the card outputs
+        System.out.println(player.getPlayerName() + "'s cards: ");
         for (int i = 0; i < hand.length; ++i) {
             System.out.println("Card " + i + ": " + hand[i]);
         }
@@ -40,12 +47,13 @@ public class GamePlay {
             try {
                 betCount = scan.nextInt();
                 if (betCount < 1 || betCount > 6){
-                    System.out.println("Bet must be between 1 and 6! ");
+                    System.out.println("Bet must be between 1 and 5! ");
                     continue;
                 }
                 break;
             }catch (java.util.InputMismatchException e) {
-                System.out.println("Bet must be between 1 and 6. ");
+                System.out.println("Bet must be between 1 and 5. ");
+                scan.nextLine();
             }
         }
         player.setBet(betCount);
@@ -60,9 +68,9 @@ public class GamePlay {
                 changeCard = scan.nextBoolean();
                 if (changeCard)
                     hand[i].setToChange(true);
-                break;
             }catch (java.util.InputMismatchException e) {
                 System.out.println("Player must input true or false!" );
+                scan.nextLine();
             }
         }
 
@@ -74,7 +82,7 @@ public class GamePlay {
         }
 
         // Step 4: Let the player cry at their new cards.
-        System.out.println("Here are your new cards! ");
+        System.out.println("Here are your new cards!");
 
 
         // return the player with the newfangled hand.
@@ -90,6 +98,10 @@ public class GamePlay {
         //I believe Luigi should be his own class.
         // The class will be referenced here - database accesses can be done whenever wanted - Luigi will essentially be a player.
         Card[] luigiHand = new Card[5];
+        //initialize values
+        for (int i = 0; i < luigiHand.length; ++i){
+            luigiHand[i] = new Card();
+        }
 
         // step 1: Get cards at random
         //This is already done by the card class.
@@ -100,11 +112,22 @@ public class GamePlay {
 
         // Step 2: Chose cards to swap out.
         //Luigi is physically cheating, so he always swaps out the third and fifth card and gets stars. How lucky.
-        luigiHand[2].setSuit(Card.Suit.STAR);
-        luigiHand[4].setSuit(Card.Suit.STAR);
+        luigiHand[2].setToChange(true);
+        luigiHand[4].setToChange(true);
 
         // Step 3: that's it.
+        for (int i = 0; i < luigiHand.length; ++i){
+            if (luigiHand[i].getToChange()) {
+                System.out.println("Luigi is changing out card " + i + "!");
+                luigiHand[i].setSuit(Card.Suit.STAR);
+            }
+        }
         luigi.setHand(luigiHand);
+
+
+        for (int i = 0; i < luigiHand.length; ++i) {
+            System.out.println("Card " + i + ": " + luigiHand[i]);
+        }
 
         //return luigi
         return luigi;
@@ -171,7 +194,6 @@ public class GamePlay {
 
     //score calculate, compare, and multiply the pots
     private int determinePayout(Player player, Player luigi){
-        System.out.println("Calculating Scores");
         int playerScore = playerScore(player);
         if (playerScore <= playerScore(luigi)){
             System.out.println(player.getPlayerName() + " did not beat Luigi. ");
@@ -217,7 +239,8 @@ public class GamePlay {
 
     private Player determineWinner(Player[] playerList){
         int winner = 0;
-        for (int i = 1; i < playerList.length; ++i){
+        for (int i = 0; i < playerList.length; ++i){
+            System.out.println(playerList[i].getPlayerName() + "had " + playerList[i].getTokens() + "tokens! ");
             if (playerList[i].getTokens() > playerList[winner].getTokens()){
                 winner = i;
             }
@@ -226,7 +249,7 @@ public class GamePlay {
     }
 
     public Game gameSeq(long gameID) {
-        DatabaseConnectionManager dcm = new DatabaseConnectionManager("db", "picturepoker", "postgres", "password");
+        DatabaseConnectionManager dcm = new DatabaseConnectionManager("localhost", "picturepoker", "postgres", "password");
         try {
             Connection connection = dcm.getConnection();
 
@@ -260,6 +283,7 @@ public class GamePlay {
                 Player luigi = new Player();
                 luigi = executeLuigi(luigi);
 
+                System.out.println("Calculating payouts");
                 //Now we run a function which pays out tokens compared to Luigi
                 for (Player player : playerList) {
                     player.setTokens(player.getTokens() + determinePayout(player, luigi));
@@ -277,9 +301,10 @@ public class GamePlay {
             //once we break out of the loop we can determine the winner.
             Player winner = determineWinner(playerList);
 
-            System.out.println("Congrats, " + winner.getPlayerName() + "has won! ");
+            System.out.println("\nCongrats, " + winner.getPlayerName() + " has won! ");
 
             //TODO: we should probably also update the game over here.
+            curGame.setWinner(winner.getPlayerName());
         }
         catch (SQLException e) {
             e.printStackTrace();

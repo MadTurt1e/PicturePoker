@@ -48,7 +48,7 @@ public class PlayerDAO extends DataAccessObject<Player>{
     }
 
     public long findIDByName(String name){
-        long foundID = 0;
+        long foundID;
         try(PreparedStatement statement = this.connection.prepareStatement(GET_ID_BY_NAME);){
             // We make a new SQL statement, and we want to go from player name to id
             statement.setString(1, name);

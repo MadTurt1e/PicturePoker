@@ -2,40 +2,35 @@ package game.jdbc.picturepoker;
 
 import game.jdbc.picturepoker.util.DataAccessObject;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.ArrayList;
 
 public class GameDAO extends DataAccessObject<Game>{
-    private static final String GET_GAME_BY_ID = "SELECT "
-    + "p1_id, p2_id, p3_id, p4_id, cur_round, num_rounds, active_players, pot_quantity, difficulty FROM game WHERE g_id = ?";
-    private static final String CREATE_NEW_GAME = "INSERT INTO game (p1_id, p2_id, p3_id, p4_id, "
-    + "num_rounds, active_players, pot_quantity, difficulty) VALUES (?, ?, ?, ?, ?, 4, ?, 0)";
+    private static final String GET_GAME_BY_GID = "SELECT cur_round, num_rounds, active_players, buy_in, pot_quantity, difficulty FROM game WHERE g_id = ?";
+    private static final String GET_PIDS_BY_GID = "SELECT p_id FROM players_in_game WHERE g_id = ?";
+    private static final String CREATE_NEW_GAME = "INSERT INTO game (num_rounds, active_players, buy_in, pot_quantity, difficulty) VALUES (?, ?, ?, ?, ?)";
     private static final String UPDATE_GAME_BY_ID = "UPDATE game SET ? = ? WHERE p_id = ?";
+    private static final String MASS_UPDATE_GAME_BY_ID =
+            "UPDATE game SET cur_round = ?, num_rounds = ?, active_players = ?, buy_in = ?, pot_quantity = ?, difficulty = ? WHERE g_id = ?";
 
     //I am not too sure what this is, but it is important.
     public GameDAO(Connection connection) {
         super(connection);
     }
 
+    @Override
     public Game findById(long id){
         Game game = new Game();
-        try(PreparedStatement statement = this.connection.prepareStatement(GET_GAME_BY_ID);){
+        try(PreparedStatement statement = this.connection.prepareStatement(GET_GAME_BY_GID);){
             statement.setLong(1, id);
             ResultSet rs = statement.executeQuery();
             while(rs.next()){
-                game.setID(rs.getLong("g_id"));
-                game.setP1(rs.getLong("p1_id"));
-                game.setP2(rs.getLong("p2_id"));
-                game.setP3(rs.getLong("p3_id"));
-                game.setP4(rs.getLong("p4_id"));
                 game.setCurRound(rs.getInt("cur_round"));
                 game.setNumRounds(rs.getInt("num_rounds"));
                 game.setActivePlayers(rs.getInt("active_players"));
+                game.setBuyIn(rs.getInt("active_players"));
                 game.setPotQuantity(rs.getInt("pot_quantity"));
                 game.setDifficulty(rs.getInt("difficulty"));
-                game.setWinner(rs.getString("lifetime_tokens")); // TODO: Please check: are you sure this is how we calculate the winner?
             }
         }
         catch (SQLException e) {
@@ -43,6 +38,23 @@ public class GameDAO extends DataAccessObject<Game>{
             throw new RuntimeException(e);
         }
         return game;
+    }
+
+    public ArrayList<Long> getPIDsByGame(Game dto){
+        try(PreparedStatement statement = this.connection.prepareStatement(GET_PIDS_BY_GID);){
+            statement.setLong(1, dto.getID());
+            ArrayList<Long> result = new ArrayList<Long>();
+            ResultSet rs = statement.executeQuery();
+            while(rs.next()){
+                Long cur_pid = rs.getLong("p_id");
+                result.add(cur_pid);
+            }
+            return result;
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -85,6 +97,25 @@ public class GameDAO extends DataAccessObject<Game>{
             statement.setLong(3, dto.getID());
             statement.execute();
             return dto; // Again, everything is done already. No need to mess with IDs anymore.
+        }
+        catch(SQLException e){
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    // This is the second time I had to program this. Richard, please don't go around reverting my changes willy nilly.
+    public Game update_all(Game dto){
+        try(PreparedStatement statement = this.connection.prepareStatement(MASS_UPDATE_GAME_BY_ID)){
+            statement.setInt(1, dto.getCurRound());
+            statement.setInt(2, dto.getNumRounds());
+            statement.setInt(3, dto.getActivePlayers());
+            statement.setInt(4, dto.getBuyIn());
+            statement.setInt(5, dto.getPotQuantity());
+            statement.setInt(6, dto.getDifficulty());
+            statement.setLong(7, dto.getID());
+            statement.execute();
+            return dto;
         }
         catch(SQLException e){
             e.printStackTrace();

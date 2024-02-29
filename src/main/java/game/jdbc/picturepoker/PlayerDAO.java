@@ -12,8 +12,10 @@ public class PlayerDAO extends DataAccessObject<Player>{
     + "p_id, p_name, passcode, dollars, first_places, second_places, third_places, "
     + "fourth_places, lifetime_tokens, tokens, bet, rounds_won FROM player WHERE p_id = ?";
     private static final String CREATE_NEW_PLAYER = "INSERT INTO player (p_name, passcode) VALUES (?, ?)";
+    private static final String CREATE_NEW_CARD = "INSERT INTO card (pid, hand_pos, suit) VALUES (?, ?, ?)";
     private static final String UPDATE_PLAYER_BY_ID = "UPDATE player SET ? = ? WHERE p_id = ?";
     private static final String GET_ID_BY_NAME = "SELECT p_id FROM player WHERE p_name = ?";
+    private static final String UPDATE_CARD = "UPDATE card SET suit = ? WHERE p_id = ? AND hand_pos = ?";
     public PlayerDAO(Connection connection){
         super(connection);
     }
@@ -95,6 +97,25 @@ public class PlayerDAO extends DataAccessObject<Player>{
         }
     }
 
+    public Player createHand(Player dto){
+        Card newHand[] = new Card[5];
+        for(int i = 0; i < 5; i++){
+            newHand[i] = new Card();
+            try(PreparedStatement statement = this.connection.prepareStatement(CREATE_NEW_CARD);){
+                statement.setLong(1, dto.getID());
+                statement.setInt(2, i);
+                statement.setString(3, newHand[i].toString());
+                statement.execute();
+            }
+            catch (SQLException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+        }
+        dto.setHand(newHand);
+        return dto;
+    }
+
     @Override
     public Player update_long(String attribute, long value, Player dto){
         try(PreparedStatement statement = this.connection.prepareStatement(UPDATE_PLAYER_BY_ID)){
@@ -124,4 +145,6 @@ public class PlayerDAO extends DataAccessObject<Player>{
             throw new RuntimeException(e);
         }
     }
+
+
 }

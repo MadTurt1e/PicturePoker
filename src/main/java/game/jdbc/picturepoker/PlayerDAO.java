@@ -11,7 +11,7 @@ public class PlayerDAO extends DataAccessObject<Player>{
     private static final String GET_PLAYER_BY_ID = "SELECT "
     + "p_id, p_name, passcode, dollars, first_places, second_places, third_places, "
     + "fourth_places, lifetime_tokens, tokens, bet, rounds_won FROM player WHERE p_id = ?";
-    private static final String CREATE_NEW_PLAYER = "INSERT INTO player (p_name, password) VALUES (?, ?)";
+    private static final String CREATE_NEW_PLAYER = "INSERT INTO player (p_name, passcode) VALUES (?, ?)";
     private static final String UPDATE_PLAYER_BY_ID = "UPDATE player SET ? = ? WHERE p_id = ?";
     private static final String GET_ID_BY_NAME = "SELECT p_id FROM player WHERE p_name = ?";
     public PlayerDAO(Connection connection){
@@ -48,7 +48,7 @@ public class PlayerDAO extends DataAccessObject<Player>{
     }
 
     public long findIDByName(String name){
-        long foundID;
+        long foundID = 0;
         try(PreparedStatement statement = this.connection.prepareStatement(GET_ID_BY_NAME);){
             // We make a new SQL statement, and we want to go from player name to id
             statement.setString(1, name);

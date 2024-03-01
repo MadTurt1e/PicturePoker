@@ -12,6 +12,7 @@ public class GamePlay {
     //Relavant variables - current game, and the list of players
     private Game curGame;
     private Player playerList[] = new Player[4];
+    private static final int PAYOUTS[] = {55, 30, 15, 0};
 
     private boolean executeTurn(Player player) {
         // Step 1: Deal cards at random

@@ -6,7 +6,7 @@ import game.jdbc.picturepoker.util.DataTransferObject;
 
 public class Player implements DataTransferObject, Comparable<Player> {
     //Special player ID - not used in the sample code
-    private int p_ID;
+    private long p_ID;
     private String p_name;
     private String passcode;
     private int dollars;

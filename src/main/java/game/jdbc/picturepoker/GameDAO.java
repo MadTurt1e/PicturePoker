@@ -104,7 +104,7 @@ public class GameDAO extends DataAccessObject<Game>{
         }
     }
 
-    // This is the second time I had to program this. Richard, please don't go around reverting my changes willy nilly.
+    // This is the second time I had to program this. Richard, please don't go around reverting my changes willy-nilly.
     public Game update_all(Game dto){
         try(PreparedStatement statement = this.connection.prepareStatement(MASS_UPDATE_GAME_BY_ID)){
             statement.setInt(1, dto.getCurRound());

@@ -146,5 +146,19 @@ public class PlayerDAO extends DataAccessObject<Player>{
         }
     }
 
-
+    public Player update_hand(Player dto){
+        for(int i = 0; i < 5; i++){
+            try(PreparedStatement statement = this.connection.prepareStatement(UPDATE_CARD);){
+                statement.setString(1, dto.getHand()[i].toString());
+                statement.setLong(2, dto.getID());
+                statement.setInt(3, i);
+                statement.execute();
+            }
+            catch (SQLException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+        }
+        return dto;
+    }
 }

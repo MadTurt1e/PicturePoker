@@ -1,7 +1,7 @@
 package game.jdbc.picturepoker;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import jdk.internal.misc.InnocuousThread;
+// import jdk.internal.misc.InnocuousThread; // Why is this here?
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.*;
@@ -107,7 +107,7 @@ public class PicturePokerGame {
         System.out.println(game);
         return game;
     }
-    public static void main (String[]args){
+    public static void main (String[] args){
         SpringApplication.run(PicturePokerGame.class, args);
     }
 }

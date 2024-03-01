@@ -5,7 +5,6 @@ import static java.lang.Math.random;
 
 public class Card {
     private Suit suit;
-
     private boolean toChange;
 
     // Enum for the suit of the card

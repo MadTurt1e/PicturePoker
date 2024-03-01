@@ -23,6 +23,7 @@ public class Game implements DataTransferObject
     private int pot_quantity;
     private int difficulty;
     private String winner;
+    private Card[] hand;
 
     @Override
     public long getID() {
@@ -119,6 +120,14 @@ public class Game implements DataTransferObject
 
     public void setWinner(String winner){
         this.winner = winner;
+    }
+
+    public Card[] getHand() {
+        return hand;
+    }
+
+    public void setHand(Card[] hand) {
+        this.hand = hand;
     }
 
     @Override

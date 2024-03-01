@@ -12,10 +12,10 @@ public class PlayerDAO extends DataAccessObject<Player>{
     + "p_id, p_name, passcode, dollars, first_places, second_places, third_places, "
     + "fourth_places, lifetime_tokens, tokens, bet, rounds_won FROM player WHERE p_id = ?";
     private static final String CREATE_NEW_PLAYER = "INSERT INTO player (p_name, passcode) VALUES (?, ?)";
-    private static final String CREATE_NEW_CARD = "INSERT INTO card (pid, hand_pos, suit) VALUES (?, ?, ?)";
+    private static final String CREATE_NEW_CARD = "INSERT INTO player_card (p_id, hand_pos, suit) VALUES (?, ?, ?)";
     private static final String UPDATE_PLAYER_BY_ID = "UPDATE player SET ? = ? WHERE p_id = ?";
     private static final String GET_ID_BY_NAME = "SELECT p_id FROM player WHERE p_name = ?";
-    private static final String UPDATE_CARD = "UPDATE card SET suit = ? WHERE p_id = ? AND hand_pos = ?";
+    private static final String UPDATE_CARD = "UPDATE player_card SET suit = ? WHERE p_id = ? AND hand_pos = ?";
     public PlayerDAO(Connection connection){
         super(connection);
     }
@@ -146,7 +146,7 @@ public class PlayerDAO extends DataAccessObject<Player>{
         }
     }
 
-    public Player update_hand(Player dto){
+    public Player updateHand(Player dto){
         for(int i = 0; i < 5; i++){
             try(PreparedStatement statement = this.connection.prepareStatement(UPDATE_CARD);){
                 statement.setString(1, dto.getHand()[i].toString());

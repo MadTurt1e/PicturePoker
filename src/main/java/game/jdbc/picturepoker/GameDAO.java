@@ -9,9 +9,13 @@ public class GameDAO extends DataAccessObject<Game>{
     private static final String GET_GAME_BY_GID = "SELECT cur_round, num_rounds, active_players, buy_in, pot_quantity, difficulty FROM game WHERE g_id = ?";
     private static final String GET_PIDS_BY_GID = "SELECT p_id FROM players_in_game WHERE g_id = ?";
     private static final String CREATE_NEW_GAME = "INSERT INTO game (num_rounds, active_players, buy_in, pot_quantity, difficulty) VALUES (?, ?, ?, ?, ?)";
+    private static final String CREATE_NEW_CARD = "INSERT INTO dealer_card (g_id, hand_pos, suit) VALUES (?, ?, ?)";
+
     private static final String UPDATE_GAME_BY_ID = "UPDATE game SET ? = ? WHERE p_id = ?";
     private static final String MASS_UPDATE_GAME_BY_ID =
             "UPDATE game SET cur_round = ?, num_rounds = ?, active_players = ?, buy_in = ?, pot_quantity = ?, difficulty = ? WHERE g_id = ?";
+    private static final String UPDATE_CARD = "UPDATE dealer_card SET suit = ? WHERE g_id = ? AND hand_pos = ?";
+
 
     //I am not too sure what this is, but it is important.
     public GameDAO(Connection connection) {
@@ -90,6 +94,25 @@ public class GameDAO extends DataAccessObject<Game>{
         }
     }
 
+    public Game createHand(Game dto){
+        Card newHand[] = new Card[5];
+        for(int i = 0; i < 5; i++){
+            newHand[i] = new Card();
+            try(PreparedStatement statement = this.connection.prepareStatement(CREATE_NEW_CARD);){
+                statement.setLong(1, dto.getID());
+                statement.setInt(2, i);
+                statement.setString(3, newHand[i].toString());
+                statement.execute();
+            }
+            catch (SQLException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+        }
+        dto.setHand(newHand);
+        return dto;
+    }
+
     public Game update_string(String attribute, String data, Game dto){
         try(PreparedStatement statement = this.connection.prepareStatement(UPDATE_GAME_BY_ID)){
             statement.setString(1, attribute);
@@ -121,5 +144,21 @@ public class GameDAO extends DataAccessObject<Game>{
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+    }
+
+    public Game updateHand(Game dto){
+        for(int i = 0; i < 5; i++){
+            try(PreparedStatement statement = this.connection.prepareStatement(UPDATE_CARD);){
+                statement.setString(1, dto.getHand()[i].toString());
+                statement.setLong(2, dto.getID());
+                statement.setInt(3, i);
+                statement.execute();
+            }
+            catch (SQLException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+        }
+        return dto;
     }
 }

@@ -13,4 +13,6 @@ subprocess.run(["psql", "-h", "localhost", "-U", "postgres", "-d", "picturepoker
 time.sleep(1)
 subprocess.run(["psql", "-h", "localhost", "-U", "postgres", "-d", "picturepoker", "-f", "card.sql"])
 time.sleep(1)
+subprocess.run(["psql", "-h", "localhost", "-U", "postgres", "-d", "picturepoker", "-f", "dealer_card.sql"])
+time.sleep(1)
 subprocess.run(["psql", "-h", "localhost", "-U", "postgres", "-d", "picturepoker", "-f", "setup.sql"])

@@ -6,7 +6,7 @@ CREATE TABLE game (
     num_rounds int NOT NULL,
     active_players int NOT NULL,
     buy_in int NOT NULL,
-    pot_quantity int NOT NULL,
+    pot_quantity int NOT NULL DEFAULT 0, -- Calculated on game initialization once players join
     difficulty int NOT NULL,
-    PRIMARY KEY (g_id),
+    PRIMARY KEY (g_id)
 );

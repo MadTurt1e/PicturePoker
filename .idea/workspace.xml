@@ -1,17 +1,26 @@
+
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f2868c71-a371-4f94-b97f-36b9e72882c0" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="f2868c71-a371-4f94-b97f-36b9e72882c0" name="Changes" comment="Updated files, fixed errors. &#10;Luigi class exists - AI to be completed.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/PicturePokerGame.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/PicturePokerGame.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/gamePlay.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/GamePlay.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
@@ -20,31 +29,15 @@
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-  </component>
-  <component name="GitHubPullRequestSearchHistory">{
-  &quot;history&quot;: [
-    {
-      &quot;state&quot;: &quot;OPEN&quot;,
-      &quot;author&quot;: &quot;MadTurt1e&quot;
-    }
-  ],
-  &quot;lastFilter&quot;: {
-    &quot;state&quot;: &quot;OPEN&quot;,
-    &quot;author&quot;: &quot;MadTurt1e&quot;
-  }
-}</component>
-  <component name="GithubPullRequestsUISettings">
-    <option name="selectedUrlAndAccountId">
-      <UrlAndAccount>
-        <option name="accountId" value="3c4462c4-e255-42c6-a10f-e1f730a16b93" />
-        <option name="url" value="git@github.com:MadTurt1e/PicturePoker" />
-      </UrlAndAccount>
-    </option>
     <option name="UPDATE_TYPE" value="REBASE" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 6
 }</component>
@@ -58,7 +51,10 @@
   "keyToString": {
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "Game__implementation",
+ Game_Turn
+    "Spring Boot.PicturePokerGame.executor": "Run",
+    "git-widget-placeholder": "Game__Turn",
+
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "//wsl.localhost/Ubuntu/home/jeffreyw/picturepoker",
@@ -67,6 +63,8 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+ Game_Turn
+    "settings.editor.selected.configurable": "reference.settingsDialog.application.dockerMachine",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -82,7 +80,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="jdk-21.0.1-openjdk-21.0.1-f644763e9732-f98dd351" />
+        <option value="jdk-21.0.2-openjdk-21.0.2-4caba194b151-78a6f59c" />
       </set>
     </attachedChunks>
   </component>
@@ -101,9 +99,7 @@
       <workItem from="1708911404335" duration="329000" />
       <workItem from="1708922870029" duration="2001000" />
       <workItem from="1708969599940" duration="3821000" />
-      <workItem from="1708895678958" duration="2908000" />
-      <workItem from="1708908821832" duration="2060000" />
-      <workItem from="1708989342494" duration="166000" />
+      <workItem from="1709059331012" duration="2563000" />
     </task>
     <task id="LOCAL-00001" summary="Updated player class to have a hand&#10;Updated card to not be final">
       <option name="closed" value="true" />
@@ -145,11 +141,30 @@
       <option name="project" value="LOCAL" />
       <updated>1708973133432</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Updated files, fixed errors. &#10;Luigi class exists - AI to be completed.">
+      <option name="closed" value="true" />
+      <created>1709061511569</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1709061511570</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Updated player class to have a hand&#10;Updated card to not be final" />
@@ -158,6 +173,7 @@
     <MESSAGE value="Springboot sample code fixed, and python files created to create sample picturepoker database" />
     <MESSAGE value="Springboot sample code fixed, and python files created to create sample picturepoker database&#10;Also, player functionality fixed so it returns an actual working player with an actual working ID." />
     <MESSAGE value="Removed drop table suits&#10;Dropping tables is an exercise left to the reader." />
-    <option name="LAST_COMMIT_MESSAGE" value="Removed drop table suits&#10;Dropping tables is an exercise left to the reader." />
+    <MESSAGE value="Updated files, fixed errors. &#10;Luigi class exists - AI to be completed." />
+    <option name="LAST_COMMIT_MESSAGE" value="Updated files, fixed errors. &#10;Luigi class exists - AI to be completed." />
   </component>
 </project>

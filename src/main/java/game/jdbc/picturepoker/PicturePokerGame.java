@@ -1,7 +1,7 @@
 package game.jdbc.picturepoker;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import jdk.internal.misc.InnocuousThread;
+// import jdk.internal.misc.InnocuousThread; // Why is this here?
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +21,7 @@ public class PicturePokerGame {
     @GetMapping("/helloWorld")
     public String helloWorld() {
         System.out.println("Hello, World!");
+        return("HELLO WORLD");
     }
 
     @GetMapping("/getByPlayerName/{playerName}")
@@ -53,11 +54,11 @@ public class PicturePokerGame {
         Player player = new Player();
         try {
             Connection connection = dcm.getConnection();
-            PlayerDAO playerDAO = new PlayerDAO(connection);
+            PlayerDAO playerdao = new PlayerDAO(connection);
             // essentially, a (new) player consists of a player name and a password, and that is it. 
             player.setPlayerName(inputMap.get("playerName"));
             player.setPasscode(inputMap.get("password"));
-            player = playerDAO.create(player);
+            player = playerdao.create(player);
             System.out.println(player);
         }
         catch(SQLException e) {
@@ -84,9 +85,9 @@ public class PicturePokerGame {
             game.setP3(playerDAO.findIDByName(inputMap.get("p3Name")));
             game.setP4(playerDAO.findIDByName(inputMap.get("p4Name")));
 
-            game.setRounds(Integer.parseInt(inputMap.get("rounds")));
-            game.setBet(Integer.parseInt(inputMap.get("bet")));
-            game = gameDAO.create(game);
+            game.setNumRounds(Integer.parseInt(inputMap.get("rounds")));
+            game.setPotQuantity(Integer.parseInt(inputMap.get("potQuantity")));
+            game = gamedao.create(game);
             //once all the necessary values are created, we can make the game. 
 
             System.out.println(game);
@@ -97,7 +98,16 @@ public class PicturePokerGame {
 
         return game;
     }
-    public static void main (String[]args){
+
+    @PostMapping("/playGame/{gameID}")
+    public Game playGame (@PathVariable("gameID") String gameID){
+        GamePlay gamePlay = new GamePlay();
+        Game game = gamePlay.gameSeq(Long.parseLong(gameID));
+
+        System.out.println(game);
+        return game;
+    }
+    public static void main (String[] args){
         SpringApplication.run(PicturePokerGame.class, args);
     }
 }

@@ -1,18 +1,16 @@
 // this is where the file is located
 package game.jdbc.picturepoker;
 
-import Java.lang.Math.random;
+import static java.lang.Math.random;
 
 public class Card {
-    // Final to insure that the suit is not changed after a card is created
     private Suit suit;
-
     private boolean toChange;
 
     // Enum for the suit of the card
     public enum Suit {
-        STAR(5), MARIO(4), LUIGI(3), FIRE_FLOWER(2), MUSHROOM(1), CLOUD(0);
-        public final int strength;
+        // Suits are listed in increasing strength for ordinal() to be used effectively
+        CLOUD, MUSHROOM, FIRE_FLOWER, LUIGI, MARIO, STAR
     }
     
     // Default constructor- Generates random suit
@@ -46,7 +44,7 @@ public class Card {
         this.toChange = toChange;
     }
 
-    public void changeSuit(){
+    public void redrawSuit(){
         if(toChange){
             suit = selectRandomSuit();
             toChange = false;
@@ -54,14 +52,14 @@ public class Card {
     }
     
     private Suit selectRandomSuit(){
-        int newStrength = (int)(Math.random() * 6);
-        for(Suit s : values()){
-            if(s.strength = newStrength){
+        int newStrength = (int)(random() * 6);
+        for(Suit s : Suit.values()){
+            if(s.ordinal() == newStrength){
                 return s;
             }
         }
-        // Mitigate potential out of bounds errors with math.random with failsafe
-        return CLOUD;
+        // Mitigate potential out-of-bounds errors with math.random with failsafe
+        return Suit.CLOUD;
     }
     
     // String representation of the card

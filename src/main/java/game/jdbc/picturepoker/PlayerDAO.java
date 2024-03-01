@@ -11,9 +11,11 @@ public class PlayerDAO extends DataAccessObject<Player>{
     private static final String GET_PLAYER_BY_ID = "SELECT "
     + "p_id, p_name, passcode, dollars, first_places, second_places, third_places, "
     + "fourth_places, lifetime_tokens, tokens, bet, rounds_won FROM player WHERE p_id = ?";
-    private static final String CREATE_NEW_PLAYER = "INSERT INTO player (p_name, password) VALUES (?, ?)";
+    private static final String CREATE_NEW_PLAYER = "INSERT INTO player (p_name, passcode) VALUES (?, ?)";
+    private static final String CREATE_NEW_CARD = "INSERT INTO player_card (p_id, hand_pos, suit) VALUES (?, ?, ?)";
     private static final String UPDATE_PLAYER_BY_ID = "UPDATE player SET ? = ? WHERE p_id = ?";
     private static final String GET_ID_BY_NAME = "SELECT p_id FROM player WHERE p_name = ?";
+    private static final String UPDATE_CARD = "UPDATE player_card SET suit = ? WHERE p_id = ? AND hand_pos = ?";
     public PlayerDAO(Connection connection){
         super(connection);
     }
@@ -48,13 +50,14 @@ public class PlayerDAO extends DataAccessObject<Player>{
     }
 
     public long findIDByName(String name){
-        try(PreparedStatement getNewPlayer = this.connection.prepareStatement(GET_ID_BY_NAME);){
+        long foundID;
+        try(PreparedStatement statement = this.connection.prepareStatement(GET_ID_BY_NAME);){
             // We make a new SQL statement, and we want to go from player name to id
             statement.setString(1, name);
             ResultSet rs = statement.executeQuery();
 
             // and this statement gets the player id and returns it
-            long foundID = rs.getLong("p_id");
+            foundID = rs.getLong("p_id");
         }
         catch (SQLException e){
             e.printStackTrace();
@@ -79,7 +82,7 @@ public class PlayerDAO extends DataAccessObject<Player>{
             statement.execute();
 
             //this should never go wrong - at this point, the player either is there, or isn't.
-            long newPlayerID = findIDByName(dto.getPlayerName);
+            long newPlayerID = findIDByName(dto.getPlayerName());
 
             // now we create the player that we're returning
             Player player = new Player();
@@ -87,12 +90,30 @@ public class PlayerDAO extends DataAccessObject<Player>{
             player.setPasscode(dto.getPasscode());
             player.setID(newPlayerID);
             return player;
-            }
         }
         catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+    }
+
+    public Player createHand(Player dto){
+        Card newHand[] = new Card[5];
+        for(int i = 0; i < 5; i++){
+            newHand[i] = new Card();
+            try(PreparedStatement statement = this.connection.prepareStatement(CREATE_NEW_CARD);){
+                statement.setLong(1, dto.getID());
+                statement.setInt(2, i);
+                statement.setString(3, newHand[i].toString());
+                statement.execute();
+            }
+            catch (SQLException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+        }
+        dto.setHand(newHand);
+        return dto;
     }
 
     @Override
@@ -123,5 +144,21 @@ public class PlayerDAO extends DataAccessObject<Player>{
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+    }
+
+    public Player updateHand(Player dto){
+        for(int i = 0; i < 5; i++){
+            try(PreparedStatement statement = this.connection.prepareStatement(UPDATE_CARD);){
+                statement.setString(1, dto.getHand()[i].toString());
+                statement.setLong(2, dto.getID());
+                statement.setInt(3, i);
+                statement.execute();
+            }
+            catch (SQLException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+        }
+        return dto;
     }
 }

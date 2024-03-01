@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
-//Fresh from the inclass example
+//Fresh from the in-class example
 public class DatabaseConnectionManager {
     private final String url;
     private final Properties properties;

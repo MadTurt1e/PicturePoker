@@ -2,10 +2,15 @@ package game.jdbc.picturepoker;
 
 import game.jdbc.picturepoker.util.DataTransferObject;
 
+import java.util.ArrayList;
+
 public class Game implements DataTransferObject
 {
     private long g_id;
 
+    // I think it would be more effective to store the player ids in an ArrayList.
+    // The new method I added in GameDAO should allow you to just retrieve all the players.
+    private ArrayList<Long> players;
     //players 1 through 4 will be stored as the player ID from now on.
     private long p1;
     private long p2;
@@ -14,9 +19,11 @@ public class Game implements DataTransferObject
     private int cur_round;
     private int num_rounds;
     private int active_players;
+    private int buy_in;
     private int pot_quantity;
     private int difficulty;
     private String winner;
+    private Card[] hand;
 
     @Override
     public long getID() {
@@ -83,6 +90,14 @@ public class Game implements DataTransferObject
         this.active_players = active_players;
     }
 
+    public int getBuyIn() {
+        return buy_in;
+    }
+
+    public void setBuyIn(int buy_in) {
+        this.buy_in = buy_in;
+    }
+
     public int getPotQuantity() {
         return pot_quantity;
     }
@@ -107,6 +122,14 @@ public class Game implements DataTransferObject
         this.winner = winner;
     }
 
+    public Card[] getHand() {
+        return hand;
+    }
+
+    public void setHand(Card[] hand) {
+        this.hand = hand;
+    }
+
     @Override
     public String toString() {
         return "Game{" +
@@ -118,6 +141,7 @@ public class Game implements DataTransferObject
                 ", cur_round=" + cur_round +
                 ", num_rounds=" + num_rounds +
                 ", active_players=" + active_players +
+                ", buy_in=" + buy_in +
                 ", pot_quantity=" + pot_quantity +
                 ", difficulty=" + difficulty +
                 ", winner= " + winner +

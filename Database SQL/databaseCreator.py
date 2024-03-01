@@ -1,6 +1,7 @@
 import subprocess
 import time
 
+
 subprocess.run(["psql", "-h", "localhost", "-U", "postgres", "-f", "databaseCreation.sql"])
 time.sleep(1)
 subprocess.run(["psql", "-h", "localhost", "-U", "postgres", "-d", "picturepoker", "-f", "player.sql"])

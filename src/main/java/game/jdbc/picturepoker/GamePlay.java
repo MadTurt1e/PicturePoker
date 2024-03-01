@@ -14,6 +14,7 @@ public class GamePlay {
 
     private Player executeTurn(Player player) {
         System.out.println("\n" + player.getPlayerName() + "'s Turn! ");
+        System.out.println(player.getPlayerName() + " has "+ player.getTokens() +" tokens!");
 
         // Step 1: Deal cards at random
         Card[] hand = new Card[5];
@@ -27,7 +28,7 @@ public class GamePlay {
 
         // This basically shuffles every card in the hand.
         for (Card value : hand) {
-            value.changeSuit();
+            value.redrawSuit();
         }
 
         player.setHand(hand);
@@ -78,7 +79,7 @@ public class GamePlay {
         // We don't actually give the player any options, but it is something that can be done.
         for (Card card : hand) {
             if (card.getToChange())
-                card.changeSuit();
+                card.redrawSuit();
         }
 
         // Step 4: Let the player cry at their new cards.
@@ -169,22 +170,22 @@ public class GamePlay {
         //convert suits to int
         for (int i = 0; i < suitCount.length; ++i){
             //we also tally up the individual cards as an extra differentiator as well.
-            score += suitCount[i] * i * 100;
-            // 5 stars gain 600 extra bonus points, and 5 clouds gain nothing - suits help, but they can't beat an entire level.
+            score += (suitCount[i] * i * 10);
+            // 5 stars gain 300 extra bonus points, and 5 clouds gain nothing - suits help, but they can't beat an entire hand
             // Also, 4 stars is much better than 4 clouds, etc.
 
             if (suitCount[i] == 5){
-                score += i * 6000; // easy way to tell differences between hand strengths - just use huge numbers
+                score += (i * 6000); // easy way to tell differences between hand strengths - just use huge numbers
                 break;
             }
             if (suitCount[i] == 4){
-                score += i * 5000;
+                score += (i * 5000);
             }
             if (suitCount[i] == 3){
-                score += i * 3000; // pairs start mattering from here
+                score += (i * 3000); // pairs start mattering from here
             }
             if (suitCount[i] == 2){
-                score += i * 1000; //Double pair is 2000, single triple becomes 3000, and triple and pair is 4000.
+                score += (i * 1000); //Double pair is 2000, single triple becomes 3000, and triple and pair is 4000.
             }
         }
 
@@ -240,7 +241,7 @@ public class GamePlay {
     private Player determineWinner(Player[] playerList){
         int winner = 0;
         for (int i = 0; i < playerList.length; ++i){
-            System.out.println(playerList[i].getPlayerName() + "had " + playerList[i].getTokens() + "tokens! ");
+            System.out.println(playerList[i].getPlayerName() + " has " + playerList[i].getTokens() + "tokens! ");
             if (playerList[i].getTokens() > playerList[winner].getTokens()){
                 winner = i;
             }
@@ -260,11 +261,12 @@ public class GamePlay {
             //Next, we get the current game state using the game ID.
             curGame = gamedao.findById(gameID);
 
+            long[]playerIDList = curGame.getPlayers();
+
             //we get the list of all the players, so it is iterable.
-            playerList[0] = playerdao.findById(curGame.getP1());
-            playerList[1] = playerdao.findById(curGame.getP2());
-            playerList[2] = playerdao.findById(curGame.getP3());
-            playerList[3] = playerdao.findById(curGame.getP4());
+            for (int i = 0; i < playerList.length; ++i){
+                playerList[i] = playerdao.findById(playerIDList[i]);
+            }
 
             //reset everything we'd need to reset before the game.
             for (Player value : playerList) {
@@ -287,15 +289,14 @@ public class GamePlay {
                 //Now we run a function which pays out tokens compared to Luigi
                 for (Player player : playerList) {
                     player.setTokens(player.getTokens() + determinePayout(player, luigi));
+                    System.out.println(player.getPlayerName() + " has " + player.getTokens() + " tokens. ");
                 }
                 // we can do a check on the number of rounds at this point to see if the game is ongoing.
                 //we should increment the current round and keep on going.
                 curGame.setCurRound(curGame.getCurRound() + 1);
 
                 //update the game at this point to the database.
-                //TODO: We need an update function in GameDAO which updates the full game class.
-                // This function should be working.
-                // gamedao.update(game);
+                gamedao.update_all(curGame);
             }
 
             //once we break out of the loop we can determine the winner.
@@ -303,8 +304,10 @@ public class GamePlay {
 
             System.out.println("\nCongrats, " + winner.getPlayerName() + " has won! ");
 
-            //TODO: we should probably also update the game over here.
+
+            //Game updates
             curGame.setWinner(winner.getPlayerName());
+            gamedao.update_all(curGame);
         }
         catch (SQLException e) {
             e.printStackTrace();

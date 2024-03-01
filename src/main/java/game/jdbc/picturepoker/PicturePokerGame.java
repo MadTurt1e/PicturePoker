@@ -78,11 +78,14 @@ public class PicturePokerGame {
             Connection connection = dcm.getConnection();
             GameDAO gamedao = new GameDAO(connection);
             PlayerDAO playerDAO = new PlayerDAO(connection);
+
             // A new game consists of 4 players, a chosen number of rounds, and a pot quantity
-            game.setP1(playerDAO.findIDByName(inputMap.get("p1Name")));
-            game.setP2(playerDAO.findIDByName(inputMap.get("p2Name")));
-            game.setP3(playerDAO.findIDByName(inputMap.get("p3Name")));
-            game.setP4(playerDAO.findIDByName(inputMap.get("p4Name")));
+            long[] playerList = new long[4];
+            playerList[0] = (playerDAO.findIDByName(inputMap.get("p1Name")));
+            playerList[1] = (playerDAO.findIDByName(inputMap.get("p2Name")));
+            playerList[2] = (playerDAO.findIDByName(inputMap.get("p3Name")));
+            playerList[3] = (playerDAO.findIDByName(inputMap.get("p4Name")));
+            game.setPlayers(playerList);
 
             game.setNumRounds(Integer.parseInt(inputMap.get("rounds")));
             game.setPotQuantity(Integer.parseInt(inputMap.get("potQuantity")));

@@ -8,9 +8,8 @@ public class Game implements DataTransferObject
 {
     private long g_id;
 
-    // I think it would be more effective to store the player ids in an ArrayList.
-    // The new method I added in GameDAO should allow you to just retrieve all the players.
-    private ArrayList<Long> players;
+    // sorry, but nonpreallocated memory is for the weak.
+    private long [] players;
     //players 1 through 4 will be stored as the player ID from now on.
     private long p1;
     private long p2;
@@ -34,36 +33,12 @@ public class Game implements DataTransferObject
         this.g_id = g_id;
     }
 
-    public long getP1() {
-        return p1;
+    public long[] getPlayers() {
+        return players;
     }
 
-    public void setP1(long p1) {
-        this.p1 = p1;
-    }
-
-    public long getP2() {
-        return p2;
-    }
-
-    public void setP2(long p2) {
-        this.p2 = p2;
-    }
-
-    public long getP3() {
-        return p3;
-    }
-
-    public void setP3(long p3) {
-        this.p3 = p3;
-    }
-
-    public long getP4() {
-        return p4;
-    }
-
-    public void setP4(long p4) {
-        this.p4 = p4;
+    public void setPlayers(long[] players) {
+        this.players = players;
     }
 
     public int getCurRound() {

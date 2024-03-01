@@ -15,7 +15,7 @@ public class GameDAO extends DataAccessObject<Game>{
     private static final String MASS_UPDATE_GAME_BY_ID =
             "UPDATE game SET cur_round = ?, num_rounds = ?, active_players = ?, buy_in = ?, pot_quantity = ?, difficulty = ? WHERE g_id = ?";
     private static final String UPDATE_CARD = "UPDATE dealer_card SET suit = ? WHERE g_id = ? AND hand_pos = ?";
-
+    private static final String JOIN_GAME = "INSERT INTO player_in_game VALUES (?, ?)";
 
     //I am not too sure what this is, but it is important.
     public GameDAO(Connection connection) {
@@ -160,5 +160,18 @@ public class GameDAO extends DataAccessObject<Game>{
             }
         }
         return dto;
+    }
+
+    public Game joinGame(Game dto, Player newPlayer){
+        try(PreparedStatement statement = this.connection.prepareStatement(MASS_UPDATE_GAME_BY_ID)){
+            statement.setLong(1, newPlayer.getID());
+            statement.setLong(2, dto.getID());
+            dto.getPlayerIDs().add(newPlayer.getID());
+            return dto;
+        }
+        catch(SQLException e){
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
 }

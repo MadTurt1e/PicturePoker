@@ -10,7 +10,7 @@ public class Game implements DataTransferObject
 
     // I think it would be more effective to store the player ids in an ArrayList.
     // The new method I added in GameDAO should allow you to just retrieve all the players.
-    private ArrayList<Long> players;
+    private ArrayList<Long> playerIDs;
     //players 1 through 4 will be stored as the player ID from now on.
     private long p1;
     private long p2;
@@ -128,6 +128,14 @@ public class Game implements DataTransferObject
 
     public void setHand(Card[] hand) {
         this.hand = hand;
+    }
+
+    public ArrayList<Long> getPlayerIDs() {
+        return playerIDs;
+    }
+
+    public void setPlayerIDs(ArrayList<Long> playerIDs) {
+        this.playerIDs = playerIDs;
     }
 
     @Override

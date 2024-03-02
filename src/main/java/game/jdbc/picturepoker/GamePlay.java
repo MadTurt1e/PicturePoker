@@ -156,54 +156,61 @@ public class GamePlay {
     private int playerScore(Card[] hand) {
         int score = 0;
 
-        int[] suitCount = new int[6];
+        int[] suitCount = new int[7];
 
         Card.Suit curSuit;
-        //count the number of each suit on hand - we're going to use a "flag" system to count suits.
+        //count the number of each suit - start from 1 to prevent any weird errors
         for (Card card : hand) {
             curSuit = card.getSuit();
             switch (curSuit) {
                 case STAR:
-                    ++suitCount[5];
+                    ++suitCount[6];
                     break;
                 case MARIO:
-                    ++suitCount[4];
+                    ++suitCount[5];
                     break;
                 case LUIGI:
-                    ++suitCount[3];
+                    ++suitCount[4];
                     break;
                 case FIRE_FLOWER:
-                    ++suitCount[2];
+                    ++suitCount[3];
                     break;
                 case MUSHROOM:
-                    ++suitCount[1];
+                    ++suitCount[2];
                     break;
                 case CLOUD:
-                    ++suitCount[0];
+                    ++suitCount[1];
                     break;
             }
         }
 
         //convert suits to int
-        for (int i = 0; i < suitCount.length; ++i){
+        for (int i = 1; i < suitCount.length; ++i){
             //we also tally up the individual cards as an extra differentiator as well.
-            score += (suitCount[i] * i * 10);
+            score += (suitCount[i] * i);
             // 5 stars gain 300 extra bonus points, and 5 clouds gain nothing - suits help, but they can't beat an entire hand
             // Also, 4 stars is much better than 4 clouds, etc.
 
             if (suitCount[i] == 5){
-                score += (i * 6000); // easy way to tell differences between hand strengths - just use huge numbers
+                score += (230800); // easy way to tell differences between hand strengths - just use huge numbers
+                score += (i*9600);
                 break;
             }
             if (suitCount[i] == 4){
-                score += (i * 5000);
+                score += (173100);
+                score += (i*1600);
+                continue;
             }
             if (suitCount[i] == 3){
-                score += (i * 3000); // pairs start mattering from here
+                score += (115400); // pairs start mattering from here
+                score += (i*250);
+                continue;
             }
             if (suitCount[i] == 2){
-                score += (i * 1000); //Double pair is 2000, single triple becomes 3000, and triple and pair is 4000.
-            }
+                score += (57700); //Double pair is 20k, single triple becomes 30k, and triple and pair is 40k.
+                score += (i*40);
+            } // jeffrey example - {Mushroom, Mushroom, Mushroom, Cloud, Cloud} vs {Cloud, Cloud, Cloud, Star, Star}
+            //Result is 173648 vs 173605 - it works baybee
         }
 
         //that's the entire score calculation done.

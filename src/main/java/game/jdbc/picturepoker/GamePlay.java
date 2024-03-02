@@ -110,7 +110,7 @@ public class GamePlay {
         for (int i = 0; i < luigiHand.length; ++i) {
             System.out.println("Card " + i + ": " + luigiHand[i]);
         }
-
+        luigi.setHand(luigiHand);
         // Step 2: Calculate current score and change out cards if needed
         int luigiScore = playerScore(luigi);
         if (luigiScore > 5000) {
@@ -432,7 +432,8 @@ public class GamePlay {
     }
 
     public static void main(String[] args) {
+
         GamePlay game = new GamePlay();
-        game.gameSeq(1);
+        game.gameSeq(14);
     }
 }

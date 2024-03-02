@@ -3,14 +3,14 @@ package game.jdbc.picturepoker;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Scanner;
+import java.util.*;
 
 
 public class GamePlay {
 
     //Relevant variables - current game, and the list of players
     private Game curGame;
-    private Player[] playerList = new Player[4];
+    private final Player[] playerList = new Player[4];
 
     private Player executeTurn(Player player) {
         System.out.println("\n" + player.getPlayerName() + "'s Turn! ");
@@ -41,18 +41,36 @@ public class GamePlay {
         }
 
         // Step 2: Take bets
+        // I noticed there is a raise function just now. This will be useful for a GUI feature where you can spam a button.
+        // Terminal inputs make it so that spamming a button is a bit hard, though.
+        // to do when we have GUI set up and everything.
         System.out.println("How much do you want to bet? ");
         Scanner scan = new Scanner(System.in);
         int betCount = 0;
         while (betCount < 1 || betCount > 6) {
+            //Case: Broke
+            if (player.getTokens() == 0){
+                System.out.println("You have no tokens to bet. How did you get here? ");
+                player.setBet(0);
+                return player;
+            }
             try {
                 betCount = scan.nextInt();
+                //case: too much / little money.
                 if (betCount < 1 || betCount > 6){
                     System.out.println("Bet must be between 1 and 5! ");
                     continue;
                 }
+                // Case: broke part 2
+                if (betCount > player.getTokens()){
+                    System.out.println("You don't have enough tokens! Right now, you have " + player.getTokens() + " tokens. ");
+                    betCount = 1000;
+                    continue;
+                }
+                //case: we are in the clear
                 break;
-            }catch (java.util.InputMismatchException e) {
+            }catch (InputMismatchException e) {
+                //case: what even was typed?
                 System.out.println("Bet must be between 1 and 5. ");
                 scan.nextLine();
             }
@@ -69,7 +87,7 @@ public class GamePlay {
                 changeCard = scan.nextBoolean();
                 if (changeCard)
                     hand[i].setToChange(true);
-            }catch (java.util.InputMismatchException e) {
+            }catch (InputMismatchException e) {
                 System.out.println("Player must input true or false!" );
                 scan.nextLine();
             }
@@ -95,14 +113,16 @@ public class GamePlay {
         return player;
     }
 
-    private Player executeLuigi(Player luigi) {
-        //I believe Luigi should be his own class.
-        // The class will be referenced here - database accesses can be done whenever wanted - Luigi will essentially be a player.
+    private void executeLuigi() {
+        // Luigi is an external game force.
         Card[] luigiHand = new Card[5];
         //initialize values
         for (int i = 0; i < luigiHand.length; ++i){
             luigiHand[i] = new Card();
         }
+        //updates the game with luigi's hand
+        curGame.setHand(luigiHand);
+
 
         // step 1: Get cards at random
         //This is already done by the card class.
@@ -123,20 +143,17 @@ public class GamePlay {
                 luigiHand[i].setSuit(Card.Suit.STAR);
             }
         }
-        luigi.setHand(luigiHand);
-
+        curGame.setHand(luigiHand);
 
         for (int i = 0; i < luigiHand.length; ++i) {
             System.out.println("Card " + i + ": " + luigiHand[i]);
         }
 
-        //return luigi
-        return luigi;
+        //no return needed.
     }
 
     //This function does a score calculation on a player.
-    private int playerScore(Player player) {
-        Card[] hand = player.getHand();
+    private int playerScore(Card[] hand) {
         int score = 0;
 
         int[] suitCount = new int[6];
@@ -194,11 +211,11 @@ public class GamePlay {
     }
 
     //score calculate, compare, and multiply the pots
-    private int determinePayout(Player player, Player luigi){
-        int playerScore = playerScore(player);
-        if (playerScore <= playerScore(luigi)){
+    private int determinePayout(Player player){
+        int playerScore = playerScore(player.getHand());
+        if (playerScore <= playerScore(curGame.getHand())){
             System.out.println(player.getPlayerName() + " did not beat Luigi. ");
-            return -player.getBet();
+            return 0;
         }
         int prizeTier = playerScore / 1000;
         return switch (prizeTier) {
@@ -238,17 +255,6 @@ public class GamePlay {
 
     }
 
-    private Player determineWinner(Player[] playerList){
-        int winner = 0;
-        for (int i = 0; i < playerList.length; ++i){
-            System.out.println(playerList[i].getPlayerName() + " has " + playerList[i].getTokens() + "tokens! ");
-            if (playerList[i].getTokens() > playerList[winner].getTokens()){
-                winner = i;
-            }
-        }
-        return playerList[winner];
-    }
-
     public Game gameSeq(long gameID) {
         DatabaseConnectionManager dcm = new DatabaseConnectionManager("localhost", "picturepoker", "postgres", "password");
         try {
@@ -274,22 +280,33 @@ public class GamePlay {
                 value.setRoundsWon(0);
             }
 
+            int curPlayerNum;
+            ArrayList<Player> playerArrayList = new ArrayList<>(Arrays.asList(playerList));
             // we can do a check on the number of rounds at this point to see if the game is ongoing.
             while (curGame.getCurRound() != curGame.getNumRounds()) {
-                // this is where you'd implement turn order. I'm not going to do it.
-                for (int i = 0; i < playerList.length; ++i) {
-                    playerList[i] = executeTurn(playerList[i]);
+                //Print out the rounds
+                System.out.println("Round " + curGame.getCurRound());
+                //I do agree that array lists are easier to sort - but not much else.
+                //This probably causes a bunch of memory leaks or something: isn't that a shame.
+                playerArrayList = new ArrayList<>(Arrays.asList(playerList));
+                Collections.sort(playerArrayList);
+
+                //we execute everyone's turns now
+                curPlayerNum = 0;
+                for (Player i : playerArrayList){
+                    playerList[curPlayerNum++] = executeTurn(i);
+                    playerdao.updateHand(i);
                 }
 
                 // this is where we'd execute Luigi's turn.
-                Player luigi = new Player();
-                luigi = executeLuigi(luigi);
+                executeLuigi();
 
                 System.out.println("Calculating payouts");
                 //Now we run a function which pays out tokens compared to Luigi
                 for (Player player : playerList) {
-                    player.setTokens(player.getTokens() + determinePayout(player, luigi));
+                    player.setTokens(player.getTokens() + determinePayout(player));
                     System.out.println(player.getPlayerName() + " has " + player.getTokens() + " tokens. ");
+                    playerdao.update_long("tokens", player.getTokens(), player);
                 }
                 // we can do a check on the number of rounds at this point to see if the game is ongoing.
                 //we should increment the current round and keep on going.
@@ -300,13 +317,36 @@ public class GamePlay {
             }
 
             //once we break out of the loop we can determine the winner.
-            Player winner = determineWinner(playerList);
 
-            System.out.println("\nCongrats, " + winner.getPlayerName() + " has won! ");
+            System.out.println("\nGame over. Placements: ");
+
+            curPlayerNum = 0;
+            for (Player player : playerArrayList){
+                System.out.println((curPlayerNum +1) + " place: " + player.getPlayerName());
+                ++curPlayerNum;
+                switch (curPlayerNum){
+                    case 0:
+                        player.setFirstPlaces(player.getFirstPlaces() + 1);
+                        playerdao.update_int("first_places", player.getFirstPlaces(), player);
+                        continue;
+                    case 1:
+                        player.setSecondPlaces(player.getSecondPlaces() + 1);
+                        playerdao.update_int("second_places", player.getSecondPlaces(), player);
+                        continue;
+                    case 2:
+                        player.setThirdPlaces(player.getThirdPlaces() + 1);
+                        playerdao.update_int("third_places", player.getThirdPlaces(), player);
+                        continue;
+                    case 3:
+                        player.setFourthPlaces(player.getFourthPlaces() + 1);
+                        playerdao.update_int("fourth_places", player.getFourthPlaces(), player);
+                        continue;
+                    default:
+                }
+            }
 
 
             //Game updates
-            curGame.setWinner(winner.getPlayerName());
             gamedao.update_all(curGame);
         }
         catch (SQLException e) {

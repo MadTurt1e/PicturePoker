@@ -12,9 +12,10 @@ public class PlayerDAO extends DataAccessObject<Player>{
     + "p_id, p_name, passcode, dollars, first_places, second_places, third_places, "
     + "fourth_places, lifetime_tokens, tokens, bet, rounds_won FROM player WHERE p_id = ?";
     private static final String CREATE_NEW_PLAYER = "INSERT INTO player (p_name, passcode) VALUES (?, ?)";
-    private static final String ADD_NEW_PLAYER_INTO_GAMES = "INSERT INTO player_in_game (p_id, g_id) VALUES (?, null)";
+    private static final String ADD_NEW_PLAYER_INTO_GAMES = "INSERT INTO player_in_game (p_id, g_id) VALUES (?, 0)";
     private static final String CREATE_NEW_CARD = "INSERT INTO player_card (p_id, hand_pos, suit) VALUES (?, ?, ?)";
-    private static final String UPDATE_PLAYER_BY_ID = "UPDATE player SET ? = ? WHERE p_id = ?";
+    private static final String UPDATE_PLAYER_BY_ID_START = "UPDATE player SET ";
+    private static final String UPDATE_PLAYER_BY_ID_END = " = ? WHERE p_id = ?";
     private static final String GET_ID_BY_NAME = "SELECT p_id FROM player WHERE p_name = ?";
     private static final String UPDATE_CARD = "UPDATE player_card SET suit = ? WHERE p_id = ? AND hand_pos = ?";
     public PlayerDAO(Connection connection){
@@ -135,10 +136,22 @@ public class PlayerDAO extends DataAccessObject<Player>{
 
     @Override
     public Player update_long(String attribute, long value, Player dto){
-        try(PreparedStatement statement = this.connection.prepareStatement(UPDATE_PLAYER_BY_ID)){
-            statement.setString(1, attribute);
-            statement.setLong(2, value);
-            statement.setLong(3, dto.getID());
+        try(PreparedStatement statement = this.connection.prepareStatement(UPDATE_PLAYER_BY_ID_START + attribute + UPDATE_PLAYER_BY_ID_END)){
+            statement.setLong(1, value);
+            statement.setLong(2, dto.getID());
+            statement.execute();
+            return dto;
+        }
+        catch(SQLException e){
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Player update_int(String attribute, int value, Player dto){
+        try(PreparedStatement statement = this.connection.prepareStatement(UPDATE_PLAYER_BY_ID_START + attribute + UPDATE_PLAYER_BY_ID_END)){
+            statement.setInt(1, value);
+            statement.setLong(2, dto.getID());
             statement.execute();
             return dto;
         }
@@ -150,10 +163,9 @@ public class PlayerDAO extends DataAccessObject<Player>{
 
 
     public Player update_string(String attribute, String data, Player dto){
-        try(PreparedStatement statement = this.connection.prepareStatement(UPDATE_PLAYER_BY_ID)){
-            statement.setString(1, attribute);
-            statement.setString(2, data);
-            statement.setLong(3, dto.getID());
+        try(PreparedStatement statement = this.connection.prepareStatement(UPDATE_PLAYER_BY_ID_START + attribute + UPDATE_PLAYER_BY_ID_END)){
+            statement.setString(1, data);
+            statement.setLong(2, dto.getID());
             statement.execute();
             return dto;
         }

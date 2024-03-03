@@ -1,14 +1,17 @@
- Game_Turn
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f2868c71-a371-4f94-b97f-36b9e72882c0" name="Changes" comment="Updated files, fixed errors. &#10;Luigi class exists - AI to be completed.">
+    <list default="true" id="ef1b7bd3-23f3-4fec-b7a1-7cd85bf83aaf" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Database SQL/databaseCreation.sql" beforeDir="false" afterPath="$PROJECT_DIR$/Database SQL/databaseCreation.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/Game.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/Game.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/GameDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/GameDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/GamePlay.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/GamePlay.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/PicturePokerGame.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/PicturePokerGame.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/gamePlay.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/GamePlay.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/PlayerDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/PlayerDAO.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,7 +40,6 @@
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
   </component>
-
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 6
 }</component>
@@ -49,23 +51,18 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
- Game_Turn
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
     "Spring Boot.PicturePokerGame.executor": "Run",
-    "git-widget-placeholder": "Game__Turn",
-
-    "ignore.virus.scanning.warn.message": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "//wsl.localhost/Ubuntu/home/jeffreyw/picturepoker",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
- Game_Turn
-    "settings.editor.selected.configurable": "reference.settingsDialog.application.dockerMachine",
-    "vue.rearranger.settings.migration": "true"
+    "git-widget-placeholder": "Per__Turn__Operation",
+    "node.js.selected.package.tslint": "(autodetect)"
+  },
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "postgresql"
+    ]
   }
 }]]></component>
   <component name="RunManager">
@@ -76,13 +73,6 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-  </component>
-  <component name="SharedIndexes">
-    <attachedChunks>
-      <set>
-        <option value="jdk-21.0.2-openjdk-21.0.2-4caba194b151-78a6f59c" />
-      </set>
-    </attachedChunks>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -175,5 +165,16 @@
     <MESSAGE value="Removed drop table suits&#10;Dropping tables is an exercise left to the reader." />
     <MESSAGE value="Updated files, fixed errors. &#10;Luigi class exists - AI to be completed." />
     <option name="LAST_COMMIT_MESSAGE" value="Updated files, fixed errors. &#10;Luigi class exists - AI to be completed." />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/GamePlay.java</url>
+          <line>145</line>
+          <option name="timeStamp" value="9" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

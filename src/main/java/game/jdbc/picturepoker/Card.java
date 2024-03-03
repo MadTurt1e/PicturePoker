@@ -5,13 +5,12 @@ import static java.lang.Math.random;
 
 public class Card {
     private Suit suit;
-
     private boolean toChange;
 
     // Enum for the suit of the card
     public enum Suit {
         // Suits are listed in increasing strength for ordinal() to be used effectively
-        CLOUD, MUSHROOM, FIRE_FLOWER, LUIGI, MARIO, STAR;
+        CLOUD, MUSHROOM, FIRE_FLOWER, LUIGI, MARIO, STAR
     }
     
     // Default constructor- Generates random suit
@@ -45,7 +44,7 @@ public class Card {
         this.toChange = toChange;
     }
 
-    public void changeSuit(){
+    public void redrawSuit(){
         if(toChange){
             suit = selectRandomSuit();
             toChange = false;
@@ -59,7 +58,7 @@ public class Card {
                 return s;
             }
         }
-        // Mitigate potential out of bounds errors with math.random with failsafe
+        // Mitigate potential out-of-bounds errors with math.random with failsafe
         return Suit.CLOUD;
     }
     

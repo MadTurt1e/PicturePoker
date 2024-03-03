@@ -1,5 +1,6 @@
 package game.jdbc.picturepoker;
 
+import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 // import jdk.internal.misc.InnocuousThread;
 import org.springframework.boot.SpringApplication;
@@ -22,7 +23,7 @@ public class PicturePokerGame {
     @GetMapping("/helloWorld")
     public String helloWorld() {
         System.out.println("Hello, World!");
-        return("HELLO WORLD");
+        return ("HELLO WORLD");
     }
 
     // CREATE Operation: Make new player
@@ -42,16 +43,15 @@ public class PicturePokerGame {
             player.setPasscode(inputMap.get("password"));
             player = playerdao.create(player);
             System.out.println(player);
-        }
-        catch(SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return player;
     }
 
     //CREATE Operation: creates new game
-    @PostMapping("/startNewGame")
-    public Game createNewGame(@RequestBody String json) throws JsonProcessingException{
+    @PostMapping("/createNewGame")
+    public Game createNewGame(@RequestBody String json) throws JsonProcessingException {
         System.out.println(json);
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, String> inputMap = objectMapper.readValue(json, Map.class);
@@ -63,22 +63,16 @@ public class PicturePokerGame {
             GameDAO gamedao = new GameDAO(connection);
             PlayerDAO playerDAO = new PlayerDAO(connection);
 
-            // A new game consists of 4 players, a chosen number of rounds, and a pot quantity
-            long[] playerList = new long[4];
-            playerList[0] = (playerDAO.findIDByName(inputMap.get("p1Name")));
-            playerList[1] = (playerDAO.findIDByName(inputMap.get("p2Name")));
-            playerList[2] = (playerDAO.findIDByName(inputMap.get("p3Name")));
-            playerList[3] = (playerDAO.findIDByName(inputMap.get("p4Name")));
-            game.setPlayers(playerList);
-
+            // A new game consists a chosen number of rounds, a pot quantity, buy in value (token stakes, and difficulty
             game.setNumRounds(Integer.parseInt(inputMap.get("rounds")));
             game.setPotQuantity(Integer.parseInt(inputMap.get("potQuantity")));
+            game.setBuyIn(Integer.parseInt(inputMap.get("buyIn")));
+            game.setDifficulty(Integer.parseInt(inputMap.get("difficulty")));
             game = gamedao.create(game);
             //once all the necessary values are created, we can make the game.
 
             System.out.println(game);
-        }
-        catch(SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
 
@@ -98,8 +92,7 @@ public class PicturePokerGame {
 
             player = playerDAO.findByName(playerName);
             System.out.println(player);
-        }
-        catch(SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return player;
@@ -122,8 +115,7 @@ public class PicturePokerGame {
             game.setPlayers(gamedao.getPIDsByGame(game));
 
             System.out.println(game);
-        }
-        catch(SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return game;
@@ -131,7 +123,7 @@ public class PicturePokerGame {
 
     //UPDATE Operation - Update a player
     @PutMapping("/updatePlayer/{p_id}")
-    public Player updateByPID(@PathVariable("p_id") String p_idStr){
+    public Player updateByPID(@PathVariable("p_id") String p_idStr) {
         System.out.println(p_idStr);
 
         //TODO: Finish this
@@ -139,33 +131,104 @@ public class PicturePokerGame {
 
     // UPDATE Operation - Update current game details
     @PutMapping("/updateGame/{g_id}")
-    public Game updateByGID(@PathVariable("g_id") String g_idStr){
+    public Game updateByGID(@PathVariable("g_id") String g_idStr) {
         System.out.println(g_idStr);
         //TODO: Finish this
     }
 
     //DELETE Operation - Delete a player
     @DeleteMapping("/deletePlayer/{p_id}")
-    public Player deleteByPID(@PathVariable("p_id") String p_idStr){
-        //TODO: Finish this
+    public Player deleteByPID(@PathVariable("p_id") String p_idStr) {
+        System.out.println(p_idStr);
+        long p_id = Long.parseLong(p_idStr);
+        DatabaseConnectionManager dcm = new DatabaseConnectionManager("localhost",
+                "picturepoker", "postgres", "password");
+        Player player = new Player();
+        try {
+            Connection connection = dcm.getConnection();
+            PlayerDAO playerDAO = new PlayerDAO(connection);
+            player = playerDAO.deletePlayer(p_id);
+
+            System.out.println(player);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return player;
     }
 
     //DELETE OPERATION - Delete a game
     @DeleteMapping("/deleteGame/{g_id}")
-    public Game deleteByGID(@PathVariable("g_id") String g_idStr){
-        //TODO: Finish this
+    public Game deleteByGID(@PathVariable("g_id") String g_idStr) {
+        System.out.println(g_idStr);
+        long g_id = Long.parseLong(g_idStr);
+        DatabaseConnectionManager dcm = new DatabaseConnectionManager("localhost",
+                "picturepoker", "postgres", "password");
+        Game game = new Game();
+        try {
+            Connection connection = dcm.getConnection();
+            GameDAO gamedao = new GameDAO(connection);
+            game = gamedao.deleteGame(g_id);
+
+            System.out.println(game);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return game;
     }
 
     //Actually play the game
     @GetMapping("/playGame/{gameID}")
-    public Game playGame (@PathVariable("gameID") String gameID){
-        GamePlay gamePlay = new GamePlay();
-        Game game = gamePlay.gameSeq(Long.parseLong(gameID));
+    public Game playGame(@PathVariable("gameID") String g_idStr) {
+        System.out.println(g_idStr);
+        long g_id = Long.parseLong(g_idStr);
+        Game game = new Game();
+        DatabaseConnectionManager dcm = new DatabaseConnectionManager("localhost",
+                "picturepoker", "postgres", "password");
 
+        try {
+            Connection connection = dcm.getConnection();
+            GameDAO gamedao = new GameDAO(connection);
+            PlayerDAO playerdao = new PlayerDAO(connection);
+
+            //pseudo lobby system - just reject starting when the game is not full.
+            int curPlayers = gamedao.findById(g_id).getActivePlayers();
+            if (curPlayers < 4){
+                System.out.println("The game is not full yet! We need " + (4 - curPlayers) + " more players. ");
+                return game;
+            }
+
+            GamePlay gamePlay = new GamePlay();
+            game = gamePlay.gameSeq(g_id, gamedao, playerdao);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         System.out.println(game);
         return game;
     }
-    public static void main (String[] args){
+
+    @PutMapping("/joinGame/{gameID}/{playerName}")
+    public Game joinGame(@PathVariable("gameID") String g_IDStr, @PathVariable("playerName") String p_Name) {
+        System.out.println("GameID: " + g_IDStr + "Player Name: " + p_Name);
+        DatabaseConnectionManager dcm = new DatabaseConnectionManager("localhost",
+                "picturepoker", "postgres", "password");
+        Game game = new Game();
+        try {
+            //Makes a connection, gets a player and the game ID, and tries adding the player to the game.
+            Connection connection = dcm.getConnection();
+            GameDAO gamedao = new GameDAO(connection);
+            PlayerDAO playerdao = new PlayerDAO(connection);
+            Player player = playerdao.findByName(p_Name);
+
+            //stick the player into the game (or at least, it tries)
+            game = gamedao.joinGame(Long.parseLong(g_IDStr), player);
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return game;
+    }
+
+    public static void main(String[] args) {
         SpringApplication.run(PicturePokerGame.class, args);
     }
 }

@@ -18,6 +18,7 @@ public class PlayerDAO extends DataAccessObject<Player>{
     private static final String UPDATE_PLAYER_BY_ID_END = " = ? WHERE p_id = ?";
     private static final String GET_ID_BY_NAME = "SELECT p_id FROM player WHERE p_name = ?";
     private static final String UPDATE_CARD = "UPDATE player_card SET suit = ? WHERE p_id = ? AND hand_pos = ?";
+    private static final String DELETE_PLAYER = "DELETE FROM player WHERE p_id = ?";
     public PlayerDAO(Connection connection){
         super(connection);
     }
@@ -189,5 +190,19 @@ public class PlayerDAO extends DataAccessObject<Player>{
             }
         }
         return dto;
+    }
+
+    //one part of CRUD - honestly this is not necessary, but it must be done.
+    public Player deletePlayer(long p_id) {
+        Player player = findById(p_id);
+        try (PreparedStatement statement = this.connection.prepareStatement(DELETE_PLAYER)) {
+            //RIP game
+            statement.setLong(1, p_id);
+            statement.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return player;
     }
 }

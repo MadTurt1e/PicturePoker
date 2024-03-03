@@ -8,6 +8,7 @@ import java.util.ArrayList;
 public class GameDAO extends DataAccessObject<Game> {
     private static final String GET_GAME_BY_GID = "SELECT g_id, cur_round, num_rounds, active_players, buy_in, pot_quantity, difficulty FROM game WHERE g_id = ?";
     private static final String GET_PIDS_BY_GID = "SELECT p_id FROM player_in_game WHERE g_id = ?";
+    private static final String GET_GID_BY_PID = "SELECT g_id FROM player_in_game WHERE p_id = ?";
     private static final String CREATE_NEW_GAME = "INSERT INTO game (num_rounds, active_players, buy_in, pot_quantity, difficulty) VALUES (?, ?, ?, ?, ?)";
     private static final String CREATE_NEW_CARD = "INSERT INTO dealer_card (g_id, hand_pos, suit) VALUES (?, ?, ?)";
 
@@ -115,6 +116,32 @@ public class GameDAO extends DataAccessObject<Game> {
             System.out.println("The game is full." );
             return game;
         }
+        long curGid = 0;
+        //run a check to see if the original game is still ongoing
+        try (PreparedStatement statement = this.connection.prepareStatement(GET_GID_BY_PID);) {
+            statement.setLong(1, player.getID());
+            ResultSet rs = statement.executeQuery();
+
+            while (rs.next()) {
+                curGid = rs.getLong("g_id");
+            }
+
+            Game curGame = findById(curGid);
+            if (curGame.getCurRound() < curGame.getNumRounds()){
+                System.out.println("The player is still in an active game.");
+                return curGame;
+            }
+            if (curGame.getPotQuantity() * 0.25 > player.getDollars()){
+                System.out.println("The player is too broke to join. Required amount to play: " + (curGame.getPotQuantity() * 0.25) + ", current dollar count: " + player.getDollars());
+                return curGame;
+            }
+
+        } catch (SQLException e) {
+            System.out.println("It doesn't look like the player is in any game.");
+        }
+
+
+
         //update that one table for each player.
         try (PreparedStatement statement2 = this.connection.prepareStatement(ADD_PLAYER_TO_GAME);) {
             statement2.setLong(1, g_id);

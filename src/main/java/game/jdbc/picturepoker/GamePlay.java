@@ -278,8 +278,10 @@ public class GamePlay {
 
         //reset everything we'd need to reset before the game.
         for (Player value : playerList) {
-            value.setTokens(5);
+            value.setTokens(10);
             value.setRoundsWon(0);
+            //drain people's bank accounts
+            value.setDollars(value.getDollars() - (int)(curGame.getPotQuantity() * 0.25));
         }
 
         int curPlayerNum;
@@ -305,6 +307,8 @@ public class GamePlay {
             gamedao.updateHand(curGame);
 
             System.out.println("Calculating payouts");
+
+            int currentRoundWinner = playerScore(curGame.getHand());
             //Now we run a function which pays out tokens compared to Luigi
             for (Player player : playerList) {
                 player.setTokens(player.getTokens() + determinePayout(player));
@@ -323,6 +327,10 @@ public class GamePlay {
 
         System.out.println("\nGame over. Placements: ");
 
+        //update this one last time just incase anything has changed
+        playerArrayList = new ArrayList<>(Arrays.asList(playerList));
+        Collections.sort(playerArrayList);
+
         curPlayerNum = 0;
         for (Player player : playerArrayList) {
             System.out.println((curPlayerNum + 1) + " place: " + player.getPlayerName());
@@ -336,7 +344,7 @@ public class GamePlay {
                     player.setFirstPlaces(player.getFirstPlaces() + 1);
                     playerdao.update_int("first_places", player.getFirstPlaces(), player);
                     //We also want to update the dollars accordingly
-                    playerdao.update_int("dollars", player.getDollars() + (int)(curGame.getPotQuantity() * 0.75), player); //TODO: Get the correct ratios. We can also print money over here.
+                    playerdao.update_int("dollars", player.getDollars() + (int)(curGame.getPotQuantity() * 0.75), player); //TODO: Get the correct ratios, because I doubt this is right
 
                     curGame.setWinner(player.getPlayerName());
                     continue;

@@ -2,20 +2,15 @@ package game.jdbc.picturepoker;
 
 import game.jdbc.picturepoker.util.DataTransferObject;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Game implements DataTransferObject
 {
     private long g_id;
 
-    // I think it would be more effective to store the player ids in an ArrayList.
-    // The new method I added in GameDAO should allow you to just retrieve all the players.
-    private ArrayList<Long> players;
-    //players 1 through 4 will be stored as the player ID from now on.
-    private long p1;
-    private long p2;
-    private long p3;
-    private long p4;
+    // sorry, but nonpreallocated memory is for the weak.
+    private long [] players;
+    //This actually accepts players 1 through n
     private int cur_round;
     private int num_rounds;
     private int active_players;
@@ -34,36 +29,12 @@ public class Game implements DataTransferObject
         this.g_id = g_id;
     }
 
-    public long getP1() {
-        return p1;
+    public long[] getPlayers() {
+        return players;
     }
 
-    public void setP1(long p1) {
-        this.p1 = p1;
-    }
-
-    public long getP2() {
-        return p2;
-    }
-
-    public void setP2(long p2) {
-        this.p2 = p2;
-    }
-
-    public long getP3() {
-        return p3;
-    }
-
-    public void setP3(long p3) {
-        this.p3 = p3;
-    }
-
-    public long getP4() {
-        return p4;
-    }
-
-    public void setP4(long p4) {
-        this.p4 = p4;
+    public void setPlayers(long[] players) {
+        this.players = players;
     }
 
     public int getCurRound() {
@@ -118,6 +89,7 @@ public class Game implements DataTransferObject
         return winner;
     }
 
+    //honestly, database wise it might be better to store the winner as a string, but whatever.
     public void setWinner(String winner){
         this.winner = winner;
     }
@@ -134,23 +106,15 @@ public class Game implements DataTransferObject
     public String toString() {
         return "Game{" +
                 "g_id=" + g_id +
-                ", p1='" + p1 + '\'' +
-                ", p2='" + p2 + '\'' +
-                ", p3='" + p3 + '\'' +
-                ", p4='" + p4 + '\'' +
+                ", players=" + Arrays.toString(players) +
                 ", cur_round=" + cur_round +
                 ", num_rounds=" + num_rounds +
                 ", active_players=" + active_players +
                 ", buy_in=" + buy_in +
                 ", pot_quantity=" + pot_quantity +
                 ", difficulty=" + difficulty +
-                ", winner= " + winner +
+                ", winner='" + winner + '\'' +
+                ", hand=" + Arrays.toString(hand) +
                 '}';
     }
-
-    //This is likely where the logic goes to calculate token distribution
-    //TODO: Implement method that checks tokens to figure out winner. This is where we'd use it.
-//    public String getWinner() {
-//        return ;
-//    }
 }

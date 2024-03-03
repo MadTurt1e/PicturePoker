@@ -1,7 +1,7 @@
 package game.jdbc.picturepoker;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-// import jdk.internal.misc.InnocuousThread; // Why is this here?
+// import jdk.internal.misc.InnocuousThread;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.*;
@@ -27,15 +27,14 @@ public class PicturePokerGame {
     @GetMapping("/getByPlayerName/{playerName}")
     public Player getByPlayerName(@PathVariable("playerName") String playerName) {
         System.out.println(playerName);
-        DatabaseConnectionManager dcm = new DatabaseConnectionManager("db",
+        DatabaseConnectionManager dcm = new DatabaseConnectionManager("localhost",
                 "picturepoker", "postgres", "password");
         Player player = new Player();
-        player.setPlayerName(playerName);
         try {
             Connection connection = dcm.getConnection();
             PlayerDAO playerDAO = new PlayerDAO(connection);
 
-            player = playerDAO.findById(player.getID());
+            player = playerDAO.findByName(playerName);
             System.out.println(player);
         }
         catch(SQLException e) {
@@ -49,7 +48,7 @@ public class PicturePokerGame {
         System.out.println(json);
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, String> inputMap = objectMapper.readValue(json, Map.class);
-        DatabaseConnectionManager dcm = new DatabaseConnectionManager("db",
+        DatabaseConnectionManager dcm = new DatabaseConnectionManager("localhost",
                 "picturepoker", "postgres", "password");
         Player player = new Player();
         try {
@@ -72,18 +71,21 @@ public class PicturePokerGame {
         System.out.println(json);
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, String> inputMap = objectMapper.readValue(json, Map.class);
-        DatabaseConnectionManager dcm = new DatabaseConnectionManager("db",
+        DatabaseConnectionManager dcm = new DatabaseConnectionManager("localhost",
                 "picturepoker", "postgres", "password");
         Game game = new Game();
         try {
             Connection connection = dcm.getConnection();
             GameDAO gamedao = new GameDAO(connection);
             PlayerDAO playerDAO = new PlayerDAO(connection);
+
             // A new game consists of 4 players, a chosen number of rounds, and a pot quantity
-            game.setP1(playerDAO.findIDByName(inputMap.get("p1Name")));
-            game.setP2(playerDAO.findIDByName(inputMap.get("p2Name")));
-            game.setP3(playerDAO.findIDByName(inputMap.get("p3Name")));
-            game.setP4(playerDAO.findIDByName(inputMap.get("p4Name")));
+            long[] playerList = new long[4];
+            playerList[0] = (playerDAO.findIDByName(inputMap.get("p1Name")));
+            playerList[1] = (playerDAO.findIDByName(inputMap.get("p2Name")));
+            playerList[2] = (playerDAO.findIDByName(inputMap.get("p3Name")));
+            playerList[3] = (playerDAO.findIDByName(inputMap.get("p4Name")));
+            game.setPlayers(playerList);
 
             game.setNumRounds(Integer.parseInt(inputMap.get("rounds")));
             game.setPotQuantity(Integer.parseInt(inputMap.get("potQuantity")));
@@ -99,7 +101,7 @@ public class PicturePokerGame {
         return game;
     }
 
-    @PostMapping("/playGame/{gameID}")
+    @GetMapping("/playGame/{gameID}")
     public Game playGame (@PathVariable("gameID") String gameID){
         GamePlay gamePlay = new GamePlay();
         Game game = gamePlay.gameSeq(Long.parseLong(gameID));

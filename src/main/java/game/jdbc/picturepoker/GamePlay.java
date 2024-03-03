@@ -277,6 +277,8 @@ public class GamePlay {
 
             //Next, we get the current game state using the game ID.
             curGame = gamedao.findById(gameID);
+            //of course, we also have to get the players because gameDAO is weird like that.
+            curGame.setPlayers(gamedao.getPIDsByGame(curGame));
 
             long[]playerIDList = curGame.getPlayers();
 
@@ -339,6 +341,7 @@ public class GamePlay {
                     case 0:
                         player.setFirstPlaces(player.getFirstPlaces() + 1);
                         playerdao.update_int("first_places", player.getFirstPlaces(), player);
+                        curGame.setWinner(player.getPlayerName());
                         continue;
                     case 1:
                         player.setSecondPlaces(player.getSecondPlaces() + 1);

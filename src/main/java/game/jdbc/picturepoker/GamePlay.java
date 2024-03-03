@@ -430,10 +430,4 @@ public class GamePlay {
         // return the game state
         return curGame;
     }
-
-    public static void main(String[] args) {
-
-        GamePlay game = new GamePlay();
-        game.gameSeq(14);
-    }
 }

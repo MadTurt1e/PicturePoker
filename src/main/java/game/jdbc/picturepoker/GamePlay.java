@@ -86,6 +86,7 @@ public class GamePlay {
                     hand[i].setToChange(true);
             } catch (InputMismatchException e) {
                 System.out.println("Player must input true or false!");
+                --i;
                 scan.nextLine();
             }
         }
@@ -427,19 +428,21 @@ public class GamePlay {
             //Now we run a function which pays out tokens compared to Luigi
             for (Player player : playerList) {
                 player.setTokens(player.getTokens() + determinePayout(player));
-
-                ++curPlayerNum;
                 //determine the current round winner
                 if (currentRoundWinner < playerScore(player.getHand())){
                     currentRoundWinner = playerScore(player.getHand());
                     winnerIndex = curPlayerNum;
                 }
-
                 System.out.println(player.getPlayerName() + " has " + player.getTokens() + " tokens. ");
                 playerdao.update_long("tokens", player.getTokens(), player);
+                ++curPlayerNum;
             }
-            playerList[curPlayerNum].setRoundsWon(playerList[curPlayerNum].getRoundsWon() + 1);
-            playerdao.update_int("rounds_won", playerList[curPlayerNum].getRoundsWon(), playerList[curPlayerNum]);
+
+            //only set a winner if there is one...
+            if (winnerIndex != -1) {
+                playerList[winnerIndex].setRoundsWon(playerList[winnerIndex].getRoundsWon() + 1);
+                playerdao.update_int("rounds_won", playerList[winnerIndex].getRoundsWon(), playerList[winnerIndex]);
+            }
 
             //we should increment the current round and keep on going.
             curGame.setCurRound(curGame.getCurRound() + 1);

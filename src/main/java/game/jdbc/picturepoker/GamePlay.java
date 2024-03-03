@@ -309,13 +309,25 @@ public class GamePlay {
             System.out.println("Calculating payouts");
 
             int currentRoundWinner = playerScore(curGame.getHand());
+            int winnerIndex = -1;
+            curPlayerNum = 0;
             //Now we run a function which pays out tokens compared to Luigi
             for (Player player : playerList) {
                 player.setTokens(player.getTokens() + determinePayout(player));
+
+                ++curPlayerNum;
+                //determine the current round winner
+                if (currentRoundWinner < playerScore(player.getHand())){
+                    currentRoundWinner = playerScore(player.getHand());
+                    winnerIndex = curPlayerNum;
+                }
+
                 System.out.println(player.getPlayerName() + " has " + player.getTokens() + " tokens. ");
                 playerdao.update_long("tokens", player.getTokens(), player);
             }
-            // we can do a check on the number of rounds at this point to see if the game is ongoing.
+            playerList[curPlayerNum].setRoundsWon(playerList[curPlayerNum].getRoundsWon() + 1);
+            playerdao.update_int("rounds_won", playerList[curPlayerNum].getRoundsWon(), playerList[curPlayerNum]);
+
             //we should increment the current round and keep on going.
             curGame.setCurRound(curGame.getCurRound() + 1);
 

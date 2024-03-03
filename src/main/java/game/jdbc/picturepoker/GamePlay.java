@@ -155,8 +155,10 @@ public class GamePlay {
     //This function does a score calculation on a player.
     private int playerScore(Card[] hand) {
         int score = 0;
-
-        int[] suitCount = new int[7];
+        int[] suitCount = new int[6];
+        boolean pairFound = false; // For evaluating two pairs
+        int singleton_mult = 120;
+        int singletons_found = 0;
 
         Card.Suit curSuit;
         //count the number of each suit - start from 1 to prevent any weird errors
@@ -164,53 +166,63 @@ public class GamePlay {
             curSuit = card.getSuit();
             switch (curSuit) {
                 case STAR:
-                    ++suitCount[6];
-                    break;
-                case MARIO:
                     ++suitCount[5];
                     break;
-                case LUIGI:
+                case MARIO:
                     ++suitCount[4];
                     break;
-                case FIRE_FLOWER:
+                case LUIGI:
                     ++suitCount[3];
                     break;
-                case MUSHROOM:
+                case FIRE_FLOWER:
                     ++suitCount[2];
                     break;
-                case CLOUD:
+                case MUSHROOM:
                     ++suitCount[1];
+                    break;
+                case CLOUD:
+                    ++suitCount[0];
                     break;
             }
         }
 
         //convert suits to int
-        for (int i = 1; i < suitCount.length; ++i){
-            //we also tally up the individual cards as an extra differentiator as well.
-            score += (suitCount[i] * i);
-            // 5 stars gain 300 extra bonus points, and 5 clouds gain nothing - suits help, but they can't beat an entire hand
-            // Also, 4 stars is much better than 4 clouds, etc.
-
+        // We should evaluate from high to low so that a higher pair breaks ties first
+        for (int i = suitCount.length - 1; i >= 0; --i){
+            // Each digit represents whether a certain set of cards exists and of what type
+            // Ex: a 30000000 = 3*10000000 represents a 5 of a kind of Flowers
             if (suitCount[i] == 5){
-                score += (230800); // easy way to tell differences between hand strengths - just use huge numbers
-                score += (i*9600);
+                score += (i+1) * 10000000; // easy way to tell differences between hand strengths - just use huge numbers
                 break;
             }
             if (suitCount[i] == 4){
-                score += (173100);
-                score += (i*1600);
-                continue;
+                score += (i+1) * 1000000;
             }
             if (suitCount[i] == 3){
-                score += (115400); // pairs start mattering from here
-                score += (i*250);
-                continue;
+                score += (i+1) * 100000; // pairs start mattering from here
             }
             if (suitCount[i] == 2){
-                score += (57700); //Double pair is 20k, single triple becomes 30k, and triple and pair is 40k.
-                score += (i*40);
-            } // jeffrey example - {Mushroom, Mushroom, Mushroom, Cloud, Cloud} vs {Cloud, Cloud, Cloud, Star, Star}
-            //Result is 173648 vs 173605 - it works baybee
+                if(!pairFound){
+                    score += (i+1) * 10000; //Double pair is 11000, single triple becomes 100000, and full house is 110000.
+                    pairFound = true;
+                }
+                else{
+                    score += (i+1) * 1000; // There should only ever be up to two pairs at once.
+                }
+
+            }
+            // We note that every singleton is unique, so we can only see one Star, then one Mario, and so on
+            // We can represent every combination of singletons uniquely using integers
+            // Using the mapping 120*[0,5] + 24[0,4] + 6[0,3] + 2[0,2] + 1[0,1],
+            // where each term corresponds to the ith highest singleton.
+            // This is necessary to completely correctly evaluate one pair hands
+            // This does not interfere with any higher sets because the singleton max
+            // is 6! - 1 = 719 < 1000.
+            if(suitCount[i] == 1){
+                score += singleton_mult * i;
+                singleton_mult /= (5-singletons_found);
+                singletons_found++;
+            }
         }
 
         //that's the entire score calculation done.
@@ -218,48 +230,40 @@ public class GamePlay {
     }
 
     //score calculate, compare, and multiply the pots
-    private int determinePayout(Player player){
+    private int determinePayout(Player player) {
         int playerScore = playerScore(player.getHand());
-        if (playerScore <= playerScore(curGame.getHand())){
+        if (playerScore <= playerScore(curGame.getHand())) {
             System.out.println(player.getPlayerName() + " did not beat Luigi. ");
             return 0;
         }
-        int prizeTier = playerScore / 1000;
-        return switch (prizeTier) {
-            case 6 -> {
-                System.out.println(player.getPlayerName() + " got a flush! ");
-                yield player.getBet() * 12;
-            }
-            case 5 -> {
-                System.out.println(player.getPlayerName() + " got a four of a kind! ");
-                yield player.getBet() * 8;
-            }
-            case 4 -> {
-                System.out.println(player.getPlayerName() + " got a full house! ");
-                yield player.getBet() * 6;
-            }
-            case 3 -> {
-                System.out.println(player.getPlayerName() + " got a three of a kind! ");
-                yield player.getBet() * 4;
-            }
-            case 2 -> {
-                System.out.println(player.getPlayerName() + " got two pairs! ");
-                yield player.getBet() * 3;
-            }
-            case 1 -> {
-                System.out.println(player.getPlayerName() + " got a pair! ");
-                yield player.getBet() * 2;
-            }
-            case 0 -> {
-                System.out.println(player.getPlayerName() + ", how did you beat Luigi?");
-                yield player.getBet();
-            }
-            default ->
-
-                //there should be no case anyone gets here.
-                    0;
-        };
-
+        if (playerScore >= 10000000) {
+            System.out.println(player.getPlayerName() + " got a flush! ");
+            return player.getBet() * 12;
+        }
+        if (playerScore >= 1000000) {
+            System.out.println(player.getPlayerName() + " got a four of a kind! ");
+            return player.getBet() * 8;
+        }
+        if (playerScore >= 110000){
+            System.out.println(player.getPlayerName() + " got a full house! ");
+            return player.getBet() * 6;
+        }
+        if (playerScore >= 100000){
+            System.out.println(player.getPlayerName() + " got a three of a kind! ");
+            return player.getBet() * 4;
+        }
+        if(playerScore >= 11000){
+            System.out.println(player.getPlayerName() + " got a two pair! ");
+            return player.getBet() * 3;
+        }
+        if(playerScore >= 10000){
+            System.out.println(player.getPlayerName() + " got a one pair! ");
+            return player.getBet() * 2;
+        }
+        else{
+            System.out.println(player.getPlayerName() + ", how did you beat Luigi?");
+            return player.getBet();
+        }
     }
 
     public Game gameSeq(long gameID) {
@@ -273,6 +277,8 @@ public class GamePlay {
 
             //Next, we get the current game state using the game ID.
             curGame = gamedao.findById(gameID);
+            //of course, we also have to get the players because gameDAO is weird like that.
+            curGame.setPlayers(gamedao.getPIDsByGame(curGame));
 
             long[]playerIDList = curGame.getPlayers();
 
@@ -335,6 +341,7 @@ public class GamePlay {
                     case 0:
                         player.setFirstPlaces(player.getFirstPlaces() + 1);
                         playerdao.update_int("first_places", player.getFirstPlaces(), player);
+                        curGame.setWinner(player.getPlayerName());
                         continue;
                     case 1:
                         player.setSecondPlaces(player.getSecondPlaces() + 1);

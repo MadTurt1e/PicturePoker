@@ -2,7 +2,7 @@ package game.jdbc.picturepoker;
 
 import game.jdbc.picturepoker.util.DataTransferObject;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Game implements DataTransferObject
 {
@@ -10,11 +10,7 @@ public class Game implements DataTransferObject
 
     // sorry, but nonpreallocated memory is for the weak.
     private long [] players;
-    //players 1 through 4 will be stored as the player ID from now on.
-    private long p1;
-    private long p2;
-    private long p3;
-    private long p4;
+    //This actually accepts players 1 through n
     private int cur_round;
     private int num_rounds;
     private int active_players;
@@ -93,6 +89,7 @@ public class Game implements DataTransferObject
         return winner;
     }
 
+    //honestly, database wise it might be better to store the winner as a string, but whatever.
     public void setWinner(String winner){
         this.winner = winner;
     }
@@ -109,23 +106,15 @@ public class Game implements DataTransferObject
     public String toString() {
         return "Game{" +
                 "g_id=" + g_id +
-                ", p1='" + p1 + '\'' +
-                ", p2='" + p2 + '\'' +
-                ", p3='" + p3 + '\'' +
-                ", p4='" + p4 + '\'' +
+                ", players=" + Arrays.toString(players) +
                 ", cur_round=" + cur_round +
                 ", num_rounds=" + num_rounds +
                 ", active_players=" + active_players +
                 ", buy_in=" + buy_in +
                 ", pot_quantity=" + pot_quantity +
                 ", difficulty=" + difficulty +
-                ", winner= " + winner +
+                ", winner='" + winner + '\'' +
+                ", hand=" + Arrays.toString(hand) +
                 '}';
     }
-
-    //This is likely where the logic goes to calculate token distribution
-    //TODO: Implement method that checks tokens to figure out winner. This is where we'd use it.
-//    public String getWinner() {
-//        return ;
-//    }
 }

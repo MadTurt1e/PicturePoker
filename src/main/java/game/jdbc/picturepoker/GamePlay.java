@@ -1,8 +1,5 @@
 package game.jdbc.picturepoker;
 
-
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.*;
 
 
@@ -329,24 +326,34 @@ public class GamePlay {
         curPlayerNum = 0;
         for (Player player : playerArrayList) {
             System.out.println((curPlayerNum + 1) + " place: " + player.getPlayerName());
-            ++curPlayerNum;
-            switch (curPlayerNum) {
+
+            //we also want to update the lifetime tokens while we're here. Also the dollar counts.
+            player.setLifetimeTokens(player.getTokens() + player.getLifetimeTokens());
+            playerdao.update_long("lifetime_tokens", player.getLifetimeTokens(), player);
+
+            switch (curPlayerNum++) {
                 case 0:
                     player.setFirstPlaces(player.getFirstPlaces() + 1);
                     playerdao.update_int("first_places", player.getFirstPlaces(), player);
+                    //We also want to update the dollars accordingly
+                    playerdao.update_int("dollars", player.getDollars() + (int)(curGame.getPotQuantity() * 0.75), player); //TODO: Get the correct ratios. We can also print money over here.
+
                     curGame.setWinner(player.getPlayerName());
                     continue;
                 case 1:
                     player.setSecondPlaces(player.getSecondPlaces() + 1);
                     playerdao.update_int("second_places", player.getSecondPlaces(), player);
+                    playerdao.update_int("dollars", player.getDollars() + (int)(curGame.getPotQuantity() * 0.50), player);
                     continue;
                 case 2:
                     player.setThirdPlaces(player.getThirdPlaces() + 1);
                     playerdao.update_int("third_places", player.getThirdPlaces(), player);
+                    playerdao.update_int("dollars", player.getDollars() + (int)(curGame.getPotQuantity() * 0.25), player);
                     continue;
                 case 3:
                     player.setFourthPlaces(player.getFourthPlaces() + 1);
                     playerdao.update_int("fourth_places", player.getFourthPlaces(), player);
+                    playerdao.update_int("dollars", player.getDollars(), player);
                     continue;
                 default:
             }

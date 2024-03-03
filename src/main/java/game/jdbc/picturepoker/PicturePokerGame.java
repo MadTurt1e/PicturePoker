@@ -1,16 +1,12 @@
 package game.jdbc.picturepoker;
 
-import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import com.fasterxml.jackson.core.JsonProcessingException;
-// import jdk.internal.misc.InnocuousThread;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,11 +15,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @SpringBootApplication
 @RestController
 public class PicturePokerGame {
+
+    //Set the hostname as a pseudo global so we can change it later
+    private final String hostname = "localhost";
+
     //Test operation - is this thing on?
     @GetMapping("/helloWorld")
     public String helloWorld() {
         System.out.println("Hello, World!");
         return ("HELLO WORLD");
+    }
+
+    //homepage
+    @GetMapping("/")
+    public String homepage() {
+        System.out.println("Welcome to PicturePoker");
+        return ("Welcome to Luigi's Picture Poker");
     }
 
     // CREATE Operation: Make new player
@@ -32,7 +39,7 @@ public class PicturePokerGame {
         System.out.println(json);
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, String> inputMap = objectMapper.readValue(json, Map.class);
-        DatabaseConnectionManager dcm = new DatabaseConnectionManager("localhost",
+        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,
                 "picturepoker", "postgres", "password");
         Player player = new Player();
         try {
@@ -55,13 +62,12 @@ public class PicturePokerGame {
         System.out.println(json);
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, String> inputMap = objectMapper.readValue(json, Map.class);
-        DatabaseConnectionManager dcm = new DatabaseConnectionManager("localhost",
+        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,
                 "picturepoker", "postgres", "password");
         Game game = new Game();
         try {
             Connection connection = dcm.getConnection();
             GameDAO gamedao = new GameDAO(connection);
-            PlayerDAO playerDAO = new PlayerDAO(connection);
 
             // A new game consists a chosen number of rounds, a pot quantity, buy in value (token stakes, and difficulty
             game.setNumRounds(Integer.parseInt(inputMap.get("rounds")));
@@ -83,7 +89,7 @@ public class PicturePokerGame {
     @GetMapping("/getByPlayerName/{playerName}")
     public Player getByPlayerName(@PathVariable("playerName") String playerName) {
         System.out.println(playerName);
-        DatabaseConnectionManager dcm = new DatabaseConnectionManager("localhost",
+        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,
                 "picturepoker", "postgres", "password");
         Player player = new Player();
         try {
@@ -99,12 +105,12 @@ public class PicturePokerGame {
     }
 
     //READ Operation - Read a game's full details
-    @GetMapping("/getByGameID/{g_id}}")
+    @GetMapping("/getByGameID/{g_id}")
     public Game getByGameID(@PathVariable("g_id") String g_idStr) {
         System.out.println(g_idStr);
         long g_id = Long.parseLong(g_idStr);
 
-        DatabaseConnectionManager dcm = new DatabaseConnectionManager("localhost",
+        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,
                 "picturepoker", "postgres", "password");
         Game game = new Game();
         try {
@@ -123,25 +129,76 @@ public class PicturePokerGame {
 
     //UPDATE Operation - Update a player
     @PutMapping("/updatePlayer/{p_id}")
-    public Player updateByPID(@PathVariable("p_id") String p_idStr) {
-        System.out.println(p_idStr);
+    public Player updateByPID(@PathVariable long p_id, @RequestBody Player player) {
+        System.out.println(p_id);
+        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,
+                "picturepoker", "postgres", "password");
+        Player updatedPlayer;
+        try {
+            Connection connection = dcm.getConnection();
+            PlayerDAO playerdao = new PlayerDAO(connection);
+            updatedPlayer = playerdao.findById(p_id);
 
-        //TODO: Finish this
+            updatedPlayer.setID(player.getID());
+            updatedPlayer.setPlayerName(player.getPlayerName());
+            updatedPlayer.setPasscode(player.getPasscode());
+            updatedPlayer.setDollars(player.getDollars());
+
+            // Per player game statistics
+            updatedPlayer.setFirstPlaces(player.getFirstPlaces());
+            updatedPlayer.setSecondPlaces(player.getSecondPlaces());
+            updatedPlayer.setThirdPlaces(player.getThirdPlaces());
+            updatedPlayer.setFourthPlaces(player.getFourthPlaces());
+            updatedPlayer.setLifetimeTokens(player.getLifetimeTokens());
+
+            //update everything
+            playerdao.update_all(updatedPlayer);
+            System.out.println(updatedPlayer);
+
+            return updatedPlayer;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return player;
     }
 
-    // UPDATE Operation - Update current game details
+    // UPDATE Operation - Update current game details. We're never really going to need this, but
     @PutMapping("/updateGame/{g_id}")
-    public Game updateByGID(@PathVariable("g_id") String g_idStr) {
-        System.out.println(g_idStr);
-        //TODO: Finish this
+    public Game updateByGID(@PathVariable Long g_id, @RequestBody Game game) {
+        System.out.println(g_id);
+        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,
+                "picturepoker", "postgres", "password");
+        Game updatedGame;
+        try {
+            Connection connection = dcm.getConnection();
+            GameDAO gamedao = new GameDAO(connection);
+            updatedGame = gamedao.findById(g_id);
+
+            //update all the things that we may want to update (no changing ID or any temporary stuff
+            updatedGame.setCurRound(game.getCurRound());
+            updatedGame.setNumRounds(game.getNumRounds());
+            updatedGame.setActivePlayers(game.getActivePlayers());
+            updatedGame.setBuyIn(game.getBuyIn());
+            updatedGame.setPotQuantity(game.getPotQuantity());
+            updatedGame.setDifficulty(game.getDifficulty());
+            updatedGame.setWinner(game.getWinner());
+
+            //and update it in the database.
+            updatedGame = gamedao.update_all(updatedGame);
+            System.out.println(updatedGame);
+            return updatedGame;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return game;
     }
 
     //DELETE Operation - Delete a player
     @DeleteMapping("/deletePlayer/{p_id}")
-    public Player deleteByPID(@PathVariable("p_id") String p_idStr) {
-        System.out.println(p_idStr);
-        long p_id = Long.parseLong(p_idStr);
-        DatabaseConnectionManager dcm = new DatabaseConnectionManager("localhost",
+    public Player deleteByPID(@PathVariable long p_id) {
+        System.out.println(p_id);
+        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,
                 "picturepoker", "postgres", "password");
         Player player = new Player();
         try {
@@ -158,10 +215,9 @@ public class PicturePokerGame {
 
     //DELETE OPERATION - Delete a game
     @DeleteMapping("/deleteGame/{g_id}")
-    public Game deleteByGID(@PathVariable("g_id") String g_idStr) {
-        System.out.println(g_idStr);
-        long g_id = Long.parseLong(g_idStr);
-        DatabaseConnectionManager dcm = new DatabaseConnectionManager("localhost",
+    public Game deleteByGID(@PathVariable long g_id) {
+        System.out.println(g_id);
+        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,
                 "picturepoker", "postgres", "password");
         Game game = new Game();
         try {
@@ -177,12 +233,11 @@ public class PicturePokerGame {
     }
 
     //Actually play the game
-    @GetMapping("/playGame/{gameID}")
-    public Game playGame(@PathVariable("gameID") String g_idStr) {
-        System.out.println(g_idStr);
-        long g_id = Long.parseLong(g_idStr);
+    @GetMapping("/playGame/{g_id}")
+    public Game playGame(@PathVariable long g_id) {
+        System.out.println(g_id);
         Game game = new Game();
-        DatabaseConnectionManager dcm = new DatabaseConnectionManager("localhost",
+        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,
                 "picturepoker", "postgres", "password");
 
         try {
@@ -206,10 +261,10 @@ public class PicturePokerGame {
         return game;
     }
 
-    @PutMapping("/joinGame/{gameID}/{playerName}")
-    public Game joinGame(@PathVariable("gameID") String g_IDStr, @PathVariable("playerName") String p_Name) {
-        System.out.println("GameID: " + g_IDStr + "Player Name: " + p_Name);
-        DatabaseConnectionManager dcm = new DatabaseConnectionManager("localhost",
+    @PutMapping("/joinGame/{g_ID}/{p_Name}")
+    public Game joinGame(@PathVariable long g_ID, @PathVariable String p_Name) {
+        System.out.println("GameID: " + g_ID + "Player Name: " + p_Name);
+        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,
                 "picturepoker", "postgres", "password");
         Game game = new Game();
         try {
@@ -220,7 +275,7 @@ public class PicturePokerGame {
             Player player = playerdao.findByName(p_Name);
 
             //stick the player into the game (or at least, it tries)
-            game = gamedao.joinGame(Long.parseLong(g_IDStr), player);
+            game = gamedao.joinGame(g_ID, player);
         }catch (SQLException e) {
             e.printStackTrace();
         }

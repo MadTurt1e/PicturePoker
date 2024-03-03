@@ -356,19 +356,19 @@ public class GamePlay {
                     player.setFirstPlaces(player.getFirstPlaces() + 1);
                     playerdao.update_int("first_places", player.getFirstPlaces(), player);
                     //We also want to update the dollars accordingly
-                    playerdao.update_int("dollars", player.getDollars() + (int)(curGame.getPotQuantity() * 0.75), player); //TODO: Get the correct ratios, because I doubt this is right
+                    playerdao.update_int("dollars", player.getDollars() + (int)(curGame.getPotQuantity() * 0.55), player);
 
                     curGame.setWinner(player.getPlayerName());
                     continue;
                 case 1:
                     player.setSecondPlaces(player.getSecondPlaces() + 1);
                     playerdao.update_int("second_places", player.getSecondPlaces(), player);
-                    playerdao.update_int("dollars", player.getDollars() + (int)(curGame.getPotQuantity() * 0.50), player);
+                    playerdao.update_int("dollars", player.getDollars() + (int)(curGame.getPotQuantity() * 0.30), player);
                     continue;
                 case 2:
                     player.setThirdPlaces(player.getThirdPlaces() + 1);
                     playerdao.update_int("third_places", player.getThirdPlaces(), player);
-                    playerdao.update_int("dollars", player.getDollars() + (int)(curGame.getPotQuantity() * 0.25), player);
+                    playerdao.update_int("dollars", player.getDollars() + (int)(curGame.getPotQuantity() * 0.15), player);
                     continue;
                 case 3:
                     player.setFourthPlaces(player.getFourthPlaces() + 1);

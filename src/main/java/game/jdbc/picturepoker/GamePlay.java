@@ -135,8 +135,8 @@ public class GamePlay {
             return;
         } else {
             List<Integer> cardToSwapIndex = findCardsToChange(luigiHand);
-            for (int i = 0; i < cardToSwapIndex.size(); ++i) {
-                luigiHand[cardToSwapIndex.get(i)].setToChange(true);
+            for (Integer toSwapIndex : cardToSwapIndex) {
+                luigiHand[toSwapIndex].setToChange(true);
             }
 
         }
@@ -401,7 +401,7 @@ public class GamePlay {
         int curPlayerNum;
         ArrayList<Player> playerArrayList = new ArrayList<>(Arrays.asList(playerList));
         // we can do a check on the number of rounds at this point to see if the game is ongoing.
-        while (curGame.getCurRound() != curGame.getNumRounds()) {
+        while (curGame.getCurRound() <= curGame.getNumRounds()) {
             //Print out the rounds
             System.out.println("Round " + curGame.getCurRound());
             //I do agree that array lists are easier to sort - but not much else.

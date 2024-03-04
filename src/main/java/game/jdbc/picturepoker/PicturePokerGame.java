@@ -17,7 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class PicturePokerGame {
 
     //Set the hostname as a pseudo global so we can change it later
-    private final String hostname = "localhost";
+    private final String hostname = "db";
 
     //Test operation - is this thing on?
     @GetMapping("/helloWorld")

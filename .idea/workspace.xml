@@ -4,10 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ef1b7bd3-23f3-4fec-b7a1-7cd85bf83aaf" name="Changes" comment="Updated files, fixed errors. &#10;Luigi class exists - AI to be completed.">
+    <list default="true" id="ef1b7bd3-23f3-4fec-b7a1-7cd85bf83aaf" name="Changes" comment="CRUD complete - please check for functionality">
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/PicturePokerGame.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/PicturePokerGame.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/GamePlay.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/GamePlay.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/Luigi.Java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,22 +46,28 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
-    "Spring Boot.PicturePokerGame.executor": "Run",
-    "git-widget-placeholder": "Docker__Demo1",
-    "node.js.selected.package.tslint": "(autodetect)"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;Spring Boot.PicturePokerGame.executor&quot;: &quot;Run&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;LuigiLogic&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "postgresql"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;postgresql&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="PicturePokerGame" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <module name="picturepoker_app" />
@@ -70,10 +77,17 @@
       </method>
     </configuration>
   </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="jdk-21.0.2-openjdk-21.0.2-4caba194b151-78a6f59c" />
+      </set>
+    </attachedChunks>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="f2868c71-a371-4f94-b97f-36b9e72882c0" name="Changes" comment="" />
+      <changelist id="ef1b7bd3-23f3-4fec-b7a1-7cd85bf83aaf" name="Changes" comment="CRUD complete - please check for functionality" />
       <created>1708895454397</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
@@ -86,6 +100,7 @@
       <workItem from="1708922870029" duration="2001000" />
       <workItem from="1708969599940" duration="3821000" />
       <workItem from="1709059331012" duration="2563000" />
+      <workItem from="1709503729670" duration="4536000" />
     </task>
     <task id="LOCAL-00001" summary="Updated player class to have a hand&#10;Updated card to not be final">
       <option name="closed" value="true" />
@@ -135,7 +150,55 @@
       <option name="project" value="LOCAL" />
       <updated>1709061511570</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="Merged the original features to this one so the database works, and added a feature to update the winner.">
+      <option name="closed" value="true" />
+      <created>1709436088635</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1709436088635</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Added HTML features for deleting and joining a game">
+      <option name="closed" value="true" />
+      <created>1709440886780</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1709440886780</updated>
+    </task>
+    <task id="LOCAL-00009" summary="CRUD complete - please check for functionality">
+      <option name="closed" value="true" />
+      <created>1709446243851</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1709446243851</updated>
+    </task>
+    <task id="LOCAL-00010" summary="Issues mentioned have been fixed.">
+      <option name="closed" value="true" />
+      <created>1709504875080</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1709504875080</updated>
+    </task>
+    <task id="LOCAL-00011" summary="Updated feature which gets the number of rounds a player wins">
+      <option name="closed" value="true" />
+      <created>1709505226756</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1709505226756</updated>
+    </task>
+    <task id="LOCAL-00012" summary="Payout logic has correct ratios">
+      <option name="closed" value="true" />
+      <created>1709505608730</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1709505608730</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -160,17 +223,12 @@
     <MESSAGE value="Springboot sample code fixed, and python files created to create sample picturepoker database&#10;Also, player functionality fixed so it returns an actual working player with an actual working ID." />
     <MESSAGE value="Removed drop table suits&#10;Dropping tables is an exercise left to the reader." />
     <MESSAGE value="Updated files, fixed errors. &#10;Luigi class exists - AI to be completed." />
-    <option name="LAST_COMMIT_MESSAGE" value="Updated files, fixed errors. &#10;Luigi class exists - AI to be completed." />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/game/jdbc/picturepoker/GamePlay.java</url>
-          <line>145</line>
-          <option name="timeStamp" value="9" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
+    <MESSAGE value="Added HTML features for deleting and joining a game" />
+    <MESSAGE value="Merged the original features to this one so the database works, and added a feature to update the winner." />
+    <MESSAGE value="Issues mentioned have been fixed." />
+    <MESSAGE value="Updated feature which gets the number of rounds a player wins" />
+    <MESSAGE value="Payout logic has correct ratios" />
+    <MESSAGE value="CRUD complete - please check for functionality" />
+    <option name="LAST_COMMIT_MESSAGE" value="CRUD complete - please check for functionality" />
   </component>
 </project>

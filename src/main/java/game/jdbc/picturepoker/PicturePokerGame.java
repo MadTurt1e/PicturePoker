@@ -134,7 +134,7 @@ public class PicturePokerGame {
         Map<String, String> inputMap = objectMapper.readValue(json, Map.class);
         DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,
                 "picturepoker", "postgres", "password");
-        Player updatedPlayer;
+        Player updatedPlayer = new Player();
         try {
             Connection connection = dcm.getConnection();
             PlayerDAO playerdao = new PlayerDAO(connection);
@@ -160,7 +160,7 @@ public class PicturePokerGame {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return player;
+        return updatedPlayer;
     }
 
     // UPDATE Operation - Update current game details. We're never really going to need this, but
@@ -172,7 +172,7 @@ public class PicturePokerGame {
         System.out.println(g_id);
         DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,
                 "picturepoker", "postgres", "password");
-        Game updatedGame;
+        Game updatedGame = new Game();
         try {
             Connection connection = dcm.getConnection();
             GameDAO gamedao = new GameDAO(connection);
@@ -185,7 +185,6 @@ public class PicturePokerGame {
             updatedGame.setBuyIn(Integer.parseInt(inputMap.get("buy_in")));
             updatedGame.setPotQuantity(Integer.parseInt(inputMap.get("pot_quant")));
             updatedGame.setDifficulty(Integer.parseInt(inputMap.get("difficulty")));
-            updatedGame.setWinner(Integer.parseInt(inputMap.get("winner")));
 
             //and update it in the database.
             updatedGame = gamedao.update_all(updatedGame);
@@ -195,7 +194,7 @@ public class PicturePokerGame {
             e.printStackTrace();
         }
 
-        return game;
+        return updatedGame;
     }
 
     //DELETE Operation - Delete a player

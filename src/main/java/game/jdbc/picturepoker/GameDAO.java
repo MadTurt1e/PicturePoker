@@ -7,6 +7,8 @@ import java.util.ArrayList;
 
 public class GameDAO extends DataAccessObject<Game> {
     private static final String GET_GAME_BY_GID = "SELECT g_id, cur_round, num_rounds, active_players, buy_in, pot_quantity, difficulty FROM game WHERE g_id = ?";
+    private static final String GET_ALL_GAMES = "SELECT g_id, cur_round, num_rounds, active_players, buy_in, pot_quantity, difficulty FROM game";
+
     private static final String GET_PIDS_BY_GID = "SELECT p_id FROM player_in_game WHERE g_id = ?";
     private static final String GET_GID_BY_PID = "SELECT g_id FROM player_in_game WHERE p_id = ?";
     private static final String CREATE_NEW_GAME = "INSERT INTO game (num_rounds, active_players, buy_in, pot_quantity, difficulty) VALUES (?, ?, ?, ?, ?)";
@@ -48,6 +50,30 @@ public class GameDAO extends DataAccessObject<Game> {
             throw new RuntimeException(e);
         }
         return game;
+    }
+
+    public ArrayList<Game> findAllGames() {
+        ArrayList<Game> allGames = new ArrayList<Game>();
+        try (PreparedStatement statement = this.connection.prepareStatement(GET_ALL_GAMES);) {
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                Game game = new Game();
+                game.setID(rs.getLong("g_id"));
+                game.setCurRound(rs.getInt("cur_round"));
+                game.setNumRounds(rs.getInt("num_rounds"));
+                game.setActivePlayers(rs.getInt("active_players"));
+                game.setBuyIn(rs.getInt("active_players"));
+                game.setPotQuantity(rs.getInt("pot_quantity"));
+                game.setDifficulty(rs.getInt("difficulty"));
+                game.setPlayers(getPIDsByGame(game));
+
+                allGames.add(game);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return allGames;
     }
 
     public long[] getPIDsByGame(Game dto) {
@@ -139,8 +165,6 @@ public class GameDAO extends DataAccessObject<Game> {
         } catch (SQLException e) {
             System.out.println("It doesn't look like the player is in any game.");
         }
-
-
 
         //update that one table for each player.
         try (PreparedStatement statement2 = this.connection.prepareStatement(ADD_PLAYER_TO_GAME);) {

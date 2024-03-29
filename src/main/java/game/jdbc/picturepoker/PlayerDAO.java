@@ -6,11 +6,15 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class PlayerDAO extends DataAccessObject<Player>{
     private static final String GET_PLAYER_BY_ID = "SELECT "
     + "p_id, p_name, passcode, dollars, first_places, second_places, third_places, "
     + "fourth_places, lifetime_tokens, tokens, bet, rounds_won FROM player WHERE p_id = ?";
+    private static final String GET_ALL_PLAYERS = "SELECT "
+            + "p_id, p_name, passcode, dollars, first_places, second_places, third_places, "
+            + "fourth_places, lifetime_tokens, tokens, bet, rounds_won FROM player";
     private static final String CREATE_NEW_PLAYER = "INSERT INTO player (p_name, passcode) VALUES (?, ?)";
     private static final String ADD_NEW_PLAYER_INTO_GAMES = "INSERT INTO player_in_game (p_id, g_id) VALUES (?, 0)";
     private static final String CREATE_NEW_CARD = "INSERT INTO player_card (p_id, hand_pos, suit) VALUES (?, ?, ?)";
@@ -53,6 +57,38 @@ public class PlayerDAO extends DataAccessObject<Player>{
             throw new RuntimeException(e);
         }
         return player;
+    }
+
+    public ArrayList<Player> findAllPlayers(){
+        ArrayList<Player> allPlayers = new ArrayList<Player>();
+        try(PreparedStatement statement = this.connection.prepareStatement(GET_ALL_PLAYERS)){
+            ResultSet rs = statement.executeQuery();
+            while(rs.next()){
+                Player player = new Player();
+
+                player.setID(rs.getLong("p_id"));
+                player.setPlayerName(rs.getString("p_name"));
+                player.setPasscode(rs.getString("passcode"));
+                player.setDollars(rs.getInt("dollars"));
+
+                player.setFirstPlaces(rs.getInt("first_places"));
+                player.setSecondPlaces(rs.getInt("second_places"));
+                player.setThirdPlaces(rs.getInt("third_places"));
+                player.setFourthPlaces(rs.getInt("fourth_places"));
+                player.setLifetimeTokens(rs.getInt("lifetime_tokens"));
+
+                player.setTokens(rs.getInt("tokens"));
+                player.setBet(rs.getInt("bet"));
+                player.setRoundsWon(rs.getInt("rounds_won"));
+
+                allPlayers.add(player);
+            }
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return allPlayers;
     }
 
     public long findIDByName(String name){
@@ -115,8 +151,6 @@ public class PlayerDAO extends DataAccessObject<Player>{
             e.printStackTrace();
             throw new RuntimeException(e);
         }
-
-
     }
 
     public Player createHand(Player dto){

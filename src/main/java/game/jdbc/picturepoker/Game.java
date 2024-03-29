@@ -1,7 +1,6 @@
 package game.jdbc.picturepoker;
 
 import game.jdbc.picturepoker.util.DataTransferObject;
-
 import java.util.Arrays;
 
 public class Game implements DataTransferObject

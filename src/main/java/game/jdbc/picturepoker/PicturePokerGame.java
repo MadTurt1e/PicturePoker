@@ -8,15 +8,16 @@ import org.springframework.web.bind.annotation.*;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.ArrayList;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-
+// @RequestMapping("/api") We will shift most of the functionality here to be hidden under /api
 @SpringBootApplication
 @RestController
 public class PicturePokerGame {
 
-    //Set the hostname as a pseudo global so we can change it later
+    //Set the hostname as a pseudo global so that we can change it later
     private final String hostname = "db";
 
     //Test operation - is this thing on?
@@ -125,6 +126,45 @@ public class PicturePokerGame {
             e.printStackTrace();
         }
         return game;
+    }
+
+    //READ Operation - Reads all players
+    @GetMapping("/getAllPlayers")
+    public ArrayList<Player> getAllPlayers() {
+        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,
+                "picturepoker", "postgres", "password");
+        ArrayList<Player> allPlayers = new ArrayList<Player>();
+        try {
+            Connection connection = dcm.getConnection();
+            PlayerDAO playerDAO = new PlayerDAO(connection);
+
+            allPlayers = playerDAO.findAllPlayers();
+            for(Player p : allPlayers){
+                System.out.println(p);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return allPlayers;
+    }
+
+    @GetMapping("/getAllGames")
+    public ArrayList<Game> getAllGames() {
+        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,
+                "picturepoker", "postgres", "password");
+        ArrayList<Game> allGames = new ArrayList<Game>();
+        try {
+            Connection connection = dcm.getConnection();
+            GameDAO gameDAO = new GameDAO(connection);
+            //we need a separate function to get pids because the database is structured poorly
+            allGames = gameDAO.findAllGames();
+            for(Game g : allGames){
+                System.out.println(g);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return allGames;
     }
 
     //UPDATE Operation - Update a player

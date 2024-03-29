@@ -86,6 +86,7 @@ public class GamePlay {
                     hand[i].setToChange(true);
             } catch (InputMismatchException e) {
                 System.out.println("Player must input true or false!");
+                --i;
                 scan.nextLine();
             }
         }
@@ -122,24 +123,32 @@ public class GamePlay {
 
 
         // step 1: Get cards at random
-        //This is already done by the card class.
+        // This is already done by the card class.
         System.out.println("Luigi Turn! ");
         for (int i = 0; i < luigiHand.length; ++i) {
             System.out.println("Card " + i + ": " + luigiHand[i]);
         }
+        // Step 2: Calculate current score and change out cards if needed
+        int luigiScore = playerScore(luigiHand);
+        if (luigiScore > 1000000) {
+            System.out.println("Luigi is happy with his hand! ");
+            return;
+        } else {
+            List<Integer> cardToSwapIndex = findCardsToChange(luigiHand);
+            for (Integer toSwapIndex : cardToSwapIndex) {
+                luigiHand[toSwapIndex].setToChange(true);
+            }
 
-        // Step 2: Chose cards to swap out.
-        //Luigi is physically cheating, so he always swaps out the third and fifth card and gets stars. How lucky.
-        luigiHand[2].setToChange(true);
-        luigiHand[4].setToChange(true);
+        }
 
         // Step 3: that's it.
         for (int i = 0; i < luigiHand.length; ++i) {
             if (luigiHand[i].getToChange()) {
                 System.out.println("Luigi is changing out card " + i + "!");
-                luigiHand[i].setSuit(Card.Suit.STAR);
+                luigiHand[i].setSuit(Card.Suit.values()[(int) (Math.random() * 6)]);
             }
         }
+
         curGame.setHand(luigiHand);
 
         for (int i = 0; i < luigiHand.length; ++i) {
@@ -149,7 +158,112 @@ public class GamePlay {
         //no return needed.
     }
 
-    //This function does a score calculation on a player.
+
+    // Returns the index of the card with the least potential to form a good hand,
+    // if no card should be changed returns -1
+    private int findCardWithLeastPotential(Card[] hand, boolean[] alreadyChosen) {
+        // Count number of cards of each suit
+        int[] suitCount = new int[Card.Suit.values().length];
+        for (int i = 0; i < hand.length; ++i) {
+            if (!alreadyChosen[i]) {
+                suitCount[hand[i].getSuit().ordinal()]++;
+            }
+        }
+
+        // First Check for 4-of-a-kind
+        for (int i = 0; i < suitCount.length; ++i) {
+            if (suitCount[i] == 4) {
+                for (int j = 0; j < hand.length; ++j) {
+                    if (!alreadyChosen[j] && hand[j].getSuit().ordinal() != i) {
+                        return j; // return the index of the card to change
+                    }
+                }
+            }
+        }
+
+        // Next, Check for possible full house (3-of-a-kind and pair)
+        boolean threeOfAKind = false;
+        int suitOfThree = -1;
+
+        for (int i = 0; i < suitCount.length; ++i) {
+            if (suitCount[i] == 3) {
+                threeOfAKind = true;
+                suitOfThree = i;
+            }
+        }
+
+        if (threeOfAKind) {
+            for (int i = 0; i < hand.length; ++i) {
+                // Finds both cards that are not part of three of a kind, if they are a pair
+                // then dont change, else change the one with the lowest value according to
+                // ordinal
+                if (!alreadyChosen[i] && hand[i].getSuit().ordinal() != suitOfThree) {
+                    for (int j = i + 1; j < hand.length; ++j) {
+                        if (!alreadyChosen[j] && hand[j].getSuit().ordinal() != suitOfThree) {
+                            if (hand[i].getSuit().ordinal() != hand[j].getSuit().ordinal()) {
+                                // returns the index of whichever card has a lower suit
+                                return (hand[i].getSuit().ordinal() < hand[j].getSuit().ordinal()) ? i : j;
+                            } else {
+                                return -1; // no change needed
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Next, we mark pairs to ensure they are not changed
+
+        boolean[] isPair = new boolean[hand.length];
+        for (int i = 0; i < hand.length; i++) {
+            if (!alreadyChosen[i]) {
+                for (int j = i + 1; j < hand.length; j++) {
+                    if (!alreadyChosen[j] && hand[i].getSuit().ordinal() == hand[j].getSuit().ordinal()) {
+                        isPair[i] = true;
+                        isPair[j] = true;
+                    }
+                }
+            }
+        }
+
+        // Finally, we change the card with the lowest value
+
+        int cardToDiscard = -1;
+        int lowestOrdinal = Integer.MAX_VALUE;
+
+        for (int i = 0; i < hand.length; ++i) {
+            if (!alreadyChosen[i] && !isPair[i]) {
+                if (hand[i].getSuit().ordinal() < lowestOrdinal) {
+                    lowestOrdinal = hand[i].getSuit().ordinal();
+                    cardToDiscard = i;
+                }
+            }
+        }
+
+        return cardToDiscard;
+    }
+
+    // Returns a list of cards to be changed
+    private List<Integer> findCardsToChange(Card[] hand) {
+        List<Integer> cardsToChange = new ArrayList<>();
+        boolean[] alreadyChosen = new boolean[hand.length];
+
+        // Tries to change up to 5 cards
+        for (int changes = 0; changes < 5; changes++) {
+            int cardIndex = findCardWithLeastPotential(hand, alreadyChosen);
+            // if a card will be beneficial to change, add it to the list and try again
+            // if no card is beneficial, break out of the loop
+            if (cardIndex == -1) {
+                break;
+            }
+            cardsToChange.add(cardIndex);
+            alreadyChosen[cardIndex] = true;
+        }
+
+        return cardsToChange;
+    }
+
+    // This function does a score calculation on a player.
     private int playerScore(Card[] hand) {
         int score = 0;
         int[] suitCount = new int[6];
@@ -287,7 +401,7 @@ public class GamePlay {
         int curPlayerNum;
         ArrayList<Player> playerArrayList = new ArrayList<>(Arrays.asList(playerList));
         // we can do a check on the number of rounds at this point to see if the game is ongoing.
-        while (curGame.getCurRound() != curGame.getNumRounds()) {
+        while (curGame.getCurRound() <= curGame.getNumRounds()) {
             //Print out the rounds
             System.out.println("Round " + curGame.getCurRound());
             //I do agree that array lists are easier to sort - but not much else.
@@ -314,19 +428,21 @@ public class GamePlay {
             //Now we run a function which pays out tokens compared to Luigi
             for (Player player : playerList) {
                 player.setTokens(player.getTokens() + determinePayout(player));
-
-                ++curPlayerNum;
                 //determine the current round winner
                 if (currentRoundWinner < playerScore(player.getHand())){
                     currentRoundWinner = playerScore(player.getHand());
                     winnerIndex = curPlayerNum;
                 }
-
                 System.out.println(player.getPlayerName() + " has " + player.getTokens() + " tokens. ");
                 playerdao.update_long("tokens", player.getTokens(), player);
+                ++curPlayerNum;
             }
-            playerList[curPlayerNum].setRoundsWon(playerList[curPlayerNum].getRoundsWon() + 1);
-            playerdao.update_int("rounds_won", playerList[curPlayerNum].getRoundsWon(), playerList[curPlayerNum]);
+
+            //only set a winner if there is one...
+            if (winnerIndex != -1) {
+                playerList[winnerIndex].setRoundsWon(playerList[winnerIndex].getRoundsWon() + 1);
+                playerdao.update_int("rounds_won", playerList[winnerIndex].getRoundsWon(), playerList[winnerIndex]);
+            }
 
             //we should increment the current round and keep on going.
             curGame.setCurRound(curGame.getCurRound() + 1);

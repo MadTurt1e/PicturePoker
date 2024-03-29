@@ -109,7 +109,6 @@ public class PicturePokerGame {
     public Game getByGameID(@PathVariable("g_id") String g_idStr) {
         System.out.println(g_idStr);
         long g_id = Long.parseLong(g_idStr);
-
         DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,
                 "picturepoker", "postgres", "password");
         Game game = new Game();
@@ -129,27 +128,29 @@ public class PicturePokerGame {
 
     //UPDATE Operation - Update a player
     @PutMapping("/updatePlayer/{p_id}")
-    public Player updateByPID(@PathVariable long p_id, @RequestBody Player player) {
-        System.out.println(p_id);
+    public Player updateByPID(@PathVariable long p_id, @RequestBody String json) throws JsonProcessingException {
+        System.out.println(json);
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, String> inputMap = objectMapper.readValue(json, Map.class);
         DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,
                 "picturepoker", "postgres", "password");
-        Player updatedPlayer;
+        Player updatedPlayer = new Player();
         try {
             Connection connection = dcm.getConnection();
             PlayerDAO playerdao = new PlayerDAO(connection);
             updatedPlayer = playerdao.findById(p_id);
 
-            updatedPlayer.setID(player.getID());
-            updatedPlayer.setPlayerName(player.getPlayerName());
-            updatedPlayer.setPasscode(player.getPasscode());
-            updatedPlayer.setDollars(player.getDollars());
+            updatedPlayer.setID(p_id);
+            updatedPlayer.setPlayerName(inputMap.get("name"));
+            updatedPlayer.setPasscode(inputMap.get("password"));
+            updatedPlayer.setDollars(Integer.parseInt(inputMap.get("dollars")));
 
             // Per player game statistics
-            updatedPlayer.setFirstPlaces(player.getFirstPlaces());
-            updatedPlayer.setSecondPlaces(player.getSecondPlaces());
-            updatedPlayer.setThirdPlaces(player.getThirdPlaces());
-            updatedPlayer.setFourthPlaces(player.getFourthPlaces());
-            updatedPlayer.setLifetimeTokens(player.getLifetimeTokens());
+            updatedPlayer.setFirstPlaces(Integer.parseInt(inputMap.get("firsts")));
+            updatedPlayer.setSecondPlaces(Integer.parseInt(inputMap.get("seconds")));
+            updatedPlayer.setThirdPlaces(Integer.parseInt(inputMap.get("thirds")));
+            updatedPlayer.setFourthPlaces(Integer.parseInt(inputMap.get("fourths")));
+            updatedPlayer.setLifetimeTokens(Integer.parseInt(inputMap.get("lifetime")));
 
             //update everything
             playerdao.update_all(updatedPlayer);
@@ -159,29 +160,31 @@ public class PicturePokerGame {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return player;
+        return updatedPlayer;
     }
 
     // UPDATE Operation - Update current game details. We're never really going to need this, but
     @PutMapping("/updateGame/{g_id}")
-    public Game updateByGID(@PathVariable Long g_id, @RequestBody Game game) {
+    public Game updateByGID(@PathVariable Long g_id, @RequestBody String json) throws JsonProcessingException {
+        System.out.println(json);
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, String> inputMap = objectMapper.readValue(json, Map.class);
         System.out.println(g_id);
         DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,
                 "picturepoker", "postgres", "password");
-        Game updatedGame;
+        Game updatedGame = new Game();
         try {
             Connection connection = dcm.getConnection();
             GameDAO gamedao = new GameDAO(connection);
             updatedGame = gamedao.findById(g_id);
 
             //update all the things that we may want to update (no changing ID or any temporary stuff
-            updatedGame.setCurRound(game.getCurRound());
-            updatedGame.setNumRounds(game.getNumRounds());
-            updatedGame.setActivePlayers(game.getActivePlayers());
-            updatedGame.setBuyIn(game.getBuyIn());
-            updatedGame.setPotQuantity(game.getPotQuantity());
-            updatedGame.setDifficulty(game.getDifficulty());
-            updatedGame.setWinner(game.getWinner());
+            updatedGame.setCurRound(Integer.parseInt(inputMap.get("cur_round")));
+            updatedGame.setNumRounds(Integer.parseInt(inputMap.get("num_rounds")));
+            updatedGame.setActivePlayers(Integer.parseInt(inputMap.get("active_players")));
+            updatedGame.setBuyIn(Integer.parseInt(inputMap.get("buy_in")));
+            updatedGame.setPotQuantity(Integer.parseInt(inputMap.get("pot_quant")));
+            updatedGame.setDifficulty(Integer.parseInt(inputMap.get("difficulty")));
 
             //and update it in the database.
             updatedGame = gamedao.update_all(updatedGame);
@@ -191,7 +194,7 @@ public class PicturePokerGame {
             e.printStackTrace();
         }
 
-        return game;
+        return updatedGame;
     }
 
     //DELETE Operation - Delete a player

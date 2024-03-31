@@ -8,6 +8,21 @@ public class GamePlay {
     private Game curGame;
     private final Player[] playerList = new Player[4];
 
+    public enum PokerHand {
+        HIGH_CARD("High Card"),
+        ONE_PAIR("One Pair"),
+        TWO_PAIR("Two Pair"),
+        THREE_OF_A_KIND("Three of a Kind"),
+        FULL_HOUSE("Full House"),
+        FOUR_OF_A_KIND("Four of a Kind"),
+        FLUSH("Flush");
+        private String handName;
+        PokerHand(String handName){
+            this.handName = handName;
+        }
+        public String getHandName(){return handName;}
+    }
+
     private Player executeTurn(Player player) {
         System.out.println("\n" + player.getPlayerName() + "'s Turn! ");
         System.out.println(player.getPlayerName() + " has " + player.getTokens() + " tokens!");
@@ -341,50 +356,87 @@ public class GamePlay {
         return score;
     }
 
+    // This function converts a calculated score to a hand name.
+    private PokerHand scoreToHand(int playerScore){
+        if (playerScore >= 10000000) {
+            return PokerHand.FLUSH;
+        }
+        if (playerScore >= 1000000) {
+            return PokerHand.FOUR_OF_A_KIND;
+        }
+        if (playerScore >= 100000) {
+            // If 10^4 digit is nonzero the two remaining cards are a pair, otherwise kickers
+            if((playerScore % 100000) / 10000 > 0){
+                return PokerHand.FULL_HOUSE;
+            }
+            return PokerHand.THREE_OF_A_KIND;
+        }
+        if (playerScore >= 10000) {
+            // If 10^3 digit is nonzero there is a second pair, otherwise three kickers
+            if((playerScore % 10000) / 1000 > 0){
+                return PokerHand.TWO_PAIR;
+            }
+            return PokerHand.ONE_PAIR;
+        }
+        else {
+            return PokerHand.HIGH_CARD;
+        }
+    }
+
     //score calculate, compare, and multiply the pots
     private int determinePayout(Player player) {
         int playerScore = playerScore(player.getHand());
+        PokerHand playerHand = scoreToHand(playerScore);
         // A player is considered to have won a round if they beat Luigi- they do not have to beat anyone else
         int winner = 1;
-        if (playerScore <= playerScore(curGame.getHand())) {
+        int luigiScore = playerScore(curGame.getHand());
+        PokerHand luigiHand = scoreToHand(luigiScore);
+        System.out.println("Luigi got a "+ luigiHand.getHandName() +"!");
+        System.out.println(player.getPlayerName()  + " got a " + playerHand.getHandName() + "!");
+        // NOTE: The scoring calculator is somewhat bugged- it does not properly compare
+        // triples and full houses, or one and two pairs.
+        // As a workaround we compare hands first, then use scores as a tiebreaker
+        if(playerHand.ordinal() < luigiHand.ordinal()){
             System.out.println(player.getPlayerName() + " did not beat Luigi. ");
             winner = 0;
         }
+        else{
+            if(playerHand.ordinal() == luigiHand.ordinal() && playerScore < luigiScore){
+                System.out.println(player.getPlayerName() + " did not beat Luigi. ");
+                winner = 0;
+            }
+            else{
+                System.out.println(player.getPlayerName() + " defeated Luigi! ");
+            }
+        }
         player.setRoundsWon(player.getRoundsWon() + winner);
         player.setLifetimeRoundsWon(player.getLifetimeRoundsWon() + winner);
-        if (playerScore >= 10000000) {
-            System.out.println(player.getPlayerName() + " got a flush! ");
-            player.setFlushes(player.getFlushes() + 1);
-            return player.getBet() * 12 * winner;
-        }
-        if (playerScore >= 1000000) {
-            System.out.println(player.getPlayerName() + " got a four of a kind! ");
-            player.setQuads(player.getQuads() + 1);
-            return player.getBet() * 8 * winner;
-        }
-        if (playerScore >= 110000) {
-            System.out.println(player.getPlayerName() + " got a full house! ");
-            player.setFullHouses(player.getFullHouses() + 1);
-            return player.getBet() * 6 * winner;
-        }
-        if (playerScore >= 100000) {
-            System.out.println(player.getPlayerName() + " got a three of a kind. ");
-            player.setTriples(player.getTriples() + 1);
-            return player.getBet() * 4 * winner;
-        }
-        if (playerScore >= 11000) {
-            System.out.println(player.getPlayerName() + " got a two pair. ");
-            player.setTwoPairs(player.getTwoPairs() + 1);
-            return player.getBet() * 3 * winner;
-        }
-        if (playerScore >= 10000) {
-            System.out.println(player.getPlayerName() + " got a one pair. ");
-            player.setOnePairs(player.getOnePairs() + 1);
-            return player.getBet() * 2 * winner;
-        } else {
-            System.out.println(player.getPlayerName() + " got a high card... ");
-            player.setHighCards(player.getHighCards() + 1);
-            return player.getBet() * winner;
+
+        switch(playerHand){
+            case FLUSH:
+                player.setFlushes(player.getFlushes() + 1);
+                return player.getBet() * 12 * winner;
+            case FOUR_OF_A_KIND:
+                player.setQuads(player.getQuads() + 1);
+                return player.getBet() * 8 * winner;
+            case FULL_HOUSE:
+                player.setFullHouses(player.getFullHouses() + 1);
+                return player.getBet() * 6 * winner;
+            case THREE_OF_A_KIND:
+                player.setTriples(player.getTriples() + 1);
+                return player.getBet() * 4 * winner;
+            case TWO_PAIR:
+                player.setTwoPairs(player.getTwoPairs() + 1);
+                return player.getBet() * 3 * winner;
+            case ONE_PAIR:
+                player.setOnePairs(player.getOnePairs() + 1);
+                return player.getBet() * 2 * winner;
+            case HIGH_CARD:
+                player.setHighCards(player.getHighCards() + 1);
+                return player.getBet() * winner;
+            default:
+                System.out.println("Invalid hand found!");
+                return 0;
         }
     }
 
@@ -439,16 +491,23 @@ public class GamePlay {
             executeLuigi();
             gamedao.updateHand(curGame);
 
-            System.out.println("Calculating payouts");
+            System.out.println("Showdown time!");
 
             int currentRoundWinner = playerScore(curGame.getHand());
             int winnerIndex = -1;
             curPlayerNum = 0;
             //Now we run a function which pays out tokens compared to Luigi
             for (Player player : playerList) {
-                player.setTokens(player.getTokens() + determinePayout(player));
+                int coinsWon = determinePayout(player);
+                if(coinsWon > 0){
+                    System.out.println(player.getPlayerName() + " won " + coinsWon + " tokens!");
+                }
+                else{
+                    System.out.println(player.getPlayerName() + " lost " + player.getBet() + " tokens.");
+                }
+                player.setTokens(player.getTokens() + coinsWon);
 
-                System.out.println(player.getPlayerName() + " has " + player.getTokens() + " tokens. ");
+                System.out.println(player.getPlayerName() + " now has " + player.getTokens() + " tokens. ");
                 playerdao.update_long("tokens", player.getTokens(), player);
                 playerdao.update_int("rounds_won", player.getRoundsWon(), player);
                 playerdao.update_all(player);

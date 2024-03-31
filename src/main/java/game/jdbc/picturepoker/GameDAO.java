@@ -157,8 +157,8 @@ public class GameDAO extends DataAccessObject<Game> {
                 System.out.println("The player is still in an active game.");
                 return curGame;
             }
-            if (curGame.getPotQuantity() * 0.25 > player.getDollars()){
-                System.out.println("The player is too broke to join. Required amount to play: " + (curGame.getPotQuantity() * 0.25) + ", current dollar count: " + player.getDollars());
+            if (curGame.getBuyIn() > player.getDollars()){
+                System.out.println("The player is too broke to join. Required amount to play: " + curGame.getBuyIn() + ", current dollar count: " + player.getDollars());
                 return curGame;
             }
 

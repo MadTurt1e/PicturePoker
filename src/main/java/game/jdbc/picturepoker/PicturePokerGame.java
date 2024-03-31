@@ -71,9 +71,8 @@ public class PicturePokerGame {
             Connection connection = dcm.getConnection();
             GameDAO gamedao = new GameDAO(connection);
 
-            // A new game consists a chosen number of rounds, a pot quantity, buy in value (token stakes, and difficulty
+            // A new game consists a chosen number of rounds, a buy in value (dollar stakes), and difficulty
             game.setNumRounds(Integer.parseInt(inputMap.get("rounds")));
-            game.setPotQuantity(Integer.parseInt(inputMap.get("potQuantity")));
             game.setBuyIn(Integer.parseInt(inputMap.get("buyIn")));
             game.setDifficulty(Integer.parseInt(inputMap.get("difficulty")));
             game = gamedao.create(game);

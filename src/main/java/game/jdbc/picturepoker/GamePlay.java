@@ -2,7 +2,6 @@ package game.jdbc.picturepoker;
 
 import java.util.*;
 
-
 public class GamePlay {
 
     //Relevant variables - current game, and the list of players
@@ -37,6 +36,13 @@ public class GamePlay {
             System.out.println("Card " + i + ": " + hand[i]);
         }
 
+        //Case: Broke- Do this before we even give them input
+        if (player.getTokens() == 0) {
+            System.out.println("You have no tokens to bet. How did you get here? ");
+            player.setBet(0);
+            return player;
+        }
+
         // Step 2: Take bets
         // I noticed there is a raise function just now. This will be useful for a GUI feature where you can spam a button.
         // Terminal inputs make it so that spamming a button is a bit hard, though.
@@ -44,24 +50,18 @@ public class GamePlay {
         System.out.println("How much do you want to bet? ");
         Scanner scan = new Scanner(System.in);
         int betCount = 0;
-        while (betCount < 1 || betCount > 6) {
-            //Case: Broke
-            if (player.getTokens() == 0) {
-                System.out.println("You have no tokens to bet. How did you get here? ");
-                player.setBet(0);
-                return player;
-            }
+        while (betCount < 1 || betCount > 5) {
             try {
                 betCount = scan.nextInt();
                 //case: too much / little money.
-                if (betCount < 1 || betCount > 6) {
-                    System.out.println("Bet must be between 1 and 5! ");
+                if (betCount < 1 || betCount > 5) {
+                    System.out.println("Bet must be between 1 and 5. ");
                     continue;
                 }
                 // Case: broke part 2
                 if (betCount > player.getTokens()) {
                     System.out.println("You don't have enough tokens! Right now, you have " + player.getTokens() + " tokens. ");
-                    betCount = 1000;
+                    betCount = 0;
                     continue;
                 }
                 //case: we are in the clear
@@ -344,11 +344,13 @@ public class GamePlay {
     //score calculate, compare, and multiply the pots
     private int determinePayout(Player player) {
         int playerScore = playerScore(player.getHand());
+        // A player is considered to have won a round if they beat Luigi- they do not have to beat anyone else
         int winner = 1;
         if (playerScore <= playerScore(curGame.getHand())) {
             System.out.println(player.getPlayerName() + " did not beat Luigi. ");
             winner = 0;
         }
+        player.setRoundsWon(player.getRoundsWon() + winner);
         if (playerScore >= 10000000) {
             System.out.println(player.getPlayerName() + " got a flush! ");
             player.setFlushes(player.getFlushes() + 1);
@@ -405,8 +407,9 @@ public class GamePlay {
             value.setTokens(10);
             value.setBet(0);
             value.setRoundsWon(0);
-            //drain people's bank accounts
-            value.setDollars(value.getDollars() - (int)(curGame.getPotQuantity() * 0.25));
+            //drain people's bank accounts and add to pot
+            value.setDollars(value.getDollars() - curGame.getBuyIn());
+            curGame.setPotQuantity(curGame.getPotQuantity() + curGame.getBuyIn());
         }
 
         int curPlayerNum;
@@ -439,20 +442,11 @@ public class GamePlay {
             //Now we run a function which pays out tokens compared to Luigi
             for (Player player : playerList) {
                 player.setTokens(player.getTokens() + determinePayout(player));
-                //determine the current round winner
-                if (currentRoundWinner < playerScore(player.getHand())){
-                    currentRoundWinner = playerScore(player.getHand());
-                    winnerIndex = curPlayerNum;
-                }
+
                 System.out.println(player.getPlayerName() + " has " + player.getTokens() + " tokens. ");
                 playerdao.update_long("tokens", player.getTokens(), player);
+                playerdao.update_int("rounds_won", player.getRoundsWon(), player);
                 ++curPlayerNum;
-            }
-
-            //only set a winner if there is one...
-            if (winnerIndex != -1) {
-                playerList[winnerIndex].setRoundsWon(playerList[winnerIndex].getRoundsWon() + 1);
-                playerdao.update_int("rounds_won", playerList[winnerIndex].getRoundsWon(), playerList[winnerIndex]);
             }
 
             //we should increment the current round and keep on going.
@@ -462,7 +456,7 @@ public class GamePlay {
             gamedao.update_all(curGame);
         }
 
-        //once we break out of the loop we can determine the winner.
+        //once we break out of the loop, all rounds are over and we can determine the winner.
 
         System.out.println("\nGame over. Placements: ");
 
@@ -505,7 +499,6 @@ public class GamePlay {
                 default:
             }
         }
-
 
         //Game updates
         gamedao.update_all(curGame);

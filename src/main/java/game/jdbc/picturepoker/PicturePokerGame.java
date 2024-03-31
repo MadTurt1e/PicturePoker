@@ -50,6 +50,7 @@ public class PicturePokerGame {
             player.setPlayerName(inputMap.get("playerName"));
             player.setPasscode(inputMap.get("password"));
             player = playerdao.create(player);
+            player = playerdao.createHand(player); // Initialize player hand on creation
             System.out.println(player);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -190,7 +191,15 @@ public class PicturePokerGame {
             updatedPlayer.setSecondPlaces(Integer.parseInt(inputMap.get("seconds")));
             updatedPlayer.setThirdPlaces(Integer.parseInt(inputMap.get("thirds")));
             updatedPlayer.setFourthPlaces(Integer.parseInt(inputMap.get("fourths")));
-            updatedPlayer.setLifetimeTokens(Integer.parseInt(inputMap.get("lifetime")));
+            updatedPlayer.setLifetimeTokens(Integer.parseInt(inputMap.get("lifetime_tokens")));
+            updatedPlayer.setFlushes(Integer.parseInt(inputMap.get("flushes")));
+            updatedPlayer.setQuads(Integer.parseInt(inputMap.get("quads")));
+            updatedPlayer.setFullHouses(Integer.parseInt(inputMap.get("full_houses")));
+            updatedPlayer.setTriples(Integer.parseInt(inputMap.get("triples")));
+            updatedPlayer.setTwoPairs(Integer.parseInt(inputMap.get("two_pairs")));
+            updatedPlayer.setOnePairs(Integer.parseInt(inputMap.get("one_pairs")));
+            updatedPlayer.setHighCards(Integer.parseInt(inputMap.get("high_card")));
+            updatedPlayer.setCardsChanged(Integer.parseInt(inputMap.get("cards_changed")));
 
             //update everything
             playerdao.update_all(updatedPlayer);

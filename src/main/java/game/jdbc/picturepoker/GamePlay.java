@@ -40,7 +40,7 @@ public class GamePlay {
         // Step 2: Take bets
         // I noticed there is a raise function just now. This will be useful for a GUI feature where you can spam a button.
         // Terminal inputs make it so that spamming a button is a bit hard, though.
-        // to do when we have GUI set up and everything.
+        // TODO: when we have GUI set up and everything.
         System.out.println("How much do you want to bet? ");
         Scanner scan = new Scanner(System.in);
         int betCount = 0;
@@ -94,8 +94,10 @@ public class GamePlay {
         //we change after choosing just in case the player wants to undo choices.
         // We don't actually give the player any options, but it is something that can be done.
         for (Card card : hand) {
-            if (card.getToChange())
+            if (card.getToChange()){
                 card.redrawSuit();
+                player.setCardsChanged(player.getCardsChanged() + 1);
+            }
         }
 
         // Step 4: Let the player cry at their new cards.
@@ -342,36 +344,44 @@ public class GamePlay {
     //score calculate, compare, and multiply the pots
     private int determinePayout(Player player) {
         int playerScore = playerScore(player.getHand());
+        int winner = 1;
         if (playerScore <= playerScore(curGame.getHand())) {
             System.out.println(player.getPlayerName() + " did not beat Luigi. ");
-            return 0;
+            winner = 0;
         }
         if (playerScore >= 10000000) {
             System.out.println(player.getPlayerName() + " got a flush! ");
-            return player.getBet() * 12;
+            player.setFlushes(player.getFlushes() + 1);
+            return player.getBet() * 12 * winner;
         }
         if (playerScore >= 1000000) {
             System.out.println(player.getPlayerName() + " got a four of a kind! ");
-            return player.getBet() * 8;
+            player.setQuads(player.getQuads() + 1);
+            return player.getBet() * 8 * winner;
         }
         if (playerScore >= 110000) {
             System.out.println(player.getPlayerName() + " got a full house! ");
-            return player.getBet() * 6;
+            player.setFullHouses(player.getFullHouses() + 1);
+            return player.getBet() * 6 * winner;
         }
         if (playerScore >= 100000) {
-            System.out.println(player.getPlayerName() + " got a three of a kind! ");
-            return player.getBet() * 4;
+            System.out.println(player.getPlayerName() + " got a three of a kind. ");
+            player.setTriples(player.getTriples() + 1);
+            return player.getBet() * 4 * winner;
         }
         if (playerScore >= 11000) {
-            System.out.println(player.getPlayerName() + " got a two pair! ");
-            return player.getBet() * 3;
+            System.out.println(player.getPlayerName() + " got a two pair. ");
+            player.setTwoPairs(player.getTwoPairs() + 1);
+            return player.getBet() * 3 * winner;
         }
         if (playerScore >= 10000) {
-            System.out.println(player.getPlayerName() + " got a one pair! ");
-            return player.getBet() * 2;
+            System.out.println(player.getPlayerName() + " got a one pair. ");
+            player.setOnePairs(player.getOnePairs() + 1);
+            return player.getBet() * 2 * winner;
         } else {
-            System.out.println(player.getPlayerName() + ", how did you beat Luigi?");
-            return player.getBet();
+            System.out.println(player.getPlayerName() + " got a high card... ");
+            player.setHighCards(player.getHighCards() + 1);
+            return player.getBet() * winner;
         }
     }
 
@@ -393,6 +403,7 @@ public class GamePlay {
         //reset everything we'd need to reset before the game.
         for (Player value : playerList) {
             value.setTokens(10);
+            value.setBet(0);
             value.setRoundsWon(0);
             //drain people's bank accounts
             value.setDollars(value.getDollars() - (int)(curGame.getPotQuantity() * 0.25));
@@ -472,19 +483,19 @@ public class GamePlay {
                     player.setFirstPlaces(player.getFirstPlaces() + 1);
                     playerdao.update_int("first_places", player.getFirstPlaces(), player);
                     //We also want to update the dollars accordingly
-                    playerdao.update_int("dollars", player.getDollars() + (int)(curGame.getPotQuantity() * 0.55), player);
+                    playerdao.update_int("dollars", player.getDollars() + (int) (curGame.getPotQuantity() * 0.55), player);
 
                     curGame.setWinner(player.getPlayerName());
                     continue;
                 case 1:
                     player.setSecondPlaces(player.getSecondPlaces() + 1);
                     playerdao.update_int("second_places", player.getSecondPlaces(), player);
-                    playerdao.update_int("dollars", player.getDollars() + (int)(curGame.getPotQuantity() * 0.30), player);
+                    playerdao.update_int("dollars", player.getDollars() + (int) (curGame.getPotQuantity() * 0.30), player);
                     continue;
                 case 2:
                     player.setThirdPlaces(player.getThirdPlaces() + 1);
                     playerdao.update_int("third_places", player.getThirdPlaces(), player);
-                    playerdao.update_int("dollars", player.getDollars() + (int)(curGame.getPotQuantity() * 0.15), player);
+                    playerdao.update_int("dollars", player.getDollars() + (int) (curGame.getPotQuantity() * 0.15), player);
                     continue;
                 case 3:
                     player.setFourthPlaces(player.getFourthPlaces() + 1);

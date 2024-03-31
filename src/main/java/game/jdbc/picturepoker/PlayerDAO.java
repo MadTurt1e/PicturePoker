@@ -10,11 +10,13 @@ import java.util.ArrayList;
 
 public class PlayerDAO extends DataAccessObject<Player>{
     private static final String GET_PLAYER_BY_ID = "SELECT "
-    + "p_id, p_name, passcode, dollars, first_places, second_places, third_places, "
-    + "fourth_places, lifetime_tokens, tokens, bet, rounds_won FROM player WHERE p_id = ?";
+            + "p_id, p_name, passcode, dollars, first_places, second_places, third_places, "
+            + "fourth_places, lifetime_tokens, flushes, quads, full_houses, triples, two_pairs, "
+            + "one_pairs, high_cards, cards_changed, tokens, bet, rounds_won FROM player WHERE p_id = ?";
     private static final String GET_ALL_PLAYERS = "SELECT "
             + "p_id, p_name, passcode, dollars, first_places, second_places, third_places, "
-            + "fourth_places, lifetime_tokens, tokens, bet, rounds_won FROM player";
+            + "fourth_places, lifetime_tokens, flushes, quads, full_houses, triples, two_pairs, "
+            + "one_pairs, high_cards, cards_changed, tokens, bet, rounds_won FROM player";
     private static final String CREATE_NEW_PLAYER = "INSERT INTO player (p_name, passcode) VALUES (?, ?)";
     private static final String ADD_NEW_PLAYER_INTO_GAMES = "INSERT INTO player_in_game (p_id, g_id) VALUES (?, 0)";
     private static final String CREATE_NEW_CARD = "INSERT INTO player_card (p_id, hand_pos, suit) VALUES (?, ?, ?)";
@@ -25,7 +27,10 @@ public class PlayerDAO extends DataAccessObject<Player>{
     private static final String DELETE_PLAYER = "DELETE FROM player WHERE p_id = ?";
 
     private static final String UPDATE_ALL =
-            "UPDATE player SET p_name = ?, passcode = ?, dollars = ?, first_places = ?, second_places = ?, third_places = ?, fourth_places = ?, lifetime_tokens = ? WHERE p_id = ?";
+            "UPDATE player SET p_name = ?, passcode = ?, dollars = ?,"+
+                    " first_places = ?, second_places = ?, third_places = ?, fourth_places = ?, lifetime_tokens = ?,"
+                    + "flushes = ?, quads = ?, full_houses = ?, triples = ?, two_pairs = ?, one_pair = ?, "
+                    + "high_cards = ?, cards_changed = ? WHERE p_id = ?";
     public PlayerDAO(Connection connection){
         super(connection);
     }
@@ -46,6 +51,15 @@ public class PlayerDAO extends DataAccessObject<Player>{
                 player.setThirdPlaces(rs.getInt("third_places"));
                 player.setFourthPlaces(rs.getInt("fourth_places"));
                 player.setLifetimeTokens(rs.getInt("lifetime_tokens"));
+
+                player.setFlushes(rs.getInt("flushes"));
+                player.setQuads(rs.getInt("quads"));
+                player.setFullHouses(rs.getInt("full_houses"));
+                player.setTriples(rs.getInt("triples"));
+                player.setTwoPairs(rs.getInt("two_pairs"));
+                player.setOnePairs(rs.getInt("one_pairs"));
+                player.setHighCards(rs.getInt("high_cards"));
+                player.setCardsChanged(rs.getInt("cards_changed"));
 
                 player.setTokens(rs.getInt("tokens"));
                 player.setBet(rs.getInt("bet"));
@@ -76,6 +90,15 @@ public class PlayerDAO extends DataAccessObject<Player>{
                 player.setThirdPlaces(rs.getInt("third_places"));
                 player.setFourthPlaces(rs.getInt("fourth_places"));
                 player.setLifetimeTokens(rs.getInt("lifetime_tokens"));
+
+                player.setFlushes(rs.getInt("flushes"));
+                player.setQuads(rs.getInt("quads"));
+                player.setFullHouses(rs.getInt("full_houses"));
+                player.setTriples(rs.getInt("triples"));
+                player.setTwoPairs(rs.getInt("two_pairs"));
+                player.setOnePairs(rs.getInt("one_pairs"));
+                player.setHighCards(rs.getInt("high_cards"));
+                player.setCardsChanged(rs.getInt("cards_changed"));
 
                 player.setTokens(rs.getInt("tokens"));
                 player.setBet(rs.getInt("bet"));
@@ -132,19 +155,6 @@ public class PlayerDAO extends DataAccessObject<Player>{
             player.setPlayerName(dto.getPlayerName());
             player.setPasscode(dto.getPasscode());
             player.setID(newPlayerID);
-
-            //We want to add the player into the games table also, so we don't have to constantly update the thing and can just do a hunt for the player.
-            try(PreparedStatement statement2 = this.connection.prepareStatement(ADD_NEW_PLAYER_INTO_GAMES)) {
-                statement.setLong(1, newPlayerID);
-                //game id 0 - this should not in theory cause problems.
-                statement.setLong(2, 0);
-                statement.execute();
-            }
-            catch (SQLException e) {
-                e.printStackTrace();
-                throw new RuntimeException(e);
-            }
-
             return player;
         }
         catch (SQLException e) {
@@ -154,7 +164,7 @@ public class PlayerDAO extends DataAccessObject<Player>{
     }
 
     public Player createHand(Player dto){
-        Card []newHand = new Card[5];
+        Card[] newHand = new Card[5];
         for(int i = 0; i < 5; i++){
             newHand[i] = new Card();
             try(PreparedStatement statement = this.connection.prepareStatement(CREATE_NEW_CARD)){
@@ -223,7 +233,15 @@ public class PlayerDAO extends DataAccessObject<Player>{
             statement.setInt(6, dto.getThirdPlaces());
             statement.setInt(7, dto.getFourthPlaces());
             statement.setLong(8, dto.getLifetimeTokens());
-            statement.setLong(9, dto.getID());
+            statement.setInt(9, dto.getFlushes());
+            statement.setInt(10, dto.getQuads());
+            statement.setInt(11, dto.getFullHouses());
+            statement.setInt(12, dto.getTriples());
+            statement.setInt(13, dto.getTwoPairs());
+            statement.setInt(14, dto.getOnePairs());
+            statement.setInt(15, dto.getHighCards());
+            statement.setInt(16, dto.getCardsChanged());
+            statement.setLong(17, dto.getID());
             statement.execute();
             return dto;
         } catch (SQLException e) {

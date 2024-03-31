@@ -402,14 +402,16 @@ public class GamePlay {
             playerList[i] = playerdao.findById(playerIDList[i]);
         }
 
-        //reset everything we'd need to reset before the game.
-        for (Player value : playerList) {
-            value.setTokens(10);
-            value.setBet(0);
-            value.setRoundsWon(0);
-            //drain people's bank accounts and add to pot
-            value.setDollars(value.getDollars() - curGame.getBuyIn());
-            curGame.setPotQuantity(curGame.getPotQuantity() + curGame.getBuyIn());
+        //reset everything we'd need to reset before the game. Do not reset if in the middle of a game
+        if(curGame.getCurRound() == 1) {
+            for (Player value : playerList) {
+                value.setTokens(10);
+                value.setBet(0);
+                value.setRoundsWon(0);
+                //drain people's bank accounts and add to pot
+                value.setDollars(value.getDollars() - curGame.getBuyIn());
+                curGame.setPotQuantity(curGame.getPotQuantity() + curGame.getBuyIn());
+            }
         }
 
         int curPlayerNum;
@@ -428,6 +430,8 @@ public class GamePlay {
             for (Player i : playerArrayList) {
                 playerList[curPlayerNum++] = executeTurn(i);
                 playerdao.updateHand(i);
+                playerdao.update_int("tokens", i.getTokens(), i);
+                playerdao.update_int("bet", i.getBet(), i);
             }
 
             // this is where we'd execute Luigi's turn.
@@ -446,6 +450,7 @@ public class GamePlay {
                 System.out.println(player.getPlayerName() + " has " + player.getTokens() + " tokens. ");
                 playerdao.update_long("tokens", player.getTokens(), player);
                 playerdao.update_int("rounds_won", player.getRoundsWon(), player);
+                playerdao.update_all(player);
                 ++curPlayerNum;
             }
 

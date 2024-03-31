@@ -29,7 +29,7 @@ public class PlayerDAO extends DataAccessObject<Player>{
     private static final String UPDATE_ALL =
             "UPDATE player SET p_name = ?, passcode = ?, dollars = ?,"+
                     " first_places = ?, second_places = ?, third_places = ?, fourth_places = ?, lifetime_tokens = ?,"
-                    + "flushes = ?, quads = ?, full_houses = ?, triples = ?, two_pairs = ?, one_pair = ?, "
+                    + "flushes = ?, quads = ?, full_houses = ?, triples = ?, two_pairs = ?, one_pairs = ?, "
                     + "high_cards = ?, cards_changed = ? WHERE p_id = ?";
     public PlayerDAO(Connection connection){
         super(connection);

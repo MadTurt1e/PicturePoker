@@ -18,12 +18,12 @@ public class PlayerDAO extends DataAccessObject<Player>{
             + "fourth_places, lifetime_tokens, flushes, quads, full_houses, triples, two_pairs, "
             + "one_pairs, high_cards, cards_changed, tokens, bet, rounds_won FROM player";
     private static final String CREATE_NEW_PLAYER = "INSERT INTO player (p_name, passcode) VALUES (?, ?)";
-    private static final String ADD_NEW_PLAYER_INTO_GAMES = "INSERT INTO player_in_game (p_id, g_id) VALUES (?, 0)";
     private static final String CREATE_NEW_CARD = "INSERT INTO player_card (p_id, hand_pos, suit) VALUES (?, ?, ?)";
     private static final String UPDATE_PLAYER_BY_ID_START = "UPDATE player SET ";
     private static final String UPDATE_PLAYER_BY_ID_END = " = ? WHERE p_id = ?";
     private static final String GET_ID_BY_NAME = "SELECT p_id FROM player WHERE p_name = ?";
     private static final String UPDATE_CARD = "UPDATE player_card SET suit = ? WHERE p_id = ? AND hand_pos = ?";
+    private static final String GET_CARD = "SELECT suit, to_change FROM player_card WHERE p_id = ? AND hand_pos = ?";
     private static final String DELETE_PLAYER = "DELETE FROM player WHERE p_id = ?";
 
     private static final String UPDATE_ALL =
@@ -161,6 +161,27 @@ public class PlayerDAO extends DataAccessObject<Player>{
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+    }
+
+    public Player getHand(Player dto){
+        Card[] result = new Card[5];
+        for(int i = 0; i < 5; i++){
+            try(PreparedStatement statement = this.connection.prepareStatement(GET_CARD)){
+                statement.setLong(1, dto.getID());
+                statement.setInt(2, i);
+                ResultSet rs = statement.executeQuery();
+                while(rs.next()){
+                    result[i] = new Card(Card.Suit.valueOf(rs.getString("suit")));
+                    result[i].setToChange(rs.getBoolean("to_change"));
+                }
+            }
+            catch (SQLException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+        }
+        dto.setHand(result);
+        return dto;
     }
 
     public Player createHand(Player dto){

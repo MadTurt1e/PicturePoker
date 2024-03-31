@@ -98,6 +98,7 @@ public class PicturePokerGame {
             PlayerDAO playerDAO = new PlayerDAO(connection);
 
             player = playerDAO.findByName(playerName);
+            player = playerDAO.getHand(player);
             System.out.println(player);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -139,6 +140,7 @@ public class PicturePokerGame {
 
             allPlayers = playerDAO.findAllPlayers();
             for(Player p : allPlayers){
+                p = playerDAO.getHand(p);
                 System.out.println(p);
             }
         } catch (SQLException e) {

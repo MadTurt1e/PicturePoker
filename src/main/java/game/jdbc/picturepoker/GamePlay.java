@@ -351,6 +351,7 @@ public class GamePlay {
             winner = 0;
         }
         player.setRoundsWon(player.getRoundsWon() + winner);
+        player.setLifetimeRoundsWon(player.getLifetimeRoundsWon() + winner);
         if (playerScore >= 10000000) {
             System.out.println(player.getPlayerName() + " got a flush! ");
             player.setFlushes(player.getFlushes() + 1);
@@ -465,7 +466,7 @@ public class GamePlay {
 
         System.out.println("\nGame over. Placements: ");
 
-        //update this one last time just incase anything has changed
+        //update this one last time just in case anything has changed
         playerArrayList = new ArrayList<>(Arrays.asList(playerList));
         Collections.sort(playerArrayList);
 

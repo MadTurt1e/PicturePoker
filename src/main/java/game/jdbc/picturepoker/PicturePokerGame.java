@@ -201,6 +201,7 @@ public class PicturePokerGame {
             updatedPlayer.setOnePairs(Integer.parseInt(inputMap.get("one_pairs")));
             updatedPlayer.setHighCards(Integer.parseInt(inputMap.get("high_card")));
             updatedPlayer.setCardsChanged(Integer.parseInt(inputMap.get("cards_changed")));
+            updatedPlayer.setLifetimeRoundsWon(Integer.parseInt(inputMap.get("lifetime_rounds_won")));
 
             //update everything
             playerdao.update_all(updatedPlayer);

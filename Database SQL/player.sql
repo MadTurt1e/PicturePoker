@@ -23,6 +23,7 @@ CREATE TABLE player
     one_pairs int NOT NULL DEFAULT 0,
     high_cards int NOT NULL DEFAULT 0,
     cards_changed int NOT NULL DEFAULT 0,
+    lifetime_rounds_won int NOT NULL DEFAULT 0,
 
     --Per game info - Zeroed out, and refreshed upon each new game
     tokens int NOT NULL DEFAULT 10,

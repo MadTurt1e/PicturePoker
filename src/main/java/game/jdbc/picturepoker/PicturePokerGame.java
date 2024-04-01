@@ -50,6 +50,7 @@ public class PicturePokerGame {
             player.setPlayerName(inputMap.get("playerName"));
             player.setPasscode(inputMap.get("password"));
             player = playerdao.create(player);
+            player = playerdao.createHand(player); // Initialize player hand on creation
             System.out.println(player);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -70,9 +71,8 @@ public class PicturePokerGame {
             Connection connection = dcm.getConnection();
             GameDAO gamedao = new GameDAO(connection);
 
-            // A new game consists a chosen number of rounds, a pot quantity, buy in value (token stakes, and difficulty
+            // A new game consists a chosen number of rounds, a buy in value (dollar stakes), and difficulty
             game.setNumRounds(Integer.parseInt(inputMap.get("rounds")));
-            game.setPotQuantity(Integer.parseInt(inputMap.get("potQuantity")));
             game.setBuyIn(Integer.parseInt(inputMap.get("buyIn")));
             game.setDifficulty(Integer.parseInt(inputMap.get("difficulty")));
             game = gamedao.create(game);
@@ -98,6 +98,7 @@ public class PicturePokerGame {
             PlayerDAO playerDAO = new PlayerDAO(connection);
 
             player = playerDAO.findByName(playerName);
+            player = playerDAO.getHand(player);
             System.out.println(player);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -139,6 +140,7 @@ public class PicturePokerGame {
 
             allPlayers = playerDAO.findAllPlayers();
             for(Player p : allPlayers){
+                p = playerDAO.getHand(p);
                 System.out.println(p);
             }
         } catch (SQLException e) {
@@ -190,7 +192,16 @@ public class PicturePokerGame {
             updatedPlayer.setSecondPlaces(Integer.parseInt(inputMap.get("seconds")));
             updatedPlayer.setThirdPlaces(Integer.parseInt(inputMap.get("thirds")));
             updatedPlayer.setFourthPlaces(Integer.parseInt(inputMap.get("fourths")));
-            updatedPlayer.setLifetimeTokens(Integer.parseInt(inputMap.get("lifetime")));
+            updatedPlayer.setLifetimeTokens(Integer.parseInt(inputMap.get("lifetime_tokens")));
+            updatedPlayer.setFlushes(Integer.parseInt(inputMap.get("flushes")));
+            updatedPlayer.setQuads(Integer.parseInt(inputMap.get("quads")));
+            updatedPlayer.setFullHouses(Integer.parseInt(inputMap.get("full_houses")));
+            updatedPlayer.setTriples(Integer.parseInt(inputMap.get("triples")));
+            updatedPlayer.setTwoPairs(Integer.parseInt(inputMap.get("two_pairs")));
+            updatedPlayer.setOnePairs(Integer.parseInt(inputMap.get("one_pairs")));
+            updatedPlayer.setHighCards(Integer.parseInt(inputMap.get("high_card")));
+            updatedPlayer.setCardsChanged(Integer.parseInt(inputMap.get("cards_changed")));
+            updatedPlayer.setLifetimeRoundsWon(Integer.parseInt(inputMap.get("lifetime_rounds_won")));
 
             //update everything
             playerdao.update_all(updatedPlayer);

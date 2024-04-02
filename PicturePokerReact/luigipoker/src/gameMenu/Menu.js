@@ -29,6 +29,13 @@ const ImageComponent = () => {
     //so basically we set the image size to the smaller of the image dimensions
     const imageSize = Math.min(windowDimensions.width, windowDimensions.height) * 0.5; // adjust as needed
 
+    //closes tab
+    const closeTab = () => {
+        window.opener = null;
+        window.open("", "_self");
+        window.close();
+    };
+
     return (
         <div style={{
             display: 'flex', flexDirection: 'column', alignItems: 'flex-end',
@@ -38,12 +45,20 @@ const ImageComponent = () => {
             height: '100vh',
             width: '100vw'
         }}>
-            <img src={logo} alt="" style={{width: imageSize*2, marginBottom: '10px'}}/>
-            {images.map((image, index) => (
-                <button class = "GFG">
-                    <img key={index} src={image} alt="" style={{height: '5vh', marginBottom: '10px'}}/>
-                </button>
-            ))}
+            <img src={logo} alt="" style={{width: imageSize * 2, marginBottom: '10px'}}/>
+            <button className="GFG">
+                <img src={images[0]} alt="" style={{height: '5vh', marginBottom: '10px'}}/>
+            </button>
+            <button className="GFG">
+                <img src={images[1]} alt="" style={{height: '5vh', marginBottom: '10px'}}/>
+            </button>
+            <button className="GFG">
+                <img src={images[2]} alt="" style={{height: '5vh', marginBottom: '10px'}}/>
+            </button>
+            <button className="GFG" onClick={closeTab}>
+                <img src={images[3]} alt="" style={{height: '5vh', marginBottom: '10px'}}/>
+            </button>
+            ))
         </div>
     );
 };

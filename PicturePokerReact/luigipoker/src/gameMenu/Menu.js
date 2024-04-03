@@ -7,11 +7,9 @@ import statistics from '../resources/menuIcons/statistics.png'
 import exit from '../resources/menuIcons/exit.png'
 import backdrop from '../resources/menuIcons/luigisCasino.jpg'
 
+import createjs from '../GameInfo/createGame/Create.js'
+
 import React, { useState, useEffect } from 'react';
-
-const images = [create, join, statistics, exit];
-
-
 
 const ImageComponent = () => {
     const [windowDimensions, setWindowDimensions] = useState({ width: window.innerWidth, height: window.innerHeight });
@@ -46,17 +44,17 @@ const ImageComponent = () => {
             width: '100vw'
         }}>
             <img src={logo} alt="" style={{width: imageSize * 2, marginBottom: '10px'}}/>
+            <link to={createjs} className="GFG">
+                <img src={create} alt="" style={{height: '5vh', marginBottom: '10px'}}/>
+            </link>
             <button className="GFG">
-                <img src={images[0]} alt="" style={{height: '5vh', marginBottom: '10px'}}/>
+                <img src={join} alt="" style={{height: '5vh', marginBottom: '10px'}}/>
             </button>
             <button className="GFG">
-                <img src={images[1]} alt="" style={{height: '5vh', marginBottom: '10px'}}/>
-            </button>
-            <button className="GFG">
-                <img src={images[2]} alt="" style={{height: '5vh', marginBottom: '10px'}}/>
+                <img src={statistics} alt="" style={{height: '5vh', marginBottom: '10px'}}/>
             </button>
             <button className="GFG" onClick={closeTab}>
-                <img src={images[3]} alt="" style={{height: '5vh', marginBottom: '10px'}}/>
+                <img src={exit} alt="" style={{height: '5vh', marginBottom: '10px'}}/>
             </button>
             ))
         </div>

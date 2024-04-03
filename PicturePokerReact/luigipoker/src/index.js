@@ -3,13 +3,15 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import Menu from './gameMenu/Menu';
+import Create from './GameInfo/createGame/Create'
 
 import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+/// This is the line you'd change to change the page the react website loads first
 root.render(
   <React.StrictMode>
-    <Menu />
+    <Create />
   </React.StrictMode>
 );
 

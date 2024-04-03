@@ -12,3 +12,15 @@
     -o-transform: rotate(270deg);
     transform: rotate(270deg);
 }
+
+.bordering {
+    color: black;
+    text-shadow: -10px 10px 0 #000,
+    10px 10px 0 #000,
+    10px -10px 0 #000,
+    -10px -10px 0 #000;
+}
+
+.modal-title {
+    font-family: MarioFont, serif;
+}

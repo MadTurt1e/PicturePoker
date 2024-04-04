@@ -12,6 +12,8 @@ import createjs from '../GameInfo/createGame/Create.js'
 import React, { useState, useEffect } from 'react';
 
 const ImageComponent = () => {
+
+    // window dimensions are not necessary
     const [windowDimensions, setWindowDimensions] = useState({ width: window.innerWidth, height: window.innerHeight });
 
     // a little thing I got off the internet to adjust the image size based on the size of the window
@@ -23,7 +25,7 @@ const ImageComponent = () => {
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
-
+    // use backgroundsize: 'cover'
     //so basically we set the image size to the smaller of the image dimensions
     const imageSize = Math.min(windowDimensions.width, windowDimensions.height) * 0.5; // adjust as needed
 

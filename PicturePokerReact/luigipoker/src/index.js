@@ -12,6 +12,7 @@ import './index.css';
 import Menu from './gameMenu/Menu';
 import Create from './GameInfo/CreateGame/Create';
 import Join from './GameInfo/JoinGame/Join';
+import Statistics from './GameInfo/Statistics'
 
 import reportWebVitals from './reportWebVitals';
 
@@ -23,6 +24,7 @@ root.render(
             <Route path="/" element={<Menu />} />
             <Route path="/createGame" element={<Create />} />
             <Route path="/joinGame" element={<Join />} />
+            <Route path="/statistics" element={<Statistics />} />
         </Routes>
     </BrowserRouter>,
   <React.StrictMode>

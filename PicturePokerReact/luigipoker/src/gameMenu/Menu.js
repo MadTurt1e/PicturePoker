@@ -34,9 +34,9 @@ const ImageComponent = () => {
             <Link to="/joinGame" class = "glow">
                 <img src={join} alt="" style={{height: '5vh', marginBottom: '10px'}}/>
             </Link>
-            <button className="glow">
+            <Link to="/statistics" class = "glow">
                 <img src={statistics} alt="" style={{height: '5vh', marginBottom: '10px'}}/>
-            </button>
+            </Link>
             <button className="glow" onClick={closeTab}>
                 <img src={exit} alt="" style={{height: '5vh', marginBottom: '10px'}}/>
             </button>

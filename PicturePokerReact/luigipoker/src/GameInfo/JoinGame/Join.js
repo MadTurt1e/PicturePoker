@@ -8,11 +8,13 @@ import React, { useState } from "react";
 
 function JoinGame() {
     const [inputValue, setInputValue] = useState('');
+    const [message, setMessage] = useState('Enter your friend\'s gameID, then press enter');
     const handleInputChange = (event) => {
         const value = event.target.value;
         if (/^\d*$/.test(value)) { // Check if the value is all digits
             setInputValue(value);
         }
+
         console.log(inputValue)
     };
 
@@ -25,6 +27,7 @@ function JoinGame() {
             //we do not want bad values anywhere near our API
             if (/^\d*$/.test(value)) {
                 setInputValue(value);
+                setMessage("Game ID: " + value);
             }
 
             // Call your function here
@@ -48,8 +51,12 @@ function JoinGame() {
             <div style={{fontSize: '5vh', fontFamily: "MarioFont", color: "Green"}} class = "bordering">
                 Game ID
                 <form>
-                    <input type="number" value={inputValue} onChange={handleInputChange} onKeyDown={handleKeyPress} style={{fontFamily: "MarioFont", fontSize: "5vh"}} pattern="\d*"/>
+                    <input type="number" value={inputValue} onChange={handleInputChange} onKeyDown={handleKeyPress} style={{fontFamily: "MarioFont", fontSize: "5vh", color: "red"}} pattern="\d*"/>
                 </form>
+            </div>
+            <br />
+            <div style={{fontSize: '5vh', fontFamily: "MarioFont", color: "lightblue"}} class="bordering">
+                {message}
             </div>
         </div>
     );

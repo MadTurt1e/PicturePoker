@@ -11,12 +11,12 @@
 
 
 /* https://www.geeksforgeeks.org/apply-glowing-effect-to-the-image-using-html-and-css/ for this button*/
-.GFG {
+.glow {
     border-radius: 10%;
     background: transparent;
     border: transparent;
 }
-.GFG:hover {
+.glow:hover {
     color: #111;
     background: transparent;
     box-shadow: 0 0 100px greenyellow;

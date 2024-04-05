@@ -17,7 +17,7 @@ function Statistics() {
             width: '100vw'
         }}>
             <Link to="/">
-                <img src={stats} alt="stats" style={{height: '10vh', marginBottom: '10vh'}}/>
+                <img src={stats} alt="stats" style={{width: '60%', marginBottom: '10vh'}}/>
             </Link>
         </div>
     );

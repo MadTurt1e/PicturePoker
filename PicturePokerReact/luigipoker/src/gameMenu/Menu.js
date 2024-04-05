@@ -27,7 +27,7 @@ const ImageComponent = () => {
             height: '100vh',
             width: '100vw'
         }}>
-            <img src={logo} alt="" style={{width: '100hh', marginBottom: '10px'}}/>
+            <img src={logo} alt="" style={{width: '70%', marginBottom: '10px'}}/>
             <Link to="/createGame" class = "glow">
                 <img src={create} alt="" style={{height: '5vh', marginBottom: '10px'}}/>
             </Link>

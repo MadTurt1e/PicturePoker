@@ -45,7 +45,7 @@ function JoinGame() {
             width: '100vw'
         }}>
             <Link to="/">
-                <img src={join} alt="" style={{height: '10vh', marginBottom: '10vh'}}/>
+                <img src={join} alt="" style={{width: '60%', marginBottom: '10vh'}}/>
             </Link>
             <br />
             <div style={{fontSize: '5vh', fontFamily: "MarioFont", color: "Green"}} class = "bordering">

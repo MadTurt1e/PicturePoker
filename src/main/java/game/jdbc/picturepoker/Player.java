@@ -236,16 +236,16 @@ public class Player implements DataTransferObject, Comparable<Player> {
     }
 
     // Game functions
-    public void raise(){
+    public int raise(){
         bet = getBet();
         if(bet >= 5 || getTokens() < 1){
             // Invalid bet, do not raise
             System.out.println("Player: Could not raise- Bet already max or no more tokens");
+            return -1;
         }
-        else{
-            setBet(bet + 1);
-            setTokens(getTokens() - 1);
-        }
+        setBet(bet + 1);
+        setTokens(getTokens() - 1);
+        return 0;
     }
 
     // Statistic aggregation functions

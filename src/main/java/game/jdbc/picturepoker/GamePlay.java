@@ -510,7 +510,7 @@ public class GamePlay {
                 System.out.println(player.getPlayerName() + " now has " + player.getTokens() + " tokens. ");
                 playerdao.update_long("tokens", player.getTokens(), player);
                 playerdao.update_int("rounds_won", player.getRoundsWon(), player);
-                playerdao.update_all(player);
+                playerdao.updateAttributes(player);
                 ++curPlayerNum;
             }
 

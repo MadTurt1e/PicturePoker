@@ -204,7 +204,7 @@ public class PicturePokerGame {
             updatedPlayer.setLifetimeRoundsWon(Integer.parseInt(inputMap.get("lifetime_rounds_won")));
 
             //update everything
-            playerdao.update_all(updatedPlayer);
+            playerdao.updateAttributes(updatedPlayer);
             System.out.println(updatedPlayer);
 
             return updatedPlayer;
@@ -246,6 +246,58 @@ public class PicturePokerGame {
         }
 
         return updatedGame;
+    }
+
+    //UPDATE Operation - Raise player bet
+    @PutMapping("/raise/{p_id}")
+    public Player raiseBet(@PathVariable long p_id){
+        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,
+                "picturepoker", "postgres", "password");
+        Player player = new Player();
+        try {
+            Connection connection = dcm.getConnection();
+            PlayerDAO playerDAO = new PlayerDAO(connection);
+
+            player = playerDAO.findById(p_id);
+            if(player.raise() < 0){
+                System.out.println("Could not raise: Not enough tokens.");
+            }
+            else{
+                System.out.println("Player bet is now :" + player.getBet());
+            }
+            playerDAO.update_int("bet", player.getBet(), player);
+            System.out.println(player);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return player;
+    }
+
+    //UPDATE Operation - Toggle whether to change out card
+    @PutMapping("/changeCard/{p_id}/{pos}")
+    public Player toggleToChange(@PathVariable long p_id, @PathVariable int pos){
+        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,
+                "picturepoker", "postgres", "password");
+        Player player = new Player();
+        try {
+            Connection connection = dcm.getConnection();
+            PlayerDAO playerDAO = new PlayerDAO(connection);
+
+            player = playerDAO.findById(p_id);
+            player = playerDAO.getHand(player);
+
+            if(pos < 0 || pos > 4){
+                System.out.println("Error: Hand position out of bounds.");
+                return player;
+            }
+            Card[] hand = player.getHand();
+            hand[pos].setToChange(!hand[pos].getToChange());
+            playerDAO.updateHand(player);
+            System.out.println(player);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return player;
     }
 
     //DELETE Operation - Delete a player

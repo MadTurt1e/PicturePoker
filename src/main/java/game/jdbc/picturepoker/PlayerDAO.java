@@ -26,7 +26,7 @@ public class PlayerDAO extends DataAccessObject<Player>{
     private static final String GET_CARD = "SELECT suit, to_change FROM player_card WHERE p_id = ? AND hand_pos = ?";
     private static final String DELETE_PLAYER = "DELETE FROM player WHERE p_id = ?";
 
-    private static final String UPDATE_ALL =
+    private static final String UPDATE_ATTRIBUTES =
             "UPDATE player SET p_name = ?, passcode = ?, dollars = ?,"+
                     " first_places = ?, second_places = ?, third_places = ?, fourth_places = ?, lifetime_tokens = ?,"
                     + "flushes = ?, quads = ?, full_houses = ?, triples = ?, two_pairs = ?, one_pairs = ?, "
@@ -246,8 +246,8 @@ public class PlayerDAO extends DataAccessObject<Player>{
         }
     }
 
-    public Player update_all(Player dto) {
-        try (PreparedStatement statement = this.connection.prepareStatement(UPDATE_ALL)) {
+    public Player updateAttributes(Player dto) {
+        try (PreparedStatement statement = this.connection.prepareStatement(UPDATE_ATTRIBUTES)) {
             statement.setString(1, dto.getPlayerName());
             statement.setString(2, dto.getPasscode());
             statement.setInt(3, dto.getDollars());

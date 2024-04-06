@@ -202,6 +202,7 @@ public class PicturePokerGame {
             updatedPlayer.setHighCards(Integer.parseInt(inputMap.get("high_card")));
             updatedPlayer.setCardsChanged(Integer.parseInt(inputMap.get("cards_changed")));
             updatedPlayer.setLifetimeRoundsWon(Integer.parseInt(inputMap.get("lifetime_rounds_won")));
+            updatedPlayer.setLifetimeTotalBet(Integer.parseInt(inputMap.get("lifetime_total_bet")));
 
             //update everything
             playerdao.updateAttributes(updatedPlayer);
@@ -259,12 +260,15 @@ public class PicturePokerGame {
             PlayerDAO playerDAO = new PlayerDAO(connection);
 
             player = playerDAO.findById(p_id);
+            if(player.getFinishedRound() > 0){
+                System.out.println("Could not raise: Finished round.");
+                return player;
+            }
             if(player.raise() < 0){
                 System.out.println("Could not raise: Not enough tokens.");
+                return player;
             }
-            else{
-                System.out.println("Player bet is now :" + player.getBet());
-            }
+            System.out.println("Player bet is now :" + player.getBet());
             playerDAO.update_int("bet", player.getBet(), player);
             System.out.println(player);
         } catch (SQLException e) {
@@ -285,9 +289,11 @@ public class PicturePokerGame {
 
             player = playerDAO.findById(p_id);
             player = playerDAO.getHand(player);
-
+            if(player.getFinishedRound() > 0){
+                System.out.println("Could not toggle Card: Finished round.");
+            }
             if(pos < 0 || pos > 4){
-                System.out.println("Error: Hand position out of bounds.");
+                System.out.println("Could not toggle Card: Hand position out of bounds.");
                 return player;
             }
             Card[] hand = player.getHand();

@@ -24,11 +24,13 @@ CREATE TABLE player
     high_cards int NOT NULL DEFAULT 0,
     cards_changed int NOT NULL DEFAULT 0,
     lifetime_rounds_won int NOT NULL DEFAULT 0,
+    lifetime_total_bet int NOT NULL DEFAULT 0,
 
     --Per game info - Zeroed out, and refreshed upon each new game
     tokens int NOT NULL DEFAULT 10,
     bet int NOT NULL DEFAULT 0,
     rounds_won int NOT NULL DEFAULT 0,
+    finished_round int NOT NULL DEFAULT 0,
 
     PRIMARY KEY(p_id)
 );

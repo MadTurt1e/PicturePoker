@@ -30,7 +30,7 @@ CREATE TABLE player
     tokens int NOT NULL DEFAULT 10,
     bet int NOT NULL DEFAULT 0,
     rounds_won int NOT NULL DEFAULT 0,
-    finished_round int NOT NULL DEFAULT 0,
+    finished_round int NOT NULL DEFAULT 1, -- Players can only input when this is zero
 
     PRIMARY KEY(p_id)
 );

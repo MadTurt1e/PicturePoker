@@ -322,7 +322,7 @@ public class Player implements DataTransferObject, Comparable<Player> {
                 ", tokens=" + tokens +
                 ", bet=" + bet +
                 ", rounds_won=" + roundsWon +
-                ", finished_round" + finishedRound +
+                ", finished_round=" + finishedRound +
                 '}';
     }
 }

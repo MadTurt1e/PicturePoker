@@ -306,6 +306,29 @@ public class PicturePokerGame {
         return player;
     }
 
+    @PutMapping("/finishRound/{p_id}")
+    public Player finishRound(@PathVariable long p_id){
+        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,
+                "picturepoker", "postgres", "password");
+        Player player = new Player();
+        try {
+            Connection connection = dcm.getConnection();
+            PlayerDAO playerDAO = new PlayerDAO(connection);
+
+            player = playerDAO.findById(p_id);
+            player = playerDAO.getHand(player);
+            if(player.getFinishedRound() > 0){
+                System.out.println("Could not finish round: It is not your turn.");
+                return player;
+            }
+            player.setFinishedRound(1);
+            playerDAO.update_int("finished_round", 1, player);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return player;
+    }
+
     //DELETE Operation - Delete a player
     @DeleteMapping("/deletePlayer/{p_id}")
     public Player deleteByPID(@PathVariable long p_id) {

@@ -481,7 +481,11 @@ public class GamePlay {
             //we execute everyone's turns now
             curPlayerNum = 0;
             for (Player i : playerArrayList) {
+                i.setFinishedRound(0);
+                playerdao.update_int("finished_round", 0, i);
                 playerList[curPlayerNum++] = executeTurn(i);
+                i.setFinishedRound(1);
+                playerdao.update_int("finished_round", 1, i);
                 playerdao.updateHand(i);
                 playerdao.update_int("tokens", i.getTokens(), i);
                 playerdao.update_int("bet", i.getBet(), i);

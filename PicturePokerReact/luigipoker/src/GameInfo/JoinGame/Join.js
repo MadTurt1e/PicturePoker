@@ -6,9 +6,11 @@ import backdrop from "../../resources/menuIcons/luigisCasino.jpg";
 import {Link} from "react-router-dom";
 import React, { useState } from "react";
 
+import ColorfulText from "../../index";
+
 function JoinGame() {
     const [inputValue, setInputValue] = useState('');
-    const [message, setMessage] = useState('Enter your friend\'s gameID, then press enter');
+    const [message, setMessage] = useState('Enter your friend\'s gameID, then press enter. ');
     const handleInputChange = (event) => {
         const value = event.target.value;
         if (/^\d*$/.test(value)) { // Check if the value is all digits
@@ -47,17 +49,19 @@ function JoinGame() {
             <Link to="/">
                 <img src={join} alt="" style={{width: '60%', marginBottom: '10vh'}}/>
             </Link>
-            <br />
-            <div style={{fontSize: '5vh', fontFamily: "MarioFont", color: "Green"}} class = "bordering">
-                Game ID
+            <br/>
+            <div style={{fontSize: '5vh'}} className="bordering">
+                <ColorfulText text={message} />
+            </div>
+            <br/>
+            <div style={{fontSize: '5vh'}} className="bordering">
+                <ColorfulText text= "Game ID"/>
                 <form>
-                    <input type="number" value={inputValue} onChange={handleInputChange} onKeyDown={handleKeyPress} style={{fontFamily: "MarioFont", fontSize: "5vh", color: "red"}} pattern="\d*"/>
+                    <input type="number" value={inputValue} onChange={handleInputChange} onKeyDown={handleKeyPress}
+                           style={{fontFamily: "MarioFont", fontSize: "5vh", color: "red"}} pattern="\d*"/>
                 </form>
             </div>
-            <br />
-            <div style={{fontSize: '5vh', fontFamily: "MarioFont", color: "lightblue"}} class="bordering">
-                {message}
-            </div>
+            <br/>
         </div>
     );
 }

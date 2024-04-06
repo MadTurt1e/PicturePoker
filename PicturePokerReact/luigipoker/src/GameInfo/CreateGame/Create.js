@@ -8,12 +8,18 @@ import rounds from "../../resources/menuIcons/number-of-rounds-4-3-2024.png"
 
 import arrow from "../../resources/incdec/Arrow_Sign_SMB3.webp";
 
-import "../../gameMenu/Menu.css";
+import "../../GameMenu/Menu.css";
 import {Link} from "react-router-dom";
+import axios from "axios";
+
+import ColorfulText from "../../index";
 
 function gameCreation(rounds, buyin){
-    return null;
+
+    //TODO: Check to make sure the game creator can actually join the game
     console.log("Game created - " + rounds + " rounds, and " + buyin + " buyin. ");
+
+    return null;
 }
 
 function CreateGame(){
@@ -34,49 +40,45 @@ function CreateGame(){
             </Link>
 
             <br />
-            <div className="RoundCount">
+            <div className="RoundCount" style={{display: 'flex'}}>
                 <img src={rounds} style={{height: '10vh'}} alt={"Round Count"}/>
                 <button
-                    className="arrow-up"
                     onClick={() => counter > 0 && setCounter(counter - 1)}
-                    class = "glow">
+                    className= "glow">
                     <img src={arrow} alt="arrow pointing upwards" className = "rotate90"/>
                 </button>
-                <span style={{fontSize:'10vh', fontFamily: "MarioFont", color: "green"}} className = "bordering">
-                    {counter}
-                </span>
+                <div style={{fontSize:'10vh'}} className = "bordering">
+                    <ColorfulText text={counter} />
+                </div>
                 <button
-                    className="arrow-down"
                     onClick={() => counter < 11 && setCounter(counter + 1)}
-                    class = "glow">
-                    <img src={arrow} alt="arrow pointing downwards" class = "rotateneg90"/>
+                    className= "glow">
+                    <img src={arrow} alt="arrow pointing downwards" className= "rotateneg90"/>
                 </button>
             </div>
             <br />
-            <div className="Buy In">
-                <img src={buyin} style={{height: '10vh'}}/>
+            <div className="Buy In" style={{display: 'flex'}}>
+                <img src={buyin} style={{height: '10vh'}} alt={"buyin"}/>
                 <button
-                    className="arrow-up"
                     onClick={() => counter10 > 0 && setCounter10(counter10 - 10)}
-                    class = "glow">
-                    <img src={arrow} alt="arrow pointing upwards" class="rotate90"/>
+                    className= "glow">
+                    <img src={arrow} alt="arrow pointing upwards" className="rotate90"/>
                 </button>
                 <span style={{fontSize:'10vh', fontFamily: "MarioFont", color: "green"}} className = "bordering">
-                    {counter10}
+                    <ColorfulText text={counter10} />
                 </span>
                 <button
-                    className="arrow-down"
                     onClick={() => setCounter10(counter10 + 10)}
-                    class = "glow">
-                    <img src={arrow} alt="arrow pointing downwards" class="rotateneg90"/>
+                    className= "glow">
+                    <img src={arrow} alt="arrow pointing downwards" className="rotateneg90"/>
                 </button>
             </div>
 
             <br />
             <div>
-                <button type={"button"} style={{height:'10vh', width:'20hh'}} className = "glow" onClick ={gameCreation(counter, counter10)}>
-                    <div style={{fontSize:'5vh', fontFamily:"MarioFont", color:"red"}} className = "bordering">
-                        Create Game
+                <button type={"button"} style={{height:'10vh', width:'20hh', border: "black", borderWidth: "10px"}} className = "glow" onClick ={() => gameCreation(counter, counter10)}>
+                    <div style={{fontSize:'5vh'}} className = "bordering">
+                        <ColorfulText text="Create Game! " />
                     </div>
                 </button>
             </div>

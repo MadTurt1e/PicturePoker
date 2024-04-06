@@ -9,12 +9,27 @@ import {
 
 import './index.css';
 
-import Menu from './gameMenu/Menu';
+import Menu from './GameMenu/Menu';
 import Create from './GameInfo/CreateGame/Create';
 import Join from './GameInfo/JoinGame/Join';
 import Statistics from './GameInfo/Statistics'
 
 import reportWebVitals from './reportWebVitals';
+
+//useful block that colorizes text to make it look like the mario font
+const colors = ['#009CDA', '#FCD000', '#E71E07', '#42B132', '#FCD000', '#E71E07', '#42B132', '#FCD000', '#009CDA', '#42B132'];
+
+const ColorfulText = ({text}) => {
+    return (
+        <div>
+            {text.toString().split('').map((char, i) => (
+                <span key={i} style={{ color: colors[i % colors.length], fontFamily: "MarioFont"}}>
+          {char}
+        </span>
+            ))}
+        </div>
+    );
+};
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 /// This is the line you'd change to change the page the react website loads first
@@ -36,3 +51,5 @@ root.render(
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
+
+export default ColorfulText;

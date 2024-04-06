@@ -1,0 +1,24 @@
+.Menu {
+    text-align: center;
+}
+.btn {
+    cursor: pointer;
+    border: transparent;
+    background-color: transparent;
+    color: #3498db;
+    box-shadow: 0 6px 6px rgba(0, 0, 0, 0.6);
+}
+
+
+/* https://www.geeksforgeeks.org/apply-glowing-effect-to-the-image-using-html-and-css/ for this button*/
+.GFG {
+    margin-left: 400px;
+    border-radius: 10%;
+    background: transparent;
+    border: transparent;
+}
+.GFG:hover {
+    color: #111;
+    background: transparent;
+    box-shadow: 0 0 100px greenyellow;
+}

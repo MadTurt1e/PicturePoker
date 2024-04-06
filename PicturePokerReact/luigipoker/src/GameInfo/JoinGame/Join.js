@@ -4,6 +4,7 @@ import join from "../../resources/menuIcons/joingame.png";
 import backdrop from "../../resources/menuIcons/luigisCasino.jpg";
 
 import {Link} from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 import React, { useState } from "react";
 
 import ColorfulText from "../../index";
@@ -20,6 +21,7 @@ function JoinGame() {
         console.log(inputValue)
     };
 
+    const navigate = useNavigate();
     //do something when a key is pressed (check if #1: it's a valid game, #2, if the game lets the player in) then enter player in game.
     const handleKeyPress = (event) => {
         if (event.key === 'Enter') {
@@ -30,6 +32,8 @@ function JoinGame() {
             if (/^\d*$/.test(value)) {
                 setInputValue(value);
                 setMessage("Game ID: " + value);
+
+                navigate("/game");
             }
 
             // Call your function here

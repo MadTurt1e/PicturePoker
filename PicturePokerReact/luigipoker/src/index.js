@@ -14,6 +14,8 @@ import Create from './GameInfo/CreateGame/Create';
 import Join from './GameInfo/JoinGame/Join';
 import Statistics from './GameInfo/Statistics'
 
+import Game from './Game/Game'
+
 import reportWebVitals from './reportWebVitals';
 
 //useful block that colorizes text to make it look like the mario font
@@ -40,6 +42,7 @@ root.render(
             <Route path="/createGame" element={<Create />} />
             <Route path="/joinGame" element={<Join />} />
             <Route path="/statistics" element={<Statistics />} />
+            <Route path="/game" element={<Game />} />
         </Routes>
     </BrowserRouter>,
   <React.StrictMode>

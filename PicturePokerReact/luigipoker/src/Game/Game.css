@@ -1,8 +1,9 @@
-.Game {
+.cards {
     display: flex;
     justify-content: space-around;
-    align-items: flex-end; /* Align items to the end of the container */
-    height: 100vh; /* Take full viewport height */
+    position: absolute;
+    width: 50%;
+    left: 25%;
 }
 
 .card {
@@ -19,4 +20,53 @@
 .card:hover,
 .raised {
     transform: translateY(-50%);
+}
+
+.dealercard {
+    width: 10%;
+    transition: all 0.3s ease;
+}
+
+.dealercard img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.dealercard:hover,
+.dealerraised {
+    transform: translateY(50%);
+}
+
+.bet {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    position: absolute;
+    left: 28%;
+    bottom: 30%;
+    height: auto;
+}
+.endTurnButton{
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    position: absolute;
+    right: 27.5%;
+    bottom: 30%;
+    height: auto;
+}
+
+.token{
+    width: 3vw;
+    position: relative;
+    margin-right: 5px;
+}
+
+.crispImages{
+    pixelperfect: true;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-crisp-edges;
+    image-rendering: pixelated;
+    -ms-interpolation-mode: nearest-neighbor;
 }

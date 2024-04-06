@@ -11,7 +11,7 @@ import {Link} from "react-router-dom";
 
 const ImageComponent = () => {
 
-    //closes tab
+    //closes tab. This is temporary - it may be better to put a logout button instead
     const closeTab = () => {
         window.opener = null;
         window.open("", "_self");

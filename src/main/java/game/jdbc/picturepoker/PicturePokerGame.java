@@ -128,6 +128,34 @@ public class PicturePokerGame {
         return game;
     }
 
+    //READ Operation - Reads players from a game
+    @GetMapping("/getPlayersByGame/{g_id}")
+    public ArrayList<Player> getPlayersByGame(@PathVariable("g_id") String g_idStr) {
+        System.out.println(g_idStr);
+        long g_id = Long.parseLong(g_idStr);
+        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,
+                "picturepoker", "postgres", "password");
+        ArrayList<Player> playersInGame = new ArrayList<Player>();Game game = new Game();
+        try {
+            Connection connection = dcm.getConnection();
+            GameDAO gamedao = new GameDAO(connection);
+            PlayerDAO playerDAO = new PlayerDAO(connection);
+            game = gamedao.findById(g_id);
+            long[] gamePIDs = gamedao.getPIDsByGame(game);
+            for(int i = 0; i < 4; i++){
+                playersInGame.add(playerDAO.findById(gamePIDs[i]));
+            }
+            for(Player p : playersInGame){
+                playerDAO.getHand(p);
+                System.out.println(p);
+            }
+            System.out.println(game);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return playersInGame;
+    }
+
     //READ Operation - Reads all players
     @GetMapping("/getAllPlayers")
     public ArrayList<Player> getAllPlayers() {

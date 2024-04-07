@@ -8,9 +8,9 @@ INSERT INTO player (p_id, p_name, passcode) VALUES (7, 'Chris', 'passwordthaiice
 INSERT INTO player (p_id, p_name, passcode) VALUES (8, 'Bowser', 'kingofkoopas');
 
 INSERT INTO game (g_id, num_rounds, active_players, buy_in, pot_quantity, difficulty) VALUES (14, 5, 4, 10, 100, 1);
-INSERT INTO game (g_id, cur_round, num_rounds, active_players, buy_in, pot_quantity, difficulty) VALUES (645, 7, 7, 4, 100, 20, 0);
+INSERT INTO game (g_id, cur_round, num_rounds, active_players, buy_in, pot_quantity, difficulty) VALUES (45, 7, 7, 4, 100, 20, 0);
 
-INSERT INTO player_in_game (p_id, g_id) VALUES (1, 14), (2, 14), (4, 14), (6, 14), (3, 645), (5, 645), (7, 645), (8, 645);
+INSERT INTO player_in_game (p_id, g_id) VALUES (1, 14), (2, 14), (4, 14), (6, 14), (3, 45), (5, 45), (7, 45), (8, 45);
 
 INSERT INTO player_card (p_id, hand_pos, suit) VALUES
 (1, 0, 'MARIO'), (1, 1, 'CLOUD'), (1, 2, 'FIRE_FLOWER'), (1, 3, 'MARIO'), (1, 4, 'STAR'),
@@ -24,4 +24,4 @@ INSERT INTO player_card (p_id, hand_pos, suit) VALUES
 
 INSERT INTO dealer_card (g_id, hand_pos, suit) VALUES
 (14, 0, 'FIRE_FLOWER'), (14, 1, 'CLOUD'), (14, 2, 'LUIGI'), (14, 3, 'FIRE_FLOWER'), (14, 4, 'FIRE_FLOWER'),
-(645, 0, 'MUSHROOM'), (645, 1, 'STAR'), (645, 2, 'MUSHROOM'), (645, 3, 'MARIO'), (645, 4, 'LUIGI');
+(45, 0, 'MUSHROOM'), (45, 1, 'STAR'), (45, 2, 'MUSHROOM'), (45, 3, 'MARIO'), (45, 4, 'LUIGI');

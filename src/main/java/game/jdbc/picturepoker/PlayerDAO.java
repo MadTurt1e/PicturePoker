@@ -12,11 +12,13 @@ public class PlayerDAO extends DataAccessObject<Player>{
     private static final String GET_PLAYER_BY_ID = "SELECT "
             + "p_id, p_name, passcode, dollars, first_places, second_places, third_places, "
             + "fourth_places, lifetime_tokens, flushes, quads, full_houses, triples, two_pairs, "
-            + "one_pairs, high_cards, cards_changed, lifetime_rounds_won, tokens, bet, rounds_won FROM player WHERE p_id = ?";
+            + "one_pairs, high_cards, cards_changed, lifetime_rounds_won, lifetime_total_bet, "
+            +" tokens, bet, rounds_won, finished_round FROM player WHERE p_id = ?";
     private static final String GET_ALL_PLAYERS = "SELECT "
             + "p_id, p_name, passcode, dollars, first_places, second_places, third_places, "
             + "fourth_places, lifetime_tokens, flushes, quads, full_houses, triples, two_pairs, "
-            + "one_pairs, high_cards, cards_changed, lifetime_rounds_won, tokens, bet, rounds_won FROM player";
+            + "one_pairs, high_cards, cards_changed, lifetime_rounds_won, lifetime_total_bet, "
+            +" tokens, bet, rounds_won, finished_round FROM player";
     private static final String CREATE_NEW_PLAYER = "INSERT INTO player (p_name, passcode) VALUES (?, ?)";
     private static final String CREATE_NEW_CARD = "INSERT INTO player_card (p_id, hand_pos, suit) VALUES (?, ?, ?)";
     private static final String UPDATE_PLAYER_BY_ID_START = "UPDATE player SET ";
@@ -26,11 +28,12 @@ public class PlayerDAO extends DataAccessObject<Player>{
     private static final String GET_CARD = "SELECT suit, to_change FROM player_card WHERE p_id = ? AND hand_pos = ?";
     private static final String DELETE_PLAYER = "DELETE FROM player WHERE p_id = ?";
 
-    private static final String UPDATE_ALL =
-            "UPDATE player SET p_name = ?, passcode = ?, dollars = ?,"+
-                    " first_places = ?, second_places = ?, third_places = ?, fourth_places = ?, lifetime_tokens = ?,"
+    private static final String UPDATE_ATTRIBUTES =
+            "UPDATE player SET p_name = ?, passcode = ?, dollars = ?,"
+                    + " first_places = ?, second_places = ?, third_places = ?, fourth_places = ?, lifetime_tokens = ?,"
                     + "flushes = ?, quads = ?, full_houses = ?, triples = ?, two_pairs = ?, one_pairs = ?, "
-                    + "high_cards = ?, cards_changed = ?, lifetime_rounds_won = ? WHERE p_id = ?";
+                    + "high_cards = ?, cards_changed = ?, lifetime_rounds_won = ?, lifetime_total_bet = ?, "
+                    + "finished_round = ? WHERE p_id = ?";
     public PlayerDAO(Connection connection){
         super(connection);
     }
@@ -61,10 +64,12 @@ public class PlayerDAO extends DataAccessObject<Player>{
                 player.setHighCards(rs.getInt("high_cards"));
                 player.setCardsChanged(rs.getInt("cards_changed"));
                 player.setLifetimeRoundsWon(rs.getInt("lifetime_rounds_won"));
+                player.setLifetimeTotalBet(rs.getInt("lifetime_total_bet"));
 
                 player.setTokens(rs.getInt("tokens"));
                 player.setBet(rs.getInt("bet"));
                 player.setRoundsWon(rs.getInt("rounds_won"));
+                player.setFinishedRound(rs.getInt("finished_round"));
             }
         }
         catch (SQLException e) {
@@ -101,10 +106,12 @@ public class PlayerDAO extends DataAccessObject<Player>{
                 player.setHighCards(rs.getInt("high_cards"));
                 player.setCardsChanged(rs.getInt("cards_changed"));
                 player.setLifetimeRoundsWon(rs.getInt("lifetime_rounds_won"));
+                player.setLifetimeTotalBet(rs.getInt("lifetime_total_bet"));
 
                 player.setTokens(rs.getInt("tokens"));
                 player.setBet(rs.getInt("bet"));
                 player.setRoundsWon(rs.getInt("rounds_won"));
+                player.setFinishedRound(rs.getInt("finished_round"));
 
                 allPlayers.add(player);
             }
@@ -246,8 +253,8 @@ public class PlayerDAO extends DataAccessObject<Player>{
         }
     }
 
-    public Player update_all(Player dto) {
-        try (PreparedStatement statement = this.connection.prepareStatement(UPDATE_ALL)) {
+    public Player updateAttributes(Player dto) {
+        try (PreparedStatement statement = this.connection.prepareStatement(UPDATE_ATTRIBUTES)) {
             statement.setString(1, dto.getPlayerName());
             statement.setString(2, dto.getPasscode());
             statement.setInt(3, dto.getDollars());
@@ -264,8 +271,11 @@ public class PlayerDAO extends DataAccessObject<Player>{
             statement.setInt(14, dto.getOnePairs());
             statement.setInt(15, dto.getHighCards());
             statement.setInt(16, dto.getCardsChanged());
-            statement.setInt(17, dto.getLifetimeRoundsWon());;
-            statement.setLong(18, dto.getID());
+            statement.setInt(17, dto.getLifetimeRoundsWon());
+            statement.setInt(18, dto.getLifetimeTotalBet());
+            statement.setInt(19, dto.getFinishedRound());
+            statement.setLong(20, dto.getID());
+
             statement.execute();
             return dto;
         } catch (SQLException e) {

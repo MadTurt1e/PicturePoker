@@ -1,0 +1,29 @@
+.rotate90 {
+    -webkit-transform:rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    transform: rotate(90deg);
+}
+.rotateneg90 {
+    -webkit-transform:rotate(270deg);
+    -moz-transform: rotate(270deg);
+    -ms-transform: rotate(270deg);
+    -o-transform: rotate(270deg);
+    transform: rotate(270deg);
+}
+
+.bordering {
+    -webkit-text-stroke-width: 6px;
+    -webkit-text-stroke-color: black;
+}
+
+.bordering span span { color: tomato; }
+.bordering span span:nth-child(2n) { color: lightseagreen; }
+.bordering span span:nth-child(3n) { color: orange; }
+.bordering span span:nth-child(4n) { color: dodgerblue; }
+.bordering span span:nth-child(5n) { color: blueviolet; }
+
+.modal-title {
+    font-family: MarioFont, serif;
+}

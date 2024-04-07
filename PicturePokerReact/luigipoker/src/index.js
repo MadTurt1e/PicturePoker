@@ -1,13 +1,32 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+
+import {
+    BrowserRouter,
+    Routes,
+    Route
+} from "react-router-dom";
+
 import './index.css';
-import App from './App';
+
 import Menu from './gameMenu/Menu';
+import Create from './GameInfo/CreateGame/Create';
+import Join from './GameInfo/JoinGame/Join';
+import Statistics from './GameInfo/Statistics'
 
 import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+/// This is the line you'd change to change the page the react website loads first
 root.render(
+    <BrowserRouter>
+        <Routes>
+            <Route path="/" element={<Menu />} />
+            <Route path="/createGame" element={<Create />} />
+            <Route path="/joinGame" element={<Join />} />
+            <Route path="/statistics" element={<Statistics />} />
+        </Routes>
+    </BrowserRouter>,
   <React.StrictMode>
     <Menu />
   </React.StrictMode>

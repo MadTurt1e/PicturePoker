@@ -18,6 +18,8 @@ import Game from './Game/Game'
 
 import reportWebVitals from './reportWebVitals';
 
+const axios = require('axios').default;
+
 //useful block that colorizes text to make it look like the mario font
 const colors = ['#009CDA', '#FCD000', '#E71E07', '#42B132', '#FCD000', '#E71E07', '#42B132', '#FCD000', '#009CDA', '#42B132'];
 

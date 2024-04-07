@@ -18,6 +18,8 @@ import token from "../resources/pokerSprites/token.png";
 
 import backdrop from "../resources/pokerSprites/table.png";
 
+import axios from "axios";
+
 function Game() {
     const images = [cloud, mushroom, fireflower, luigi, mario, star, normalCard, proCard];
     const [cards, setCards] = useState([6, 6, 6, 6 , 6]);
@@ -50,6 +52,7 @@ function Game() {
         const newCards = [...cards];
         selectedCards.map((index) =>
             newCards[index] = Math.floor(Math.random() * 6)
+
         )
         setCards(newCards);
     }

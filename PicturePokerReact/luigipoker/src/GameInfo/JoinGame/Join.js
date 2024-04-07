@@ -5,9 +5,33 @@ import backdrop from "../../resources/menuIcons/luigisCasino.jpg";
 
 import {Link} from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
+import axios from "axios";
 
 import ColorfulText from "../../index";
+
+function GameList() {
+    const [data, setData] = useState(null);
+    useEffect(() => {
+        const loadGame = async () => {
+            const response = await axios.get(`http://localhost:8080/getAllGames`);
+            setData(response.data)
+        }
+        loadGame();
+    }, []);
+    if (data) {
+        const filteredData = data.filter(game => game.players.includes(0) && game.curRound === 1);
+        const gameIDs = filteredData.map(game => game.id);
+        return (
+            <div>
+                {gameIDs.map((value) =>
+                    <ColorfulText text={JSON.stringify(value, null, 2)}/>
+                )}
+            </div>
+        );
+    }
+    return <h1>Data</h1>;
+}
 
 function JoinGame() {
     const [inputValue, setInputValue] = useState('');
@@ -64,6 +88,13 @@ function JoinGame() {
                     <input type="number" value={inputValue} onChange={handleInputChange} onKeyDown={handleKeyPress}
                            style={{fontFamily: "MarioFont", fontSize: "5vh", color: "red"}} pattern="\d*"/>
                 </form>
+            </div>
+
+            <div style={{fontSize: '5vh'}} className="bordering">
+                <ColorfulText text={"Game ID List: "}/>
+                <br/>
+
+                <GameList/>
             </div>
             <br/>
         </div>

@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 // @RequestMapping("/api") We will shift most of the functionality here to be hidden under /api
 @SpringBootApplication
 @RestController
+@CrossOrigin
 public class PicturePokerGame {
 
     //Set the hostname as a pseudo global so that we can change it later

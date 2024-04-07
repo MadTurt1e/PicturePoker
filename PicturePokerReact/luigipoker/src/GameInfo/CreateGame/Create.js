@@ -1,5 +1,5 @@
 import "./Create.css"
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import create from "../../resources/menuIcons/creategame.png";
 import backdrop from "../../resources/menuIcons/luigisCasino.jpg";
 
@@ -15,9 +15,19 @@ import axios from "axios";
 import ColorfulText from "../../index";
 
 function gameCreation(rounds, buyin){
-
     //TODO: Check to make sure the game creator can actually join the game
-    console.log("Game created - " + rounds + " rounds, and " + buyin + " buyin. ");
+
+    const gameDetails = {
+        rounds: rounds.toString(), // number of rounds
+        buyIn: buyin.toString(), // buy-in amount
+        difficulty: "1" // difficulty level
+    };
+    const makeGame = async () => {
+        const response = await axios.post('http://localhost:8080/createNewGame', gameDetails);
+        console.log("Game created! " + gameDetails.rounds + gameDetails.buyIn + " buyin, and " + response.data.g_id + " id");
+    }
+    makeGame();
+
 
     return null;
 }
@@ -27,6 +37,7 @@ function CreateGame(){
     const [counter, setCounter] = useState(0);
     const [counter10, setCounter10] = useState(0);
 
+    const [message, setMessage] = useState(null);
     return (
         <div style = {{
             backgroundImage: `url(${backdrop})`,

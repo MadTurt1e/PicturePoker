@@ -202,9 +202,10 @@ public class PicturePokerGame {
             updatedPlayer.setHighCards(Integer.parseInt(inputMap.get("high_card")));
             updatedPlayer.setCardsChanged(Integer.parseInt(inputMap.get("cards_changed")));
             updatedPlayer.setLifetimeRoundsWon(Integer.parseInt(inputMap.get("lifetime_rounds_won")));
+            updatedPlayer.setLifetimeTotalBet(Integer.parseInt(inputMap.get("lifetime_total_bet")));
 
             //update everything
-            playerdao.update_all(updatedPlayer);
+            playerdao.updateAttributes(updatedPlayer);
             System.out.println(updatedPlayer);
 
             return updatedPlayer;
@@ -246,6 +247,86 @@ public class PicturePokerGame {
         }
 
         return updatedGame;
+    }
+
+    //UPDATE Operation - Raise player bet
+    @PutMapping("/raise/{p_id}")
+    public Player raiseBet(@PathVariable long p_id){
+        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,
+                "picturepoker", "postgres", "password");
+        Player player = new Player();
+        try {
+            Connection connection = dcm.getConnection();
+            PlayerDAO playerDAO = new PlayerDAO(connection);
+
+            player = playerDAO.findById(p_id);
+            if(player.getFinishedRound() > 0){
+                System.out.println("Could not raise: Finished round.");
+                return player;
+            }
+            if(player.raise() < 0){
+                System.out.println("Could not raise: Not enough tokens.");
+                return player;
+            }
+            System.out.println("Player bet is now :" + player.getBet());
+            playerDAO.update_int("bet", player.getBet(), player);
+            System.out.println(player);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return player;
+    }
+
+    //UPDATE Operation - Toggle whether to change out card
+    @PutMapping("/changeCard/{p_id}/{pos}")
+    public Player toggleToChange(@PathVariable long p_id, @PathVariable int pos){
+        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,
+                "picturepoker", "postgres", "password");
+        Player player = new Player();
+        try {
+            Connection connection = dcm.getConnection();
+            PlayerDAO playerDAO = new PlayerDAO(connection);
+
+            player = playerDAO.findById(p_id);
+            player = playerDAO.getHand(player);
+            if(player.getFinishedRound() > 0){
+                System.out.println("Could not toggle Card: Finished round.");
+            }
+            if(pos < 0 || pos > 4){
+                System.out.println("Could not toggle Card: Hand position out of bounds.");
+                return player;
+            }
+            Card[] hand = player.getHand();
+            hand[pos].setToChange(!hand[pos].getToChange());
+            playerDAO.updateHand(player);
+            System.out.println(player);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return player;
+    }
+
+    @PutMapping("/finishRound/{p_id}")
+    public Player finishRound(@PathVariable long p_id){
+        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,
+                "picturepoker", "postgres", "password");
+        Player player = new Player();
+        try {
+            Connection connection = dcm.getConnection();
+            PlayerDAO playerDAO = new PlayerDAO(connection);
+
+            player = playerDAO.findById(p_id);
+            player = playerDAO.getHand(player);
+            if(player.getFinishedRound() > 0){
+                System.out.println("Could not finish round: It is not your turn.");
+                return player;
+            }
+            player.setFinishedRound(1);
+            playerDAO.update_int("finished_round", 1, player);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return player;
     }
 
     //DELETE Operation - Delete a player

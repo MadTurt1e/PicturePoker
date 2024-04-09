@@ -12,9 +12,9 @@ import './index.css';
 import Menu from './GameMenu/Menu';
 import Create from './GameInfo/CreateGame/Create';
 import Join from './GameInfo/JoinGame/Join';
-import Statistics from './GameInfo/Statistics'
-
-import Game from './Game/Game'
+import Statistics from './GameInfo/Statistics';
+import WaitingRoom from './Game/Game/WaitingRoom';
+import Game from './Game/Game';
 
 import reportWebVitals from './reportWebVitals';
 
@@ -45,6 +45,7 @@ root.render(
             <Route path="/joinGame" element={<Join />} />
             <Route path="/statistics" element={<Statistics />} />
             <Route path="/game" element={<Game />} />
+            <Route path="/WaitingRoom" element={<WaitingRoom />} />
         </Routes>
     </BrowserRouter>,
   <React.StrictMode>

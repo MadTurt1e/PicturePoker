@@ -3,8 +3,7 @@ import "../CreateGame/Create.css";
 import join from "../../resources/menuIcons/joingame.png";
 import backdrop from "../../resources/menuIcons/luigisCasino.jpg";
 
-import {Link} from "react-router-dom";
-import { useNavigate } from 'react-router-dom';
+import {Link, useNavigate} from "react-router-dom";
 import React, {useEffect, useState} from "react";
 import axios from "axios";
 
@@ -57,7 +56,10 @@ function JoinGame() {
                 setInputValue(value);
                 setMessage("Game ID: " + value);
 
-                navigate("/game");
+                //use navigate with additional parameters
+                navigate("/WaitingRoom", {
+                    gid: value,
+                });
             }
 
             // Call your function here

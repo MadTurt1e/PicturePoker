@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './Game.css'; // make sure to create this file
+import './Game.css'; 
 
 import cloud from "../resources/pokerSprites/cloud.png";
 import mushroom from "../resources/pokerSprites/mushroom.png";

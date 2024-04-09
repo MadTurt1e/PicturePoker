@@ -14,20 +14,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 // @RequestMapping("/api") We will shift most of the functionality here to be hidden under /api
 @SpringBootApplication
+@CrossOrigin // This is for the front end to be able to access the backend
 @RestController
 public class PicturePokerGame {
 
-    //Set the hostname as a pseudo global so that we can change it later
+    // Set the hostname as a pseudo global so that we can change it later
     private final String hostname = "db";
 
-    //Test operation - is this thing on?
+    // Test operation - is this thing on?
     @GetMapping("/helloWorld")
     public String helloWorld() {
         System.out.println("Hello, World!");
         return ("HELLO WORLD");
     }
 
-    //homepage
+    // homepage
     @GetMapping("/")
     public String homepage() {
         System.out.println("Welcome to PicturePoker");
@@ -46,7 +47,8 @@ public class PicturePokerGame {
         try {
             Connection connection = dcm.getConnection();
             PlayerDAO playerdao = new PlayerDAO(connection);
-            // essentially, a (new) player consists of a player name and a password, and that is it.
+            // essentially, a (new) player consists of a player name and a password, and
+            // that is it.
             player.setPlayerName(inputMap.get("playerName"));
             player.setPasscode(inputMap.get("password"));
             player = playerdao.create(player);
@@ -58,7 +60,7 @@ public class PicturePokerGame {
         return player;
     }
 
-    //CREATE Operation: creates new game
+    // CREATE Operation: creates new game
     @PostMapping("/createNewGame")
     public Game createNewGame(@RequestBody String json) throws JsonProcessingException {
         System.out.println(json);
@@ -71,12 +73,13 @@ public class PicturePokerGame {
             Connection connection = dcm.getConnection();
             GameDAO gamedao = new GameDAO(connection);
 
-            // A new game consists a chosen number of rounds, a buy in value (dollar stakes), and difficulty
+            // A new game consists a chosen number of rounds, a buy in value (dollar
+            // stakes), and difficulty
             game.setNumRounds(Integer.parseInt(inputMap.get("rounds")));
             game.setBuyIn(Integer.parseInt(inputMap.get("buyIn")));
             game.setDifficulty(Integer.parseInt(inputMap.get("difficulty")));
             game = gamedao.create(game);
-            //once all the necessary values are created, we can make the game.
+            // once all the necessary values are created, we can make the game.
 
             System.out.println(game);
         } catch (SQLException e) {
@@ -86,7 +89,7 @@ public class PicturePokerGame {
         return game;
     }
 
-    //READ Operation - Read a player's full details
+    // READ Operation - Read a player's full details
     @GetMapping("/getByPlayerName/{playerName}")
     public Player getByPlayerName(@PathVariable("playerName") String playerName) {
         System.out.println(playerName);
@@ -106,7 +109,7 @@ public class PicturePokerGame {
         return player;
     }
 
-    //READ Operation - Read a game's full details
+    // READ Operation - Read a game's full details
     @GetMapping("/getByGameID/{g_id}")
     public Game getByGameID(@PathVariable("g_id") String g_idStr) {
         System.out.println(g_idStr);
@@ -118,7 +121,8 @@ public class PicturePokerGame {
             Connection connection = dcm.getConnection();
             GameDAO gamedao = new GameDAO(connection);
             game = gamedao.findById(g_id);
-            //we need a separate function to get pids because the database is structured poorly
+            // we need a separate function to get pids because the database is structured
+            // poorly
             game.setPlayers(gamedao.getPIDsByGame(game));
 
             System.out.println(game);
@@ -128,7 +132,7 @@ public class PicturePokerGame {
         return game;
     }
 
-    //READ Operation - Reads all players
+    // READ Operation - Reads all players
     @GetMapping("/getAllPlayers")
     public ArrayList<Player> getAllPlayers() {
         DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,
@@ -139,7 +143,7 @@ public class PicturePokerGame {
             PlayerDAO playerDAO = new PlayerDAO(connection);
 
             allPlayers = playerDAO.findAllPlayers();
-            for(Player p : allPlayers){
+            for (Player p : allPlayers) {
                 p = playerDAO.getHand(p);
                 System.out.println(p);
             }
@@ -157,9 +161,10 @@ public class PicturePokerGame {
         try {
             Connection connection = dcm.getConnection();
             GameDAO gameDAO = new GameDAO(connection);
-            //we need a separate function to get pids because the database is structured poorly
+            // we need a separate function to get pids because the database is structured
+            // poorly
             allGames = gameDAO.findAllGames();
-            for(Game g : allGames){
+            for (Game g : allGames) {
                 System.out.println(g);
             }
         } catch (SQLException e) {
@@ -168,7 +173,7 @@ public class PicturePokerGame {
         return allGames;
     }
 
-    //UPDATE Operation - Update a player
+    // UPDATE Operation - Update a player
     @PutMapping("/updatePlayer/{p_id}")
     public Player updateByPID(@PathVariable long p_id, @RequestBody String json) throws JsonProcessingException {
         System.out.println(json);
@@ -203,7 +208,7 @@ public class PicturePokerGame {
             updatedPlayer.setCardsChanged(Integer.parseInt(inputMap.get("cards_changed")));
             updatedPlayer.setLifetimeRoundsWon(Integer.parseInt(inputMap.get("lifetime_rounds_won")));
 
-            //update everything
+            // update everything
             playerdao.update_all(updatedPlayer);
             System.out.println(updatedPlayer);
 
@@ -214,7 +219,8 @@ public class PicturePokerGame {
         return updatedPlayer;
     }
 
-    // UPDATE Operation - Update current game details. We're never really going to need this, but
+    // UPDATE Operation - Update current game details. We're never really going to
+    // need this, but
     @PutMapping("/updateGame/{g_id}")
     public Game updateByGID(@PathVariable Long g_id, @RequestBody String json) throws JsonProcessingException {
         System.out.println(json);
@@ -229,7 +235,8 @@ public class PicturePokerGame {
             GameDAO gamedao = new GameDAO(connection);
             updatedGame = gamedao.findById(g_id);
 
-            //update all the things that we may want to update (no changing ID or any temporary stuff
+            // update all the things that we may want to update (no changing ID or any
+            // temporary stuff
             updatedGame.setCurRound(Integer.parseInt(inputMap.get("cur_round")));
             updatedGame.setNumRounds(Integer.parseInt(inputMap.get("num_rounds")));
             updatedGame.setActivePlayers(Integer.parseInt(inputMap.get("active_players")));
@@ -237,7 +244,7 @@ public class PicturePokerGame {
             updatedGame.setPotQuantity(Integer.parseInt(inputMap.get("pot_quant")));
             updatedGame.setDifficulty(Integer.parseInt(inputMap.get("difficulty")));
 
-            //and update it in the database.
+            // and update it in the database.
             updatedGame = gamedao.update_all(updatedGame);
             System.out.println(updatedGame);
             return updatedGame;
@@ -248,7 +255,7 @@ public class PicturePokerGame {
         return updatedGame;
     }
 
-    //DELETE Operation - Delete a player
+    // DELETE Operation - Delete a player
     @DeleteMapping("/deletePlayer/{p_id}")
     public Player deleteByPID(@PathVariable long p_id) {
         System.out.println(p_id);
@@ -267,7 +274,7 @@ public class PicturePokerGame {
         return player;
     }
 
-    //DELETE OPERATION - Delete a game
+    // DELETE OPERATION - Delete a game
     @DeleteMapping("/deleteGame/{g_id}")
     public Game deleteByGID(@PathVariable long g_id) {
         System.out.println(g_id);
@@ -286,7 +293,7 @@ public class PicturePokerGame {
         return game;
     }
 
-    //Actually play the game
+    // Actually play the game
     @GetMapping("/playGame/{g_id}")
     public Game playGame(@PathVariable long g_id) {
         System.out.println(g_id);
@@ -299,9 +306,9 @@ public class PicturePokerGame {
             GameDAO gamedao = new GameDAO(connection);
             PlayerDAO playerdao = new PlayerDAO(connection);
 
-            //pseudo lobby system - just reject starting when the game is not full.
+            // pseudo lobby system - just reject starting when the game is not full.
             int curPlayers = gamedao.findById(g_id).getActivePlayers();
-            if (curPlayers < 4){
+            if (curPlayers < 4) {
                 System.out.println("The game is not full yet! We need " + (4 - curPlayers) + " more players. ");
                 return game;
             }
@@ -322,15 +329,16 @@ public class PicturePokerGame {
                 "picturepoker", "postgres", "password");
         Game game = new Game();
         try {
-            //Makes a connection, gets a player and the game ID, and tries adding the player to the game.
+            // Makes a connection, gets a player and the game ID, and tries adding the
+            // player to the game.
             Connection connection = dcm.getConnection();
             GameDAO gamedao = new GameDAO(connection);
             PlayerDAO playerdao = new PlayerDAO(connection);
             Player player = playerdao.findByName(p_Name);
 
-            //stick the player into the game (or at least, it tries)
+            // stick the player into the game (or at least, it tries)
             game = gamedao.joinGame(g_ID, player);
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
 

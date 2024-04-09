@@ -1,0 +1,56 @@
+.background {
+    background-image: url('../resources/menuIcons/luigisCasino.jpg');
+    background-size: cover;
+    background-position: center center;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .container {
+    text-align: center;
+  }
+  
+  .logo img {
+    margin-bottom: 20px;
+    width: 700px;
+  }
+  
+  .form-container {
+    display: flex;
+    justify-content: center;
+    gap: 100px;
+  }
+  
+  .login, .register {
+    margin: 0 20px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0);
+  }
+  
+  .login form, .register form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .login img, .register img {
+    width: 300px;
+  }
+  
+  input {
+    margin-bottom: 20px;
+    vertical-align: middle;
+    height: 40px;
+    width: 250px;
+  }
+  
+  input[type="image"] {
+    margin: 20px 0;
+    width: 250px;
+    height: auto;
+  }
+  
+  

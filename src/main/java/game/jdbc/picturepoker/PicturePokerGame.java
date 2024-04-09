@@ -75,6 +75,9 @@ public class PicturePokerGame {
             game.setNumRounds(Integer.parseInt(inputMap.get("rounds")));
             game.setBuyIn(Integer.parseInt(inputMap.get("buyIn")));
             game.setDifficulty(Integer.parseInt(inputMap.get("difficulty")));
+            // Default attributes
+            game.setCurRound(1);
+            game.setPotQuantity(0);
             game = gamedao.create(game);
             //once all the necessary values are created, we can make the game.
 
@@ -87,9 +90,10 @@ public class PicturePokerGame {
     }
 
     //READ Operation - Read a player's full details
-    @GetMapping("/getByPlayerName/{playerName}")
-    public Player getByPlayerName(@PathVariable("playerName") String playerName) {
-        System.out.println(playerName);
+    @GetMapping("/getByPlayerID/{p_idStr}")
+    public Player getByPlayerID(@PathVariable("p_idStr") String p_idStr) {
+        long p_id = Long.parseLong(p_idStr);
+        System.out.println(p_id);
         DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,
                 "picturepoker", "postgres", "password");
         Player player = new Player();
@@ -97,7 +101,7 @@ public class PicturePokerGame {
             Connection connection = dcm.getConnection();
             PlayerDAO playerDAO = new PlayerDAO(connection);
 
-            player = playerDAO.findByName(playerName);
+            player = playerDAO.findById(p_id);
             player = playerDAO.getHand(player);
             System.out.println(player);
         } catch (SQLException e) {
@@ -474,9 +478,9 @@ public class PicturePokerGame {
         return game;
     }
 
-    @PutMapping("/joinGame/{g_ID}/{p_Name}")
-    public Game joinGame(@PathVariable long g_ID, @PathVariable String p_Name) {
-        System.out.println("GameID: " + g_ID + "Player Name: " + p_Name);
+    @PutMapping("/joinGame/{g_id}/{p_id}")
+    public Game joinGame(@PathVariable long g_id, @PathVariable long p_id) {
+        System.out.println("GameID: " + g_id + "Player Name: " + p_id);
         DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,
                 "picturepoker", "postgres", "password");
         Game game = new Game();
@@ -485,10 +489,10 @@ public class PicturePokerGame {
             Connection connection = dcm.getConnection();
             GameDAO gamedao = new GameDAO(connection);
             PlayerDAO playerdao = new PlayerDAO(connection);
-            Player player = playerdao.findByName(p_Name);
+            Player player = playerdao.findById(p_id);
 
             //stick the player into the game (or at least, it tries)
-            game = gamedao.joinGame(g_ID, player);
+            game = gamedao.joinGame(g_id, player);
         }catch (SQLException e) {
             e.printStackTrace();
         }

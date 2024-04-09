@@ -11,7 +11,7 @@ public class GameDAO extends DataAccessObject<Game> {
 
     private static final String GET_PIDS_BY_GID = "SELECT p_id FROM player_in_game WHERE g_id = ?";
     private static final String GET_GID_BY_PID = "SELECT g_id FROM player_in_game WHERE p_id = ?";
-    private static final String CREATE_NEW_GAME = "INSERT INTO game (num_rounds, active_players, buy_in, pot_quantity, difficulty) VALUES (?, ?, ?, ?, ?)";
+    private static final String CREATE_NEW_GAME = "INSERT INTO game (num_rounds, active_players, buy_in, pot_quantity, difficulty) VALUES (?, ?, ?, ?, ?) RETURNING g_id";
     private static final String CREATE_NEW_CARD = "INSERT INTO dealer_card (g_id, hand_pos, suit) VALUES (?, ?, ?)";
 
     private static final String UPDATE_GAME_BY_ID_START = "UPDATE game SET ";
@@ -127,7 +127,10 @@ public class GameDAO extends DataAccessObject<Game> {
             statement.setLong(3, dto.getBuyIn());
             statement.setLong(4, dto.getPotQuantity());
             statement.setLong(5, dto.getDifficulty());
-            statement.execute();
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                dto.setID(rs.getLong("g_id"));
+            }
             return dto; //we just care about the game here - no need for getting and setting something we already have.
         } catch (SQLException e) {
             e.printStackTrace();

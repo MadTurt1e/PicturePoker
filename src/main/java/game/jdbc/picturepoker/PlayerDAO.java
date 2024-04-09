@@ -19,7 +19,7 @@ public class PlayerDAO extends DataAccessObject<Player>{
             + "fourth_places, lifetime_tokens, flushes, quads, full_houses, triples, two_pairs, "
             + "one_pairs, high_cards, cards_changed, lifetime_rounds_won, lifetime_total_bet, "
             +" tokens, bet, rounds_won, finished_round FROM player";
-    private static final String CREATE_NEW_PLAYER = "INSERT INTO player (p_name, passcode) VALUES (?, ?)";
+    private static final String CREATE_NEW_PLAYER = "INSERT INTO player (p_name, passcode) VALUES (?, ?) RETURNING p_id";
     private static final String CREATE_NEW_CARD = "INSERT INTO player_card (p_id, hand_pos, suit) VALUES (?, ?, ?)";
     private static final String UPDATE_PLAYER_BY_ID_START = "UPDATE player SET ";
     private static final String UPDATE_PLAYER_BY_ID_END = " = ? WHERE p_id = ?";
@@ -145,6 +145,7 @@ public class PlayerDAO extends DataAccessObject<Player>{
     }
 
     //Way to find the player by name, instead of by ID, which seems to be more "colloquial"
+    // This will be deprecated eventually, but left in for now in case my changes are too spicy.
     public Player findByName(String name){
         long playerID = findIDByName(name);
         return findById(playerID);
@@ -155,16 +156,15 @@ public class PlayerDAO extends DataAccessObject<Player>{
         try(PreparedStatement statement = this.connection.prepareStatement(CREATE_NEW_PLAYER)){
             statement.setString(1, dto.getPlayerName());
             statement.setString(2, dto.getPasscode());
-            statement.execute();
-
-            //this should never go wrong - at this point, the player either is there, or isn't.
-            long newPlayerID = findIDByName(dto.getPlayerName());
 
             // now we create the player that we're returning
             Player player = new Player();
             player.setPlayerName(dto.getPlayerName());
             player.setPasscode(dto.getPasscode());
-            player.setID(newPlayerID);
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()){
+                player.setID(rs.getLong("p_id"));
+            }
             return player;
         }
         catch (SQLException e) {

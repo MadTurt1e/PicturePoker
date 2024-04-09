@@ -24,6 +24,7 @@ public class PlayerDAO extends DataAccessObject<Player>{
     private static final String UPDATE_PLAYER_BY_ID_START = "UPDATE player SET ";
     private static final String UPDATE_PLAYER_BY_ID_END = " = ? WHERE p_id = ?";
     private static final String GET_ID_BY_NAME = "SELECT p_id FROM player WHERE p_name = ?";
+    private static final String GET_CURRENT_GAME = "SELECT g_id FROM player_in_game WHERE p_id = ?";
     private static final String UPDATE_CARD = "UPDATE player_card SET suit = ? WHERE p_id = ? AND hand_pos = ?";
     private static final String GET_CARD = "SELECT suit, to_change FROM player_card WHERE p_id = ? AND hand_pos = ?";
     private static final String DELETE_PLAYER = "DELETE FROM player WHERE p_id = ?";
@@ -172,6 +173,23 @@ public class PlayerDAO extends DataAccessObject<Player>{
         }
     }
 
+    public long getCurrentGame(Player dto){
+        long foundGID = -1;
+        try(PreparedStatement statement = this.connection.prepareStatement(GET_CURRENT_GAME)){
+            statement.setLong(1, dto.getID());
+            ResultSet rs = statement.executeQuery();
+            while(rs.next()) {
+                // and this statement gets the player id and returns it
+                foundGID = rs.getLong("g_id");
+            }
+            return foundGID;
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
     public Player getHand(Player dto){
         Card[] result = new Card[5];
         for(int i = 0; i < 5; i++){
@@ -304,7 +322,7 @@ public class PlayerDAO extends DataAccessObject<Player>{
     public Player deletePlayer(long p_id) {
         Player player = findById(p_id);
         try (PreparedStatement statement = this.connection.prepareStatement(DELETE_PLAYER)) {
-            //RIP game
+            //RIP player
             statement.setLong(1, p_id);
             statement.execute();
         } catch (SQLException e) {

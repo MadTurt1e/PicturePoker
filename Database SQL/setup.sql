@@ -7,8 +7,8 @@ INSERT INTO player (p_id, p_name, passcode) VALUES (6, 'Annie', 'passwordinkcher
 INSERT INTO player (p_id, p_name, passcode) VALUES (7, 'Chris', 'passwordthaiicedtea');
 INSERT INTO player (p_id, p_name, passcode) VALUES (8, 'Bowser', 'kingofkoopas');
 
-INSERT INTO game (g_id, num_rounds, active_players, buy_in, pot_quantity, difficulty) VALUES (14, 5, 4, 10, 100, 1);
-INSERT INTO game (g_id, cur_round, num_rounds, active_players, buy_in, pot_quantity, difficulty) VALUES (45, 7, 7, 4, 100, 20, 0);
+INSERT INTO game (g_id, num_rounds, active_players, buy_in, difficulty) VALUES (14, 5, 4, 10, 1);
+INSERT INTO game (g_id, cur_round, num_rounds, active_players, buy_in, difficulty) VALUES (45, 7, 7, 4, 100, 0);
 
 INSERT INTO player_in_game (p_id, g_id) VALUES (1, 14), (2, 14), (4, 14), (6, 14), (3, 45), (5, 45), (7, 45), (8, 45);
 

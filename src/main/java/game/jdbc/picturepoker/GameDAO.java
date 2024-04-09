@@ -21,6 +21,7 @@ public class GameDAO extends DataAccessObject<Game> {
     private static final String UPDATE_CARD = "UPDATE dealer_card SET suit = ? WHERE g_id = ? AND hand_pos = ?";
     //insert player
     private static final String ADD_PLAYER_TO_GAME = "UPDATE player_in_game SET g_id = ? WHERE p_id = ?";
+    private static final String REMOVE_PLAYER_FROM_GAME = "DELETE FROM player_in_game WHERE p_id = ?";
     private static final String DELETE_GAME = "DELETE FROM game WHERE g_id = ?";
 
 
@@ -139,7 +140,7 @@ public class GameDAO extends DataAccessObject<Game> {
         Game game = findById(g_id);
 
         if (game.getActivePlayers() >= 4){
-            System.out.println("The game is full." );
+            System.out.println("joinGame: The game is already full." );
             return game;
         }
         long curGid = 0;
@@ -154,16 +155,16 @@ public class GameDAO extends DataAccessObject<Game> {
 
             Game curGame = findById(curGid);
             if (curGame.getCurRound() < curGame.getNumRounds()){
-                System.out.println("The player is still in an active game.");
+                System.out.println("joinGame: The player is still in an active game.");
                 return curGame;
             }
             if (curGame.getBuyIn() > player.getDollars()){
-                System.out.println("The player is too broke to join. Required amount to play: " + curGame.getBuyIn() + ", current dollar count: " + player.getDollars());
+                System.out.println("joinGame: The player is too broke to join. Required amount to play: " + curGame.getBuyIn() + ", current dollar count: " + player.getDollars());
                 return curGame;
             }
 
         } catch (SQLException e) {
-            System.out.println("It doesn't look like the player is in any game.");
+            System.out.println("joinGame: It doesn't look like the player is in any game.");
         }
 
         //update that one table for each player.
@@ -242,6 +243,31 @@ public class GameDAO extends DataAccessObject<Game> {
             }
         }
         return dto;
+    }
+
+    //one part of CRUD - honestly this is not necessary, but it must be done.
+    public Game removePlayerFromGame(Game dto, long p_id) {
+        if(dto.getActivePlayers() >= 4 && dto.getCurRound() <= dto.getNumRounds()){
+            System.out.println("removePlayerFromGame: Cannot remove players from game in progress!");
+            return dto;
+        }
+        long[] playersInGame = dto.getPlayers();
+        boolean present = false;
+        for(int i = 0; i < playersInGame.length; i++){
+            if(playersInGame[i] == p_id){present = true;}
+        }
+        if(!present){
+            System.out.println("removePlayerFromGame: Requested player is not in game!");
+            return dto;
+        }
+        try (PreparedStatement statement = this.connection.prepareStatement(REMOVE_PLAYER_FROM_GAME)) {
+            statement.setLong(1, p_id);
+            statement.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return update_int("active_players", dto.getActivePlayers() - 1, dto);
     }
 
     //one part of CRUD - honestly this is not necessary, but it must be done.

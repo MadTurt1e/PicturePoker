@@ -106,6 +106,30 @@ public class PicturePokerGame {
         return player;
     }
 
+    //READ Operation - Read a player's full details
+    @GetMapping("/getPlayerActiveGame/{pid}")
+    public Game getPlayerActiveGame(@PathVariable("pid") long pid) {
+        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,
+                "picturepoker", "postgres", "password");
+        Game game = new Game();
+        try {
+            Connection connection = dcm.getConnection();
+            PlayerDAO playerDAO = new PlayerDAO(connection);
+            GameDAO gameDAO = new GameDAO(connection);
+            Player p = playerDAO.findById(pid);
+            long gid = playerDAO.getCurrentGame(p);
+            if(gid < 0){
+                System.out.println("Player is not in any games!");
+                return null;
+            }
+            game = gameDAO.findById(gid);
+            System.out.println(game);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return game;
+    }
+
     //READ Operation - Read a game's full details
     @GetMapping("/getByGameID/{g_id}")
     public Game getByGameID(@PathVariable("g_id") String g_idStr) {
@@ -388,6 +412,32 @@ public class PicturePokerGame {
             GameDAO gamedao = new GameDAO(connection);
             game = gamedao.deleteGame(g_id);
 
+            System.out.println(game);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return game;
+    }
+
+    //DELETE OPERATION - Remove a player from a game
+    @DeleteMapping("/leaveCurrentGame/{p_id}")
+    public Game leaveGame(@PathVariable long p_id) {
+        System.out.println(p_id);
+        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,
+                "picturepoker", "postgres", "password");
+        Game game = new Game();
+        try {
+            Connection connection = dcm.getConnection();
+            GameDAO gameDAO = new GameDAO(connection);
+            PlayerDAO playerDAO = new PlayerDAO(connection);
+            Player p = playerDAO.findById(p_id);
+            long gid = playerDAO.getCurrentGame(p);
+            game = gameDAO.findById(gid);
+            game = gameDAO.removePlayerFromGame(game, p_id);
+            // Clean up once all players leave.
+            if(game.getActivePlayers() == 0){
+                game = gameDAO.deleteGame(game.getID());
+            }
             System.out.println(game);
         } catch (SQLException e) {
             e.printStackTrace();

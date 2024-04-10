@@ -1,6 +1,7 @@
 import "./Login.css";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 import logo from '../resources/menuIcons/luigi poker.png'
 import loginP from '../resources/loginIcons/login.png'
@@ -19,24 +20,31 @@ const Login = () => {
     const handleSubmission = async (e) => {
         e.preventDefault();
         setError(null);
-        
+
         try {
             const serverHost = 'http://localhost:8080';
-            const response = await fetch(`${serverHost}/getByPlayerName/${loginUsername}`);
+            const response = await axios.get(`${serverHost}/getByPlayerName/` + loginUsername);
 
-            if (response.ok) {
-                if(response.status === 200){
-                // User login info is saved as loggedInUser for future use
-                const loggedInUser = await response.json();
-                navigate("/menu");
-            } else if (response.status === 404){
-                setError("Username not found")
-            }else {
-                setError("An error occured while logging in")
+            if (response.status === 200) {
+                const data = response.data;
+                //TODO: Implement a more rigourous check for the password info
+                if(data.id !== 0 && data.passcode === loginPassword){
+                    // User login info is saved as loggedInUser for future use
+                    const loggedInUser = data;
+                    navigate("/menu");
+                } else if (data.id === 0){
+                    setError("Username not found")
+                }else {
+                    setError("An error occured while logging in")
+                }
             }
-        }  
         } catch (error) {
-            console.error(error);
+            if (error.response && error.response.status === 404) {
+                setError("Username not found");
+            } else {
+                console.error(error);
+                setError("An error occured while logging in");
+            }
         }
     };
 
@@ -45,19 +53,13 @@ const Login = () => {
         // Save the user to the database
         try {
             const serverHost = 'http://localhost:8080';
-            const response = await fetch(`${serverHost}/createNewPlayer`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    playerName: registerUsername,
-                    password: registerPassword
-                })
+            const response = await axios.post(`${serverHost}/createNewPlayer`, {
+                playerName: registerUsername,
+                password: registerPassword
             });
 
-            if (response.ok) {
-                const newUser = await response.json();
+            if (response.status === 200) {
+                const newUser = response.data;
                 console.log("Successfully created account for", newUser);
                 // User login info is saved as newUser for future use
                 navigate("/menu");
@@ -66,6 +68,7 @@ const Login = () => {
             }
         } catch (error) {
             console.error(error);
+            setError("An error occured while creating your account");
         }
     };
 

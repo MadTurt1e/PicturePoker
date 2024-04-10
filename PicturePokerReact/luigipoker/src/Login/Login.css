@@ -52,5 +52,8 @@
     width: 250px;
     height: auto;
   }
-  
+
+.modal-title {
+  font-family: MarioFont, serif;
+}
   

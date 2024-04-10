@@ -44,7 +44,7 @@ function JoinGame() {
             height: '100vh',
             width: '100vw'
         }}>
-            <Link to="/">
+            <Link to="/menu">
                 <img src={join} alt="" style={{height: '10vh', marginBottom: '10vh'}}/>
             </Link>
             <br />

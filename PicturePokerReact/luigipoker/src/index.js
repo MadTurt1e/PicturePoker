@@ -13,7 +13,7 @@ import Menu from './GameMenu/Menu';
 import Create from './GameInfo/CreateGame/Create';
 import Join from './GameInfo/JoinGame/Join';
 import Statistics from './GameInfo/Statistics';
-import WaitingRoom from './Game/Game/WaitingRoom';
+import WaitingRoom from './Game/WaitingRoom';
 import Game from './Game/Game';
 
 import reportWebVitals from './reportWebVitals';
@@ -40,7 +40,7 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <BrowserRouter>
         <Routes>
-            <Route path="/" element={<Menu />} />
+            <Route path="/" element={<Game />} />
             <Route path="/createGame" element={<Create />} />
             <Route path="/joinGame" element={<Join />} />
             <Route path="/statistics" element={<Statistics />} />

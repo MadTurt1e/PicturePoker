@@ -9,12 +9,12 @@ import rounds from "../../resources/menuIcons/number-of-rounds-4-3-2024.png"
 import arrow from "../../resources/incdec/Arrow_Sign_SMB3.webp";
 
 import "../../GameMenu/Menu.css";
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import axios from "axios";
 
 import ColorfulText from "../../index";
 
-function gameCreation(rounds, buyin){
+function gameCreation(rounds, buyin, navigate){
     //TODO: Check to make sure the game creator can actually join the game
 
     const gameDetails = {
@@ -23,8 +23,19 @@ function gameCreation(rounds, buyin){
         difficulty: "1" // difficulty level
     };
     const makeGame = async () => {
-        const response = await axios.post('http://localhost:8080/createNewGame', gameDetails);
-        console.log("Game created! " + gameDetails.rounds + gameDetails.buyIn + " buyin, and " + response.data.g_id + " id");
+        const response = await axios.post('http://localhost:8080/createNewGame', gameDetails)
+            .catch(function(error){
+                console.log("Unable to create game");
+                return (
+                    <div>
+                        Game could not be created.
+                    </div>
+                )
+            });
+        //use navigate with additional parameters
+        navigate("/WaitingRoom", {
+            gid: response.data.g_id,
+        });
     }
     makeGame();
 
@@ -38,6 +49,8 @@ function CreateGame(){
     const [counter10, setCounter10] = useState(0);
 
     const [message, setMessage] = useState(null);
+    const navigate = useNavigate();
+
     return (
         <div style = {{
             backgroundImage: `url(${backdrop})`,
@@ -87,7 +100,7 @@ function CreateGame(){
 
             <br />
             <div>
-                <button type={"button"} style={{height:'10vh', width:'20hh', border: "black", borderWidth: "10px"}} className = "glow" onClick ={() => gameCreation(counter, counter10)}>
+                <button type={"button"} style={{height:'10vh', width:'20hh', border: "black", borderWidth: "10px"}} className = "glow" onClick ={() => gameCreation(counter, counter10, navigate)}>
                     <div style={{fontSize:'5vh'}} className = "bordering">
                         <ColorfulText text="Create Game! " />
                     </div>

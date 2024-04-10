@@ -62,6 +62,16 @@
     position: relative;
     margin-right: 5px;
 }
+.luigi{
+    width: 20vw;
+}
+.tokenCount{
+    font-size: 7vh;
+    position: absolute;
+    left:28%;
+    bottom: 40%;
+
+}
 
 .crispImages{
     pixelperfect: true;

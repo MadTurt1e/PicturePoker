@@ -13,7 +13,14 @@ function GameList() {
     const [data, setData] = useState(null);
     useEffect(() => {
         const loadGame = async () => {
-            const response = await axios.get(`http://localhost:8080/getAllGames`);
+            const response = await axios.get(`http://localhost:8080/getAllGames`)
+                .catch(function(error){
+                    return (
+                        <div>
+                            Connection not established.
+                        </div>
+                    )
+            });
             setData(response.data)
         }
         loadGame();
@@ -29,7 +36,7 @@ function GameList() {
             </div>
         );
     }
-    return <h1>Data</h1>;
+    return <ColorfulText text={"Connection not established"}/>;
 }
 
 function JoinGame() {

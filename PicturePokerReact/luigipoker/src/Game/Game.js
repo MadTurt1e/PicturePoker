@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Game.css'; 
 
 import cloud from "../resources/pokerSprites/cloud.png";
@@ -14,23 +14,71 @@ import betButton from "../resources/pokerSprites/bet.png";
 import draw from "../resources/pokerSprites/draw.png";
 import hold from "../resources/pokerSprites/hold.png";
 
+import luigiDefault from "../resources/luigi/soulread.png";
+import luigiShuffling  from "../resources/luigi/shuffling.gif";
+
 import token from "../resources/pokerSprites/token.png";
 
 import backdrop from "../resources/pokerSprites/table.png";
 
 import axios from "axios";
+import ColorfulText from "../index";
+import {useParams} from "react-router-dom";
 
 function Game() {
     const images = [cloud, mushroom, fireflower, luigi, mario, star, normalCard, proCard];
     const [cards, setCards] = useState([6, 6, 6, 6 , 6]);
     const [dealerCards, setDealerCards] = useState([7, 7, 7, 7, 7]);
-
     const [selectedCards, setSelectedCards] = useState([]); // Change to an array
+
+    //set luigi animation based on what's happening.
+    const [luigiState, setLuigiState] = useState(0);
+    const [data, setData] = useState(null);
+
+    const {gid} = useParams();
+
+    const pid = 0;
+    const getPlayerData = async (pid) => {
+        //TODO: This API call has not been implemented yet.
+        const response = axios.get('http://localhost:8080/getByPID/' + pid)
+            .catch(function (error) {
+                console.log("getByPID API call didn't work. ");
+            });
+        setData(response.data);
+    };
+    //try to update as much about the player as reasonable
+    if (data) {
+        const hand = data.hand.map(
+            //we are probably going to need to do a conversion from suit to ints - to be tested.
+            hand => hand.Suit
+        );
+        const tokens = data.tokens;
+        const bet = data.bet;
+    }
+
+    const finishRound = async (pid) => {
+        const response = axios.get('http://localhost:8080/finishRound/' + pid)
+            .catch(function (error) {
+                console.log("finishRound API call didn't work. ");
+            });
+        setData(response.data);
+
+
+    };
+
+    const setToChange = async(index) => {
+        //just set something to be changed out depending on if it has been clicked or not
+        const response = await axios.get(`http://localhost:8080/changeCard/` + pid + '/' + index)
+            .catch(function(error){
+                console.log("changeCard API call didn't work. Card " + index);
+            });
+    }
 
     const handleCardClick = (index) => {
         const newCards = [...cards];
-        console.log(index);
-        newCards[index] = Math.floor(Math.random() * 6); // THIS IS WHERE THE CARD VALUE (WOULD) CHANGE AND HOW TO CHANGE IT
+        //set to change here, via that one API call. .
+        setToChange(index);
+
         setCards(newCards);
 
         // Add or remove the index from the selectedCards array
@@ -43,19 +91,52 @@ function Game() {
 
     //do stuff when the bet button is clicked
     const [bet, setBet] = useState(0);
+    const [tokens, setTokens] = useState(10);
+
     const handleBetClick = () => {
-        if (bet < 5)
-            setBet(bet + 1);
+        if (bet < 5) {
+            const response = axios.put("http://localhost:8080/raise/" + pid)
+                .catch(function (error) {
+                    console.log("raise API call didn't work. ")
+                });
+            setBet(response.data.bet);
+            setTokens(response.data.tokens);
+            setLuigiState(0);
+        }
     };
 
     const endTurnProcedure = () => {
         const newCards = [...cards];
         selectedCards.map((index) =>
             newCards[index] = Math.floor(Math.random() * 6)
-
         )
         setCards(newCards);
+        setBet(0);
+
+        finishRound(pid);
+
+        getPlayerData(pid);
+        setLuigiState(1);
+        //pseudo animations - we don't have the budget to go further. I'm going to screencap these images eventually.
+        setTimeout(() => {
+            setLuigiState(0);
+        }, 2000);
+
+        //show luigi's hand
+        const response = axios.put("http://localhost:8080/getByGameID/" + gid)
+            .catch(function (error) {
+                console.log("getByGameID API call didn't work. ")
+            });
+        const hand = response.data.hand.map(
+            //we are probably going to need to do a conversion from suit to ints - to be tested.
+            hand => hand.Suit
+        );
     }
+
+    //This chunk runs on every render - so basically this stuff is the stuff we want to run at the start of the code.
+    useEffect(()=>{
+        getPlayerData(pid);
+    }, [])
 
     return (
         <div style={{
@@ -65,6 +146,13 @@ function Game() {
             height: '100vh',
             width: '100vw'
         }}>
+            <div>
+                <ColorfulText text = {gid}/>
+            </div>
+            <div>
+                {luigiState === 0 && <img src={luigiDefault} alt="luigistare" className="luigi crispImages"/>}
+                {luigiState === 1 && <img src={luigiShuffling} alt="luigishuffle" className="luigi crispImages"/>}
+            </div>
             <div className="cards" style={{
                 top: '5%'
             }}>
@@ -73,6 +161,9 @@ function Game() {
                         <img src={images[dealerCards[index]]} alt={`Dealer Card ${index + 1}`} className='crispImages'/>
                     </div>
                 ))}
+            </div>
+            <div className = "tokenCount bordering">
+                <ColorfulText text={"Tokens: " + tokens}/>
             </div>
             <div
                 className="bet"

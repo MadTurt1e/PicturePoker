@@ -75,6 +75,9 @@ public class PicturePokerGame {
             game.setNumRounds(Integer.parseInt(inputMap.get("rounds")));
             game.setBuyIn(Integer.parseInt(inputMap.get("buyIn")));
             game.setDifficulty(Integer.parseInt(inputMap.get("difficulty")));
+            // Default attributes
+            game.setCurRound(1);
+            game.setPotQuantity(0);
             game = gamedao.create(game);
             //once all the necessary values are created, we can make the game.
 
@@ -87,9 +90,10 @@ public class PicturePokerGame {
     }
 
     //READ Operation - Read a player's full details
-    @GetMapping("/getByPlayerName/{playerName}")
-    public Player getByPlayerName(@PathVariable("playerName") String playerName) {
-        System.out.println(playerName);
+    @GetMapping("/getByPlayerID/{p_idStr}")
+    public Player getByPlayerID(@PathVariable("p_idStr") String p_idStr) {
+        long p_id = Long.parseLong(p_idStr);
+        System.out.println(p_id);
         DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,
                 "picturepoker", "postgres", "password");
         Player player = new Player();
@@ -97,13 +101,37 @@ public class PicturePokerGame {
             Connection connection = dcm.getConnection();
             PlayerDAO playerDAO = new PlayerDAO(connection);
 
-            player = playerDAO.findByName(playerName);
+            player = playerDAO.findById(p_id);
             player = playerDAO.getHand(player);
             System.out.println(player);
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return player;
+    }
+
+    //READ Operation - Read a player's full details
+    @GetMapping("/getPlayerActiveGame/{pid}")
+    public Game getPlayerActiveGame(@PathVariable("pid") long pid) {
+        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,
+                "picturepoker", "postgres", "password");
+        Game game = new Game();
+        try {
+            Connection connection = dcm.getConnection();
+            PlayerDAO playerDAO = new PlayerDAO(connection);
+            GameDAO gameDAO = new GameDAO(connection);
+            Player p = playerDAO.findById(pid);
+            long gid = playerDAO.getCurrentGame(p);
+            if(gid < 0){
+                System.out.println("Player is not in any games!");
+                return null;
+            }
+            game = gameDAO.findById(gid);
+            System.out.println(game);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return game;
     }
 
     //READ Operation - Read a game's full details
@@ -126,6 +154,34 @@ public class PicturePokerGame {
             e.printStackTrace();
         }
         return game;
+    }
+
+    //READ Operation - Reads players from a game
+    @GetMapping("/getPlayersByGame/{g_id}")
+    public ArrayList<Player> getPlayersByGame(@PathVariable("g_id") String g_idStr) {
+        System.out.println(g_idStr);
+        long g_id = Long.parseLong(g_idStr);
+        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,
+                "picturepoker", "postgres", "password");
+        ArrayList<Player> playersInGame = new ArrayList<Player>();Game game = new Game();
+        try {
+            Connection connection = dcm.getConnection();
+            GameDAO gamedao = new GameDAO(connection);
+            PlayerDAO playerDAO = new PlayerDAO(connection);
+            game = gamedao.findById(g_id);
+            long[] gamePIDs = gamedao.getPIDsByGame(game);
+            for(int i = 0; i < 4; i++){
+                playersInGame.add(playerDAO.findById(gamePIDs[i]));
+            }
+            for(Player p : playersInGame){
+                playerDAO.getHand(p);
+                System.out.println(p);
+            }
+            System.out.println(game);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return playersInGame;
     }
 
     //READ Operation - Reads all players
@@ -367,6 +423,32 @@ public class PicturePokerGame {
         return game;
     }
 
+    //DELETE OPERATION - Remove a player from a game
+    @DeleteMapping("/leaveCurrentGame/{p_id}")
+    public Game leaveGame(@PathVariable long p_id) {
+        System.out.println(p_id);
+        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,
+                "picturepoker", "postgres", "password");
+        Game game = new Game();
+        try {
+            Connection connection = dcm.getConnection();
+            GameDAO gameDAO = new GameDAO(connection);
+            PlayerDAO playerDAO = new PlayerDAO(connection);
+            Player p = playerDAO.findById(p_id);
+            long gid = playerDAO.getCurrentGame(p);
+            game = gameDAO.findById(gid);
+            game = gameDAO.removePlayerFromGame(game, p_id);
+            // Clean up once all players leave.
+            if(game.getActivePlayers() == 0){
+                game = gameDAO.deleteGame(game.getID());
+            }
+            System.out.println(game);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return game;
+    }
+
     //Actually play the game
     @GetMapping("/playGame/{g_id}")
     public Game playGame(@PathVariable long g_id) {
@@ -396,9 +478,9 @@ public class PicturePokerGame {
         return game;
     }
 
-    @PutMapping("/joinGame/{g_ID}/{p_Name}")
-    public Game joinGame(@PathVariable long g_ID, @PathVariable String p_Name) {
-        System.out.println("GameID: " + g_ID + "Player Name: " + p_Name);
+    @PutMapping("/joinGame/{g_id}/{p_id}")
+    public Game joinGame(@PathVariable long g_id, @PathVariable long p_id) {
+        System.out.println("GameID: " + g_id + "Player Name: " + p_id);
         DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,
                 "picturepoker", "postgres", "password");
         Game game = new Game();
@@ -407,10 +489,10 @@ public class PicturePokerGame {
             Connection connection = dcm.getConnection();
             GameDAO gamedao = new GameDAO(connection);
             PlayerDAO playerdao = new PlayerDAO(connection);
-            Player player = playerdao.findByName(p_Name);
+            Player player = playerdao.findById(p_id);
 
             //stick the player into the game (or at least, it tries)
-            game = gamedao.joinGame(g_ID, player);
+            game = gamedao.joinGame(g_id, player);
         }catch (SQLException e) {
             e.printStackTrace();
         }

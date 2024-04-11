@@ -37,7 +37,8 @@ function Game() {
 
     const {gid} = useParams();
 
-    const pid = 0;
+    //TODO: Better PID call
+    const pid = 6;
     const getPlayerData = async (pid) => {
         //TODO: This API call has not been implemented yet.
         const response = axios.get('http://localhost:8080/getByPID/' + pid)
@@ -147,7 +148,7 @@ function Game() {
             width: '100vw'
         }}>
             <div>
-                <ColorfulText text = {gid}/>
+                <ColorfulText text = {gid} />
             </div>
             <div>
                 {luigiState === 0 && <img src={luigiDefault} alt="luigistare" className="luigi crispImages"/>}
@@ -163,7 +164,7 @@ function Game() {
                 ))}
             </div>
             <div className = "tokenCount bordering">
-                <ColorfulText text={"Tokens: " + tokens}/>
+                <ColorfulText text={"Tokens: " + tokens} />
             </div>
             <div
                 className="bet"

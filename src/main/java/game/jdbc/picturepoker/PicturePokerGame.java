@@ -16,7 +16,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @SpringBootApplication
 @CrossOrigin // This is for the front end to be able to access the backend
 @RestController
-@CrossOrigin
 public class PicturePokerGame {
 
     // Set the hostname as a pseudo global so that we can change it later

@@ -29,7 +29,7 @@ function GameList() {
         const filteredData = data.filter(game => game.players.includes(0) && game.curRound === 1);
         const gameIDs = filteredData.map(game => game.id);
         return (
-            <div>
+            <div style={{height: '30vh', overflow: 'scroll'}}>
                 {gameIDs.map((value) =>
                     <ColorfulText text={JSON.stringify(value, null, 2)}/>
                 )}
@@ -40,7 +40,7 @@ function GameList() {
 }
 
 function JoinGame() {
-    const [inputValue, setInputValue] = useState('');
+    const [inputValue, setInputValue] = useState();
     const [message, setMessage] = useState('Enter your friend\'s gameID, then press enter. ');
     const handleInputChange = (event) => {
         const value = event.target.value;
@@ -63,10 +63,22 @@ function JoinGame() {
                 setInputValue(value);
                 setMessage("Game ID: " + value);
 
-                //use navigate with additional parameters
-                navigate("/WaitingRoom", {
-                    gid: value,
-                });
+                //try to get the person into the game
+                const joinGame = async() => {
+                    let response = await axios.put(`http://localhost:8080/joinGame/${value}/${sessionStorage.getItem('userID')}`)
+                        .catch(function (error) {
+                            console.log("joinGame didn't work. ");
+                        });
+                    //a quick check to see if the player was able to join. Only than do we let them in.
+                    for (let i=0; i < response.data.players.length; i++){
+                        if (response.data.players[i] === sessionStorage.getItem('userID')){
+                            navigate(`/WaitingRoom`, { state: { gameId: value } });
+                        }
+                    }
+                    //TODO: There is literally no information for us to say anything better here.
+                    setMessage("You can't join this game. Try getting better? ");
+                }
+                joinGame();
             }
 
             // Call your function here
@@ -88,11 +100,11 @@ function JoinGame() {
             </Link>
             <br/>
             <div style={{fontSize: '5vh'}} className="bordering">
-                <ColorfulText text={message} />
+                <ColorfulText text={message}/>
             </div>
             <br/>
             <div style={{fontSize: '5vh'}} className="bordering">
-                <ColorfulText text= "Game ID"/>
+                <ColorfulText text="Game ID"/>
                 <form>
                     <input type="number" value={inputValue} onChange={handleInputChange} onKeyDown={handleKeyPress}
                            style={{fontFamily: "MarioFont", fontSize: "5vh", color: "red"}} pattern="\d*"/>
@@ -106,6 +118,9 @@ function JoinGame() {
                 <GameList/>
             </div>
             <br/>
+            <div style={{position: "absolute", right: "5%", bottom: "5%", fontSize: "5vh"}} className={"bordering"}>
+                <ColorfulText text={"Player: " + sessionStorage.getItem('username')}/>
+            </div>
         </div>
     );
 }

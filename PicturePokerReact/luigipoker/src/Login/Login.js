@@ -30,7 +30,8 @@ const Login = () => {
                 //TODO: Implement a more rigourous check for the password info
                 if(data.id !== 0 && data.passcode === loginPassword){
                     // User login info is saved as loggedInUser for future use
-                    const loggedInUser = data;
+                    sessionStorage.setItem('userID', data.id);
+                    sessionStorage.setItem('username', data.playerName);
                     navigate("/menu");
                 } else if (data.id === 0){
                     setError("Username not found")

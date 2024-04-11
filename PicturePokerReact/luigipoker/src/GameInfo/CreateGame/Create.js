@@ -16,16 +16,16 @@ import ColorfulText from "../../index";
 
 function gameCreation(rounds, buyin, navigate){
     //TODO: Check to make sure the game creator can actually join the game
-
-    const gameDetails = {
-        rounds: rounds.toString(), // number of rounds
-        buyIn: buyin.toString(), // buy-in amount
-        difficulty: "1" // difficulty level
-    };
     const makeGame = async () => {
+        const gameDetails = {
+            "rounds": rounds.toString(), // number of rounds
+            "buyIn": buyin.toString(), // buy-in amount
+            "difficulty": "1" // difficulty level
+        };
+
         const response = await axios.post('http://localhost:8080/createNewGame', gameDetails)
             .catch(function(error){
-                console.log("Unable to create game");
+                console.log("Error with createNewGame");
                 return (
                     <div>
                         Game could not be created.
@@ -33,14 +33,11 @@ function gameCreation(rounds, buyin, navigate){
                 )
             });
         //use navigate with additional parameters
-        navigate("/WaitingRoom", {
-            gid: response.data.g_id,
-        });
+        navigate(`/WaitingRoom`, { state: { gameId: response.data.id } });
     }
     makeGame();
 
-
-    return null;
+    return;
 }
 
 function CreateGame(){
@@ -52,7 +49,7 @@ function CreateGame(){
     const navigate = useNavigate();
 
     return (
-        <div style = {{
+        <div style={{
             backgroundImage: `url(${backdrop})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
@@ -63,51 +60,55 @@ function CreateGame(){
                 <img src={create} alt="" style={{width: '60%', marginBottom: '10vh'}}/>
             </Link>
 
-            <br />
+            <br/>
             <div className="RoundCount" style={{display: 'flex'}}>
                 <img src={rounds} style={{height: '10vh'}} alt={"Round Count"}/>
                 <button
                     onClick={() => counter > 0 && setCounter(counter - 1)}
-                    className= "glow">
-                    <img src={arrow} alt="arrow pointing upwards" className = "rotate90"/>
+                    className="glow">
+                    <img src={arrow} alt="arrow pointing upwards" className="rotate90"/>
                 </button>
-                <div style={{fontSize:'10vh'}} className = "bordering">
-                    <ColorfulText text={counter} />
+                <div style={{fontSize: '10vh'}} className="bordering">
+                    <ColorfulText text={counter}/>
                 </div>
                 <button
                     onClick={() => counter < 11 && setCounter(counter + 1)}
-                    className= "glow">
-                    <img src={arrow} alt="arrow pointing downwards" className= "rotateneg90"/>
+                    className="glow">
+                    <img src={arrow} alt="arrow pointing downwards" className="rotateneg90"/>
                 </button>
             </div>
-            <br />
+            <br/>
             <div className="Buy In" style={{display: 'flex'}}>
                 <img src={buyin} style={{height: '10vh'}} alt={"buyin"}/>
                 <button
                     onClick={() => counter10 > 0 && setCounter10(counter10 - 10)}
-                    className= "glow">
+                    className="glow">
                     <img src={arrow} alt="arrow pointing upwards" className="rotate90"/>
                 </button>
-                <span style={{fontSize:'10vh', fontFamily: "MarioFont", color: "green"}} className = "bordering">
-                    <ColorfulText text={counter10} />
+                <span style={{fontSize: '10vh', fontFamily: "MarioFont", color: "green"}} className="bordering">
+                    <ColorfulText text={counter10}/>
                 </span>
                 <button
                     onClick={() => setCounter10(counter10 + 10)}
-                    className= "glow">
+                    className="glow">
                     <img src={arrow} alt="arrow pointing downwards" className="rotateneg90"/>
                 </button>
             </div>
 
-            <br />
+            <br/>
             <div>
-                <button type={"button"} style={{height:'10vh', width:'20hh', border: "black", borderWidth: "10px"}} className = "glow" onClick ={() => gameCreation(counter, counter10, navigate)}>
-                    <div style={{fontSize:'5vh'}} className = "bordering">
-                        <ColorfulText text="Create Game! " />
+                <button type={"button"} style={{height: '10vh', width: '20hh', border: "black", borderWidth: "10px"}}
+                        className="glow" onClick={() => gameCreation(counter, counter10, navigate)}>
+                    <div style={{fontSize: '5vh'}} className="bordering">
+                        <ColorfulText text="Create Game! "/>
                     </div>
                 </button>
             </div>
+            <div style={{position: "absolute", right: "5%", bottom: "5%", fontSize: "5vh"}} className={"bordering"}>
+                <ColorfulText text={"Player: " + sessionStorage.getItem('username')}/>
+            </div>
         </div>
-);
+    );
 }
 
 export default CreateGame

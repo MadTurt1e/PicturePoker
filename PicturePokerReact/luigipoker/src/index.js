@@ -15,6 +15,7 @@ import Join from './GameInfo/JoinGame/Join';
 import Statistics from './GameInfo/Statistics';
 import WaitingRoom from './Game/WaitingRoom';
 import Game from './Game/Game';
+import Login from './Login/Login';
 
 import reportWebVitals from './reportWebVitals';
 
@@ -36,11 +37,12 @@ const ColorfulText = ({text}) => {
 };
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
-/// This is the line you'd change to change the page the react website loads first
+/// This now sends the user to the login page first, and only after logging in can they access the menu
 root.render(
     <BrowserRouter>
         <Routes>
-            <Route path="/" element={<Game />} />
+            <Route path="/" element={<Login />} />
+            <Route path="/menu" element={<Menu />} />
             <Route path="/createGame" element={<Create />} />
             <Route path="/joinGame" element={<Join />} />
             <Route path="/statistics" element={<Statistics />} />

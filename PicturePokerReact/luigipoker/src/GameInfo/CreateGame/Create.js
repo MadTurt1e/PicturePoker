@@ -59,7 +59,7 @@ function CreateGame(){
             height: '100vh',
             width: '100vw'
         }}>
-            <Link to="/">
+            <Link to="/menu">
                 <img src={create} alt="" style={{width: '60%', marginBottom: '10vh'}}/>
             </Link>
 

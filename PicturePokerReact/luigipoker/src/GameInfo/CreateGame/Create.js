@@ -1,5 +1,5 @@
 import "./Create.css"
-import React, { useEffect, useState } from 'react';
+import React, {useState } from 'react';
 import create from "../../resources/menuIcons/creategame.png";
 import backdrop from "../../resources/menuIcons/luigisCasino.jpg";
 
@@ -26,13 +26,13 @@ function gameCreation(rounds, buyin, navigate, state){
         };
 
         const response = await axios.post('http://localhost:8080/createNewGame', gameDetails)
-            .catch(function(error){
+            .catch(function(){
                 console.log("Error with createNewGame");
             });
 
         //try joining the game we just made
         let response2 = await axios.put(`http://localhost:8080/joinGame/${response.data.id}/${sessionStorage.getItem('userID')}`)
-            .catch(function (error) {
+            .catch(function () {
                 console.log("joinGame didn't work. ");
             });
         //a quick check to see if the player was able to join by scanning the player list. Only than do we let them in.
@@ -44,8 +44,6 @@ function gameCreation(rounds, buyin, navigate, state){
         state = "Player couldn't join the game";
     }
     makeGame();
-
-    return;
 }
 
 function CreateGame(){
@@ -58,7 +56,7 @@ function CreateGame(){
 
     const checkIfGood = async () => {
         const response = await axios.get(`http://localhost:8080/getByPlayerID/${sessionStorage.getItem('userID')}`)
-            .catch(function(error){
+            .catch(function(){
                 console.log("Error with getByPlayerID");
             });
 
@@ -66,7 +64,7 @@ function CreateGame(){
         // two checks - if the player can actually join a game, and if a player has enough cash to join
         if (response.status === 200) {
             const response2 = await axios.get(`http://localhost:8080/getPlayerActiveGame/${sessionStorage.getItem('userID')}`)
-                .catch(function (error) {
+                .catch(function () {
                     console.log("Error with getByPlayerID");
                 });
             //only if we pass all these checks do we let the player create a game.

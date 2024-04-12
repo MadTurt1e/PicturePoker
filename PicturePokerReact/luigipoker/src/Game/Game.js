@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import {useLocation} from 'react-router-dom';
 import './Game.css'; 
 
 import cloud from "../resources/pokerSprites/cloud.png";
@@ -23,7 +24,6 @@ import backdrop from "../resources/pokerSprites/table.png";
 
 import axios from "axios";
 import ColorfulText from "../index";
-import {useParams} from "react-router-dom";
 
 function Game() {
     const images = [cloud, mushroom, fireflower, luigi, mario, star, normalCard, proCard];
@@ -35,30 +35,33 @@ function Game() {
     const [luigiState, setLuigiState] = useState(0);
     const [data, setData] = useState(null);
 
-    const {gid} = useParams();
+    const location = useLocation();
+    const gid = location.state.gameId;
 
-    //TODO: Better PID call
-    const pid = 6;
-    const getPlayerData = async (pid) => {
-        //TODO: This API call has not been implemented yet.
-        const response = axios.get('http://localhost:8080/getByPID/' + pid)
+    //do stuff when the bet button is clicked
+    const [bet, setBet] = useState(0);
+    const [tokens, setTokens] = useState(10);
+
+    const pid = sessionStorage.getItem('userID');
+
+    const getPlayerData = async () => {
+        const response = await axios.get('http://localhost:8080/getByPlayerID/' + pid)
             .catch(function (error) {
-                console.log("getByPID API call didn't work. ");
+                console.log("getByPlayerID API call didn't work. ");
             });
         setData(response.data);
+        //try to update as much about the player as reasonable
+        if (response.status === 200) {
+            const hand = response.data.hand.map(card => card.suit);
+            setCards(hand); // Update cards state here
+            setTokens(response.data.tokens);
+            setBet(response.data.bet);
+        }
+
     };
-    //try to update as much about the player as reasonable
-    if (data) {
-        const hand = data.hand.map(
-            //we are probably going to need to do a conversion from suit to ints - to be tested.
-            hand => hand.Suit
-        );
-        const tokens = data.tokens;
-        const bet = data.bet;
-    }
 
     const finishRound = async (pid) => {
-        const response = axios.get('http://localhost:8080/finishRound/' + pid)
+        const response = await axios.put('http://localhost:8080/finishRound/' + pid)
             .catch(function (error) {
                 console.log("finishRound API call didn't work. ");
             });
@@ -69,7 +72,7 @@ function Game() {
 
     const setToChange = async(index) => {
         //just set something to be changed out depending on if it has been clicked or not
-        const response = await axios.get(`http://localhost:8080/changeCard/` + pid + '/' + index)
+        const response = await axios.put(`http://localhost:8080/changeCard/` + pid + '/' + index)
             .catch(function(error){
                 console.log("changeCard API call didn't work. Card " + index);
             });
@@ -90,23 +93,21 @@ function Game() {
         }
     };
 
-    //do stuff when the bet button is clicked
-    const [bet, setBet] = useState(0);
-    const [tokens, setTokens] = useState(10);
 
-    const handleBetClick = () => {
+    const handleBetClick = async() => {
         if (bet < 5) {
-            const response = axios.put("http://localhost:8080/raise/" + pid)
+            const response = await axios.put("http://localhost:8080/raise/" + pid)
                 .catch(function (error) {
                     console.log("raise API call didn't work. ")
                 });
+            console.log(response);
             setBet(response.data.bet);
             setTokens(response.data.tokens);
             setLuigiState(0);
         }
     };
 
-    const endTurnProcedure = () => {
+    const endTurnProcedure = async() => {
         const newCards = [...cards];
         selectedCards.map((index) =>
             newCards[index] = Math.floor(Math.random() * 6)
@@ -124,7 +125,7 @@ function Game() {
         }, 2000);
 
         //show luigi's hand
-        const response = axios.put("http://localhost:8080/getByGameID/" + gid)
+        const response = await axios.get("http://localhost:8080/getByGameID/" + gid)
             .catch(function (error) {
                 console.log("getByGameID API call didn't work. ")
             });
@@ -134,11 +135,8 @@ function Game() {
         );
     }
 
-    //This chunk runs on every render - so basically this stuff is the stuff we want to run at the start of the code.
-    useEffect(()=>{
-        getPlayerData(pid);
-    }, [])
 
+    let tokenMessage = "Tokens: " + tokens;
     return (
         <div style={{
             backgroundImage: `url(${backdrop})`,
@@ -164,7 +162,7 @@ function Game() {
                 ))}
             </div>
             <div className = "tokenCount bordering">
-                <ColorfulText text={"Tokens: " + tokens} />
+                <ColorfulText text={tokenMessage} />
             </div>
             <div
                 className="bet"

@@ -15,11 +15,7 @@ function GameList() {
         const loadGame = async () => {
             const response = await axios.get(`http://localhost:8080/getAllGames`)
                 .catch(function(error){
-                    return (
-                        <div>
-                            Connection not established.
-                        </div>
-                    )
+                    console.log("getAllGames API call did not work");
             });
             setData(response.data)
         }
@@ -69,13 +65,13 @@ function JoinGame() {
                         .catch(function (error) {
                             console.log("joinGame didn't work. ");
                         });
-                    //a quick check to see if the player was able to join. Only than do we let them in.
+                    //a quick check to see if the player was able to join by scanning the player list. Only than do we let them in.
                     for (let i=0; i < response.data.players.length; i++){
                         if (response.data.players[i] === sessionStorage.getItem('userID')){
                             navigate(`/WaitingRoom`, { state: { gameId: value } });
                         }
                     }
-                    //TODO: There is literally no information for us to say anything better here.
+                    // We can say something better, but this requires way more checks.
                     setMessage("You can't join this game. Try getting better? ");
                 }
                 joinGame();

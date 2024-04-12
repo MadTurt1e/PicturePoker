@@ -11,6 +11,8 @@ function PlayerList() {
     const location = useLocation();
     const gid = location.state.gameId;
 
+    const navigate = useNavigate();
+
     //the call to get the game info
     useEffect(() => {
         const loadGame = async () => {
@@ -23,38 +25,38 @@ function PlayerList() {
             setPlayers(response.data.players);
         }
         loadGame();
-    }, []);
 
-    const navigate = useNavigate();
-    if(players) {
-        const filteredPlayers = players.filter(player => player !== 0);
-        const pNames = [];
+        if(players) {
+            const filteredPlayers = players.filter(player => player !== 0);
+            const pNames = [];
 
-        async function getPlayerNames() {
-            for(let i=0; i < filteredPlayers.length; i++) {
-                let response = await axios.get(`http://localhost:8080/getByPlayerID/${filteredPlayers[i]}`)
-                    .catch(function(error){
-                        console.log('getByPlayerID didn\'t work');
-                    });
-                pNames.push(response.data.playerName);
+            async function getPlayerNames() {
+                for(let i=0; i < filteredPlayers.length; i++) {
+                    let response = await axios.get(`http://localhost:8080/getByPlayerID/${filteredPlayers[i]}`)
+                        .catch(function(error){
+                            console.log('getByPlayerID didn\'t work');
+                        });
+                    pNames.push(response.data.playerName);
+                }
             }
-        }
+            getPlayerNames();
 
-        if (filteredPlayers.length === 4) {
-            navigate('/game', {gid: gid,});
-        }
+            if (filteredPlayers.length === 4) {
+                navigate('/game', {gid: gid,});
+            }
 
-        return (
-            <div>
-                <div style={{fontSize:"5vh"}} className={"bordering"}>
-                    <ColorfulText text={"Game  ID: " + gid.toString() + " Players required: " + (4 - pNames.length)} />
+            return (
+                <div>
+                    <div style={{fontSize:"5vh"}} className={"bordering"}>
+                        <ColorfulText text={"Game  ID: " + gid.toString() + " Players required: " + (4 - pNames.length)} />
+                    </div>
+                    {pNames.map((value) =>
+                        <ColorfulText text={JSON.stringify(value, null, 2)}/>
+                    )}
                 </div>
-                {pNames.map((value) =>
-                    <ColorfulText text={JSON.stringify(value, null, 2)}/>
-                )}
-            </div>
-        );
-    }
+            );
+        }
+    }, []);
     return (
         <ColorfulText text={"Connection not established."}/>
     )

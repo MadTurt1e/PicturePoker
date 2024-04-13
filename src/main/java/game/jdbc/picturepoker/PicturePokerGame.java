@@ -81,6 +81,7 @@ public class PicturePokerGame {
             game.setCurRound(1);
             game.setPotQuantity(0);
             game = gamedao.create(game);
+            game = gamedao.createHand(game);
             // once all the necessary values are created, we can make the game.
 
             System.out.println(game);

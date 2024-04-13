@@ -192,6 +192,10 @@ public class PicturePokerGame {
             GameDAO gamedao = new GameDAO(connection);
             PlayerDAO playerDAO = new PlayerDAO(connection);
             game = gamedao.findById(g_id);
+            if(game.getCurRound() <= game.getNumRounds()){
+                // Game is not yet complete, do not calculate anything
+                return null;
+            }
             // Sort array of player IDs
             long[] pidsInGame = gamedao.getPIDsByGame(game);
             ArrayList<Player> playersInGame = new ArrayList<Player>();

@@ -62,8 +62,14 @@
     position: relative;
     margin-right: 5px;
 }
+.miniToken{
+    height: 2vh;
+    position: relative;
+    margin-right: 5px;
+}
 .luigi{
-    width: 20vw;
+    width: 10vw;
+    left: 3%;
 }
 .tokenCount{
     font-size: 7vh;

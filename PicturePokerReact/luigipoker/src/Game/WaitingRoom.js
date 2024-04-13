@@ -6,7 +6,6 @@ import ColorfulText from "../index"
 import backdrop from "../resources/menuIcons/luigisCasino.jpg";
 
 function PlayerList() {
-    const [data, setData] = useState(null);
     const [players, setPlayers] = useState(null);
     const location = useLocation();
     const gid = location.state.gameId;
@@ -16,12 +15,10 @@ function PlayerList() {
     //the call to get the game info
     useEffect(() => {
         const loadGame = async () => {
-            // Replace this with the updated API call
             const response = await axios.get(`http://localhost:8080/getByGameID/` + gid)
-                .catch(function(error){
+                .catch(function(){
                     console.log("GetbyGameID didn't work. ");
                 });
-            setData(response.data)
             setPlayers(response.data.players);
         }
         loadGame();

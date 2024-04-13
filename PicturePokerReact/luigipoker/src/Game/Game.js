@@ -121,6 +121,26 @@ function RoundCount({gid}) {
         </div>
     )
 }
+
+function WaitingOnTurn(){
+    let waitingOnTurn = false;
+    useEffect(() => {
+        async function getPlayerNames(){
+            let response = await axios.get(`http://localhost:8080/getByPlayerID/${sessionStorage.getItem("userID")}`)
+                .catch(function(error){
+                    console.log('getByPlayerID didn\'t work. ');
+                });
+            if (response.status === 200 && response.data.finishedRound === 1){
+                waitingOnTurn = true;
+            }
+        }
+    }, []);
+    return (
+        <div style = {{fontSize: "2vh"}} className={"bordering"}>
+            <ColorfulText text={"Waiting for round to finish.  "}/>
+        </div>
+    )
+}
 function Game() {
     const images = [cloud, mushroom, fireflower, luigi, mario, star, normalCard, proCard];
     const [cards, setCards] = useState([6, 6, 6, 6, 6]);
@@ -286,6 +306,7 @@ function Game() {
             </div>
             <PlayerList gid = {gid}/>
             <RoundCount gid = {gid}/>
+            <WaitingOnTurn/>
             <div className="cards" style={{
                 top: '5%'
             }}>

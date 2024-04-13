@@ -14,7 +14,7 @@
 }
 
 .bordering {
-    -webkit-text-stroke-width: 5px;
+    -webkit-text-stroke-width: 0.2vh;
     -webkit-text-stroke-color: black;
 }
 .modal-title {

@@ -7,56 +7,59 @@ import backdrop from "../resources/menuIcons/luigisCasino.jpg";
 
 function PlayerList() {
     const [players, setPlayers] = useState(null);
+    const [pNames, setPNames] = useState([]);
     const location = useLocation();
     const gid = location.state.gameId;
-
     const navigate = useNavigate();
 
-    //the call to get the game info
     useEffect(() => {
-        const loadGame = async () => {
+        const interval = setInterval(async () => {
             const response = await axios.get(`http://localhost:8080/getByGameID/` + gid)
                 .catch(function(){
                     console.log("GetbyGameID didn't work. ");
                 });
             setPlayers(response.data.players);
-        }
-        loadGame();
 
-        if(players) {
-            const filteredPlayers = players.filter(player => player !== 0);
-            const pNames = [];
+            if(players) {
+                const filteredPlayers = players.filter(player => player !== 0);
+                let newPNames = [];
 
-            async function getPlayerNames() {
                 for(let i=0; i < filteredPlayers.length; i++) {
                     let response = await axios.get(`http://localhost:8080/getByPlayerID/${filteredPlayers[i]}`)
                         .catch(function(error){
                             console.log('getByPlayerID didn\'t work');
                         });
-                    pNames.push(response.data.playerName);
+                    newPNames.push(response.data.playerName);
                 }
+                setPNames(newPNames);
             }
-            getPlayerNames();
+        }, 1000);
+        //TIME: for debugging purposes. Set to 10 seconds in real life.
 
-            if (filteredPlayers.length === 4) {
-                navigate('/game', {gid: gid,});
-            }
-
-            return (
-                <div>
-                    <div style={{fontSize:"5vh"}} className={"bordering"}>
-                        <ColorfulText text={"Game  ID: " + gid.toString() + " Players required: " + (4 - pNames.length)} />
-                    </div>
-                    {pNames.map((value) =>
-                        <ColorfulText text={JSON.stringify(value, null, 2)}/>
-                    )}
-                </div>
-            );
+        //LEAVE THE WAITING ROOM
+        if (pNames.length === 4) {
+            navigate(`/Game`, { state: { gameId: gid } });
         }
-    }, []);
+
+
+        // Cleanup interval on unmount
+        return () => clearInterval(interval);
+
+    }, [players]); // Re-run effect when `players` changes
+
+
     return (
-        <ColorfulText text={"Connection not established."}/>
-    )
+        <div>
+            <div style={{fontSize:"5vh"}} className={"bordering"}>
+                <ColorfulText text={"Game  ID: " + gid.toString() + " Players required: " + (4 - pNames.length)} />
+            </div>
+            <div style={{fontSize:"3vh"}} className={"bordering"}>
+                {pNames.map((value) =>
+                    <ColorfulText text={value}/>
+                )}
+            </div>
+        </div>
+    );
 }
 
 function WaitingRoom(){
@@ -94,11 +97,11 @@ function WaitingRoom(){
             <PlayerList/>
             <br/>
 
-            <div className="escapeGame" onClick={() => exitGame()}>
+            <button className="escapeGame bordering glow" style={{fontSize:"3vh"}}onClick={() => exitGame()}>
                 <ColorfulText text={"Leave Game?  "}/>
-            </div>
+            </button>
 
-            <div style={{position: "absolute", right: "5%", bottom: "5%", fontSize: "5vh"}} className={"bordering"}>
+            <div style={{position: "absolute", right: "5%", bottom: "5%", fontSize: "5vh"}} className={ "bordering"}>
                 <ColorfulText text={"Player: " + sessionStorage.getItem('username')}/>
             </div>
         </div>

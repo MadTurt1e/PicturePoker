@@ -43,8 +43,6 @@ function JoinGame() {
         if (/^\d*$/.test(value)) { // Check if the value is all digits
             setInputValue(value);
         }
-
-        console.log(inputValue)
     };
 
     const navigate = useNavigate();
@@ -60,27 +58,34 @@ function JoinGame() {
                 setMessage("Game ID: " + value);
 
                 //try to get the person into the game
-                const joinGame = async() => {
-                    let response = await axios.put(`http://localhost:8080/joinGame/${value}/${sessionStorage.getItem('userID')}`)
-                        .catch(function (error) {
-                            console.log("joinGame didn't work. ");
-                        });
-                    //a quick check to see if the player was able to join by scanning the player list. Only than do we let them in.
-                    for (let i=0; i < response.data.players.length; i++){
-                        if (response.data.players[i] === sessionStorage.getItem('userID')){
-                            navigate(`/WaitingRoom`, { state: { gameId: value } });
-                        }
-                    }
-                    // We can say something better, but this requires way more checks.
-                    setMessage("You can't join this game. Try getting better? ");
-                }
-                joinGame();
+                joinGame(value);
             }
-
-            // Call your function here
-            console.log('Enter key pressed! ' + value + " in form. ");
         }
     };
+
+    const joinGame = async(gameId) => {
+        try {
+            let response = await axios.put(`http://localhost:8080/joinGame/${gameId}/${sessionStorage.getItem('userID')}`);
+            handleJoinGameResponse(response, gameId);
+        } catch (error) {
+            console.error("Error joining game: ", error);
+            setMessage("An error occurred while trying to join the game. Please try again.");
+        }
+    }
+
+    const handleJoinGameResponse = (response, gameId) => {
+        if (isUserInGame(response.data.players)) {
+            navigate(`/WaitingRoom`, { state: { gameId: gameId } });
+        } else {
+            setMessage("You can't join this game. Try getting better?");
+        }
+    }
+
+    const isUserInGame = (players) => {
+        console.log(players);
+        const userId = sessionStorage.getItem('userID');
+        return players.includes(parseInt(userId));
+    }
 
 
     return (

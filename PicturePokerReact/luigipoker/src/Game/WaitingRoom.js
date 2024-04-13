@@ -97,9 +97,9 @@ function WaitingRoom(){
             <PlayerList/>
             <br/>
 
-            <button className="escapeGame bordering glow" style={{fontSize:"3vh"}}onClick={() => exitGame()}>
-                <ColorfulText text={"Leave Game?  "}/>
-            </button>
+            {/*<button className="escapeGame bordering glow" style={{fontSize:"3vh"}}onClick={() => exitGame()}>*/}
+            {/*    <ColorfulText text={"Leave Game?  "}/>*/}
+            {/*</button>*/}
 
             <div style={{position: "absolute", right: "5%", bottom: "5%", fontSize: "5vh"}} className={ "bordering"}>
                 <ColorfulText text={"Player: " + sessionStorage.getItem('username')}/>

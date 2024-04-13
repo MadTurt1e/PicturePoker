@@ -100,6 +100,7 @@ function PlayerList({gid}) {
     );
 }
 
+
 function RoundCount({gid}) {
     const [rounds, setRounds] = useState(null);
     const [curRound, setCurRounds] = useState(null);
@@ -237,7 +238,7 @@ function Game() {
 
             getPlayerData(pid);
             setLuigiState(1);
-            //pseudo animations - we don't have the budget to go further. I'm going to screencap these images eventually.
+            //pseudo animations - we don't have the budget to go further.
             setTimeout(() => {
                 setLuigiState(0);
             }, 5310);
@@ -247,7 +248,7 @@ function Game() {
                 .catch(function (error) {
                     console.log("getByGameID API call didn't work. ")
                 });
-            if (response.status === 200 && response.hand === null) {
+            if (response.status === 200 && response.data.hand === null) {
                 // Define the mapping
                 const cardMapping = {
                     "CLOUD": 0,
@@ -268,7 +269,6 @@ function Game() {
     }
 
 
-    let tokenMessage = "Tokens: " + tokens;
     return (
         <div style={{
             backgroundImage: `url(${backdrop})`,
@@ -296,7 +296,7 @@ function Game() {
                 ))}
             </div>
             <div className="tokenCount bordering">
-                <ColorfulText text={tokenMessage}/>
+                <ColorfulText text={"Tokens: " + tokens}/>
             </div>
             <div
                 className="bet"

@@ -488,7 +488,8 @@ public class PicturePokerGame {
             PlayerDAO playerdao = new PlayerDAO(connection);
 
             // pseudo lobby system - just reject starting when the game is not full.
-            int curPlayers = gamedao.findById(g_id).getActivePlayers();
+            game = gamedao.findById(g_id);
+            int curPlayers = game.getActivePlayers();
             if (curPlayers < 4) {
                 System.out.println("The game is not full yet! We need " + (4 - curPlayers) + " more players. ");
                 return game;
@@ -505,7 +506,7 @@ public class PicturePokerGame {
 
     @PutMapping("/joinGame/{g_id}/{p_id}")
     public Game joinGame(@PathVariable long g_id, @PathVariable long p_id) {
-        System.out.println("GameID: " + g_id + "Player Name: " + p_id);
+        System.out.println("GameID: " + g_id + "PlayerID: " + p_id);
         DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,
                 "picturepoker", "postgres", "password");
         Game game = new Game();
@@ -515,9 +516,11 @@ public class PicturePokerGame {
             GameDAO gamedao = new GameDAO(connection);
             PlayerDAO playerdao = new PlayerDAO(connection);
             Player player = playerdao.findById(p_id);
+            game = gamedao.findById(g_id);
 
             //stick the player into the game (or at least, it tries)
-            game = gamedao.joinGame(g_id, player);
+            game = gamedao.joinGame(game, player);
+            gamedao.update_all(game);
         }catch (SQLException e) {
             e.printStackTrace();
         }

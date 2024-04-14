@@ -41,7 +41,7 @@ public class GameDAO extends DataAccessObject<Game> {
                 game.setCurRound(rs.getInt("cur_round"));
                 game.setNumRounds(rs.getInt("num_rounds"));
                 game.setActivePlayers(rs.getInt("active_players"));
-                game.setBuyIn(rs.getInt("active_players"));
+                game.setBuyIn(rs.getInt("buy_in"));
                 game.setPotQuantity(rs.getInt("pot_quantity"));
                 game.setDifficulty(rs.getInt("difficulty"));
                 game.setPlayers(getPIDsByGame(game));
@@ -138,13 +138,12 @@ public class GameDAO extends DataAccessObject<Game> {
         }
     }
 
-    public Game joinGame(long g_id, Player player) {
+    public Game joinGame(Game dto, Player player) {
         //this is a way to check if the game id is valid, also lets us return the game in case we want it.
-        Game game = findById(g_id);
 
-        if (game.getActivePlayers() >= 4){
+        if (dto.getActivePlayers() >= 4){
             System.out.println("joinGame: The game is already full." );
-            return game;
+            return dto;
         }
         long curGid = 0;
         //run a check to see if the original game is still ongoing
@@ -157,13 +156,14 @@ public class GameDAO extends DataAccessObject<Game> {
             }
 
             Game curGame = findById(curGid);
+            System.out.println(curGame);
             if (curGame.getCurRound() < curGame.getNumRounds()){
                 System.out.println("joinGame: The player is still in an active game.");
-                return curGame;
+                return dto;
             }
-            if (curGame.getBuyIn() > player.getDollars()){
-                System.out.println("joinGame: The player is too broke to join. Required amount to play: " + curGame.getBuyIn() + ", current dollar count: " + player.getDollars());
-                return curGame;
+            if (dto.getBuyIn() > player.getDollars()){
+                System.out.println("joinGame: The player is too broke to join. Required amount to play: " + dto.getBuyIn() + ", current dollar count: " + player.getDollars());
+                return dto;
             }
 
         } catch (SQLException e) {
@@ -173,7 +173,7 @@ public class GameDAO extends DataAccessObject<Game> {
         //update that one table for each player.
         try (PreparedStatement statement2 = this.connection.prepareStatement(ADD_PLAYER_TO_GAME);) {
             statement2.setLong(1, player.getID());
-            statement2.setLong(2, g_id);
+            statement2.setLong(2, dto.getID());
             statement2.execute();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -181,7 +181,7 @@ public class GameDAO extends DataAccessObject<Game> {
         }
 
         //if we get here, the player has been inserted so we can update the game table accordingly.
-        return update_int("active_players", game.getActivePlayers() + 1, game);
+        return update_int("active_players", dto.getActivePlayers() + 1, dto);
     }
 
     public Game createHand(Game dto) {

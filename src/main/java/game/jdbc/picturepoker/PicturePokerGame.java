@@ -105,7 +105,6 @@ public class PicturePokerGame {
             PlayerDAO playerDAO = new PlayerDAO(connection);
 
             player = playerDAO.findByName(playerName);
-            player = playerDAO.getHand(player);
             System.out.println(player);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -126,7 +125,6 @@ public class PicturePokerGame {
             PlayerDAO playerDAO = new PlayerDAO(connection);
 
             player = playerDAO.findById(p_id);
-            player = playerDAO.getHand(player);
             System.out.println(player);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -151,6 +149,7 @@ public class PicturePokerGame {
                 return null;
             }
             game = gameDAO.findById(gid);
+            game.setPlayers(gameDAO.getPIDsByGame(game));
             System.out.println(game);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -172,7 +171,6 @@ public class PicturePokerGame {
             game = gamedao.findById(g_id);
             //we need a separate function to get pids because the database is structured poorly
             game.setPlayers(gamedao.getPIDsByGame(game));
-            game = gamedao.getHand(game);
             System.out.println(game);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -233,7 +231,6 @@ public class PicturePokerGame {
                 playersInGame.add(playerDAO.findById(gamePIDs[i]));
             }
             for(Player p : playersInGame){
-                playerDAO.getHand(p);
                 System.out.println(p);
             }
             System.out.println(game);
@@ -255,7 +252,6 @@ public class PicturePokerGame {
 
             allPlayers = playerDAO.findAllPlayers();
             for (Player p : allPlayers) {
-                p = playerDAO.getHand(p);
                 System.out.println(p);
             }
         } catch (SQLException e) {
@@ -274,7 +270,6 @@ public class PicturePokerGame {
             GameDAO gameDAO = new GameDAO(connection);
             allGames = gameDAO.findAllGames();
             for (Game g : allGames) {
-                g = gameDAO.getHand(g);
                 System.out.println(g);
             }
         } catch (SQLException e) {
@@ -406,7 +401,6 @@ public class PicturePokerGame {
             PlayerDAO playerDAO = new PlayerDAO(connection);
 
             player = playerDAO.findById(p_id);
-            player = playerDAO.getHand(player);
             if(player.getFinishedRound() > 0){
                 System.out.println("Could not toggle Card: Finished round.");
             }
@@ -435,7 +429,6 @@ public class PicturePokerGame {
             GameDAO gameDAO = new GameDAO(connection);
 
             player = playerDAO.findById(p_id);
-            player = playerDAO.getHand(player);
             if(player.getFinishedRound() > 0){
                 System.out.println("Could not finish round: You have already finished the current round.");
                 return player;
@@ -450,8 +443,11 @@ public class PicturePokerGame {
             gameDAO.update_int("players_finished", curGame.getPlayersFinished(), curGame);
             if(curGame.getPlayersFinished() >= 4){
                 // Do round stuff
+                GamePlay gp = new GamePlay(curGame);
+                gp.showdownResolution(gameDAO, playerDAO);
                 if(curGame.getCurRound() > curGame.getNumRounds()){
                     // Do end of game stuff
+                    gp.gameEndResolution(gameDAO, playerDAO);
                 }
             }
         } catch (SQLException e) {
@@ -513,7 +509,6 @@ public class PicturePokerGame {
             long gid = playerDAO.getCurrentGame(p);
             game = gameDAO.findById(gid);
             game = gameDAO.removePlayerFromGame(game, p_id);
-            p = playerDAO.getHand(p);
             p.resetPerGameInfo();
             playerDAO.updateAttributes(p);
             playerDAO.updateHand(p);
@@ -549,8 +544,8 @@ public class PicturePokerGame {
                 return game;
             }
 
-            GamePlay gamePlay = new GamePlay();
-            game = gamePlay.gameSeq(g_id, gamedao, playerdao);
+            GamePlay gamePlay = new GamePlay(game);
+            game = gamePlay.gameSeq(gamedao, playerdao);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -570,15 +565,38 @@ public class PicturePokerGame {
             GameDAO gamedao = new GameDAO(connection);
             PlayerDAO playerDAO = new PlayerDAO(connection);
             Player player = playerDAO.findById(p_id);
-            player = playerDAO.getHand(player);
             // Reset player info before joining
             player.resetPerGameInfo();
             playerDAO.updateAttributes(player);
             playerDAO.updateHand(player);
             game = gamedao.findById(g_id);
 
+            int players_before = game.getActivePlayers();
             //stick the player into the game (or at least, it tries)
             game = gamedao.joinGame(game, player);
+            // Once everyone joins, start the game and take away money from players' balances
+            if(game.getActivePlayers() >= 4 && players_before == 3){
+                Player[] playerList = new Player[4];
+                long[] playerIDList = game.getPlayers();
+
+                //we get the list of all the players, so it is iterable.
+                for (int i = 0; i < 4; ++i) {
+                    playerList[i] = playerDAO.findById(playerIDList[i]);
+                }
+                for (Player p : playerList) {
+                    p.resetPerGameInfo();
+                    playerDAO.update_int("tokens", 10, p);
+                    playerDAO.update_int("bet", 1, p);
+                    playerDAO.update_int("rounds_won", 0, p);
+                    playerDAO.update_int("finished_round", 0, p);
+
+                    //drain people's bank accounts and add to pot
+                    p.setDollars(p.getDollars() - game.getBuyIn());
+                    playerDAO.updateAttributes(p);
+                    playerDAO.updateHand(p);
+                    game.setPotQuantity(game.getPotQuantity() + game.getBuyIn());
+                }
+            }
             gamedao.update_all(game);
         }catch (SQLException e) {
             e.printStackTrace();

@@ -19,7 +19,7 @@ public class GameDAO extends DataAccessObject<Game> {
     private static final String MASS_UPDATE_GAME_BY_ID =
             "UPDATE game SET cur_round = ?, num_rounds = ?, active_players = ?, buy_in = ?, pot_quantity = ?,"+
                     " difficulty = ?, players_finished = ? WHERE g_id = ?";
-    private static final String UPDATE_CARD = "UPDATE dealer_card SET suit = ? WHERE g_id = ? AND hand_pos = ?";
+    private static final String UPDATE_CARD = "UPDATE dealer_card SET suit = ?, to_change = ? WHERE g_id = ? AND hand_pos = ?";
     //insert player
     private static final String ADD_PLAYER_TO_GAME = "INSERT INTO player_in_game (p_id, g_id) VALUES (?, ?)";
     private static final String REMOVE_PLAYER_FROM_GAME = "DELETE FROM player_in_game WHERE p_id = ?";
@@ -263,8 +263,9 @@ public class GameDAO extends DataAccessObject<Game> {
         for (int i = 0; i < 5; i++) {
             try (PreparedStatement statement = this.connection.prepareStatement(UPDATE_CARD);) {
                 statement.setString(1, dto.getHand()[i].toString());
-                statement.setLong(2, dto.getID());
-                statement.setInt(3, i);
+                statement.setBoolean(2, dto.getHand()[i].getToChange());
+                statement.setLong(3, dto.getID());
+                statement.setInt(4, i);
                 statement.execute();
             } catch (SQLException e) {
                 e.printStackTrace();

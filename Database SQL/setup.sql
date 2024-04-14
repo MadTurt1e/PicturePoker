@@ -7,6 +7,16 @@ INSERT INTO player (p_id, p_name, passcode) VALUES (6, 'Annie', 'passwordinkcher
 INSERT INTO player (p_id, p_name, passcode) VALUES (7, 'Chris', 'passwordthaiicedtea');
 INSERT INTO player (p_id, p_name, passcode) VALUES (8, 'Bowser', 'kingofkoopas');
 
+-- Pre-seed some player information
+UPDATE player SET first_places = 1, lifetime_tokens = 62, quads = 1, full_houses = 0, triples = 2,
+two_pairs = 1, one_pairs = 1, cards_changed = 9, lifetime_rounds_won = 3, dollars = 109 WHERE p_id = 6;
+UPDATE player SET second_places = 1, lifetime_tokens = 40, full_houses = 1, triples = 4,
+cards_changed = 15, lifetime_rounds_won = 4, dollars = 80 WHERE p_id = 2;
+UPDATE player SET third_places = 1, lifetime_tokens = 30, full_houses = 2,
+two_pairs = 3, cards_changed = 10, lifetime_rounds_won = 3, dollars = 63 WHERE p_id = 4;
+UPDATE player SET fourth_places = 1, lifetime_tokens = 25, full_houses = 2, triples = 1,
+two_pairs = 2, cards_changed = 10, lifetime_rounds_won = 3, dollars = 46 WHERE p_id = 1;
+
 INSERT INTO game (g_id, num_rounds, active_players, buy_in, difficulty) VALUES (14, 5, 4, 10, 1);
 INSERT INTO game (g_id, cur_round, num_rounds, active_players, buy_in, difficulty) VALUES (45, 7, 7, 4, 100, 0);
 

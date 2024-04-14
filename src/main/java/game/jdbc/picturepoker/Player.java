@@ -269,6 +269,17 @@ public class Player implements DataTransferObject, Comparable<Player> {
         return 0;
     }
 
+    public void resetPerGameInfo(){
+        tokens = 10;
+        bet = 1;
+        roundsWon = 0;
+        // Reset player hands
+        for(int i = 0; i < 5; i++){
+            hand[i].setToChange(true);
+            hand[i].redrawSuit();
+        }
+    }
+
     // Statistic aggregation functions
     public int getGamesPlayed(){
         return getFirstPlaces() + getSecondPlaces() + getThirdPlaces() + getFourthPlaces();

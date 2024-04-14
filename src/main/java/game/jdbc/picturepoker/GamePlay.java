@@ -458,9 +458,7 @@ public class GamePlay {
         //reset everything we'd need to reset before the game. Do not reset if in the middle of a game
         if(curGame.getCurRound() == 1) {
             for (Player value : playerList) {
-                value.setTokens(10);
-                value.setBet(0);
-                value.setRoundsWon(0);
+                value.resetPerGameInfo();
                 //drain people's bank accounts and add to pot
                 value.setDollars(value.getDollars() - curGame.getBuyIn());
                 curGame.setPotQuantity(curGame.getPotQuantity() + curGame.getBuyIn());

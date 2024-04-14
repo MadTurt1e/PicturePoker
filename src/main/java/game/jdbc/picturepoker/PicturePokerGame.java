@@ -499,6 +499,10 @@ public class PicturePokerGame {
             long gid = playerDAO.getCurrentGame(p);
             game = gameDAO.findById(gid);
             game = gameDAO.removePlayerFromGame(game, p_id);
+            p = playerDAO.getHand(p);
+            p.resetPerGameInfo();
+            playerDAO.updateAttributes(p);
+            playerDAO.updateHand(p);
             // Clean up once all players leave.
             if(game.getActivePlayers() == 0){
                 game = gameDAO.deleteGame(game.getID());
@@ -550,8 +554,13 @@ public class PicturePokerGame {
             //Makes a connection, gets a player and the game ID, and tries adding the player to the game.
             Connection connection = dcm.getConnection();
             GameDAO gamedao = new GameDAO(connection);
-            PlayerDAO playerdao = new PlayerDAO(connection);
-            Player player = playerdao.findById(p_id);
+            PlayerDAO playerDAO = new PlayerDAO(connection);
+            Player player = playerDAO.findById(p_id);
+            player = playerDAO.getHand(player);
+            // Reset player info before joining
+            player.resetPerGameInfo();
+            playerDAO.updateAttributes(player);
+            playerDAO.updateHand(player);
             game = gamedao.findById(g_id);
 
             //stick the player into the game (or at least, it tries)

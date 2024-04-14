@@ -76,7 +76,6 @@ function WaitingRoom(){
                 .catch(function(error){
                     console.log("GetPlayerActiveGame didn\'t work. ");
                 });
-            console.log(response2.data);
             if (response2.data === "" || response2.data.players.includes(parseInt(sessionStorage.getItem("userID"))))
                 navigate('/menu');
         }

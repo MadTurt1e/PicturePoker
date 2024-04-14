@@ -106,7 +106,6 @@ public class PicturePokerGame {
             PlayerDAO playerDAO = new PlayerDAO(connection);
 
             player = playerDAO.findByName(playerName);
-            player = playerDAO.getHand(player);
             System.out.println(player);
             connection.close();
         } catch (SQLException e) {
@@ -128,7 +127,6 @@ public class PicturePokerGame {
             PlayerDAO playerDAO = new PlayerDAO(connection);
 
             player = playerDAO.findById(p_id);
-            player = playerDAO.getHand(player);
             System.out.println(player);
             connection.close();
         } catch (SQLException e) {
@@ -154,6 +152,7 @@ public class PicturePokerGame {
                 return null;
             }
             game = gameDAO.findById(gid);
+            game.setPlayers(gameDAO.getPIDsByGame(game));
             System.out.println(game);
             connection.close();
         } catch (SQLException e) {
@@ -237,7 +236,6 @@ public class PicturePokerGame {
                 playersInGame.add(playerDAO.findById(gamePIDs[i]));
             }
             for(Player p : playersInGame){
-                playerDAO.getHand(p);
                 System.out.println(p);
             }
             System.out.println(game);
@@ -260,7 +258,6 @@ public class PicturePokerGame {
 
             allPlayers = playerDAO.findAllPlayers();
             for (Player p : allPlayers) {
-                p = playerDAO.getHand(p);
                 System.out.println(p);
             }
             connection.close();
@@ -278,7 +275,6 @@ public class PicturePokerGame {
         try {
             Connection connection = dcm.getConnection();
             GameDAO gameDAO = new GameDAO(connection);
-            //we need a separate function to get pids because the database is structured poorly
             allGames = gameDAO.findAllGames();
             for (Game g : allGames) {
                 System.out.println(g);
@@ -361,6 +357,7 @@ public class PicturePokerGame {
             updatedGame.setBuyIn(Integer.parseInt(inputMap.get("buy_in")));
             updatedGame.setPotQuantity(Integer.parseInt(inputMap.get("pot_quant")));
             updatedGame.setDifficulty(Integer.parseInt(inputMap.get("difficulty")));
+            updatedGame.setPlayersFinished(Integer.parseInt(inputMap.get("players_finished")));
 
             // and update it in the database.
             updatedGame = gamedao.update_all(updatedGame);
@@ -395,6 +392,8 @@ public class PicturePokerGame {
             }
             System.out.println("Player bet is now :" + player.getBet());
             playerDAO.update_int("bet", player.getBet(), player);
+            System.out.println("Player tokens remaining :" + player.getTokens());
+            playerDAO.update_int("tokens", player.getTokens(), player);
             System.out.println(player);
             connection.close();
         } catch (SQLException e) {
@@ -414,7 +413,6 @@ public class PicturePokerGame {
             PlayerDAO playerDAO = new PlayerDAO(connection);
 
             player = playerDAO.findById(p_id);
-            player = playerDAO.getHand(player);
             if(player.getFinishedRound() > 0){
                 System.out.println("Could not toggle Card: Finished round.");
             }
@@ -441,15 +439,40 @@ public class PicturePokerGame {
         try {
             Connection connection = dcm.getConnection();
             PlayerDAO playerDAO = new PlayerDAO(connection);
+            GameDAO gameDAO = new GameDAO(connection);
 
             player = playerDAO.findById(p_id);
-            player = playerDAO.getHand(player);
             if(player.getFinishedRound() > 0){
-                System.out.println("Could not finish round: It is not your turn.");
+                System.out.println("Could not finish round: You have already finished the current round.");
                 return player;
             }
             player.setFinishedRound(1);
             playerDAO.update_int("finished_round", 1, player);
+
+            long curGameID = playerDAO.getCurrentGame(player);
+            Game curGame = gameDAO.findById(curGameID);
+
+            curGame.setPlayersFinished(curGame.getPlayersFinished() + 1);
+            gameDAO.update_int("players_finished", curGame.getPlayersFinished(), curGame);
+            if(curGame.getPlayersFinished() >= 4){
+                // Do round stuff
+                Player[] playerList = new Player[4];
+                long[] playerIDList = curGame.getPlayers();
+
+                //we get the list of all the players, so it is iterable.
+                for (int i = 0; i < 4; ++i) {
+                    playerList[i] = playerDAO.findById(playerIDList[i]);
+                    playerList[i].redrawHand();
+                    playerDAO.updateHand(playerList[i]);
+                }
+                GamePlay gp = new GamePlay(curGame, playerList);
+
+                gp.showdownResolution(gameDAO, playerDAO);
+                if(curGame.getCurRound() > curGame.getNumRounds()){
+                    // Do end of game stuff
+                    gp.gameEndResolution(gameDAO, playerDAO);
+                }
+            }
             connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -512,6 +535,9 @@ public class PicturePokerGame {
             long gid = playerDAO.getCurrentGame(p);
             game = gameDAO.findById(gid);
             game = gameDAO.removePlayerFromGame(game, p_id);
+            p.resetPerGameInfo();
+            playerDAO.updateAttributes(p);
+            playerDAO.updateHand(p);
             // Clean up once all players leave.
             if(game.getActivePlayers() == 0){
                 game = gameDAO.deleteGame(game.getID());
@@ -534,19 +560,24 @@ public class PicturePokerGame {
 
         try {
             Connection connection = dcm.getConnection();
-            GameDAO gamedao = new GameDAO(connection);
-            PlayerDAO playerdao = new PlayerDAO(connection);
+            GameDAO gameDAO = new GameDAO(connection);
+            PlayerDAO playerDAO = new PlayerDAO(connection);
 
             // pseudo lobby system - just reject starting when the game is not full.
-            game = gamedao.findById(g_id);
+            game = gameDAO.findById(g_id);
             int curPlayers = game.getActivePlayers();
             if (curPlayers < 4) {
                 System.out.println("The game is not full yet! We need " + (4 - curPlayers) + " more players. ");
                 return game;
             }
-
-            GamePlay gamePlay = new GamePlay();
-            game = gamePlay.gameSeq(g_id, gamedao, playerdao);
+            Player[] playerList = new Player[4];
+            long[] playerIDList = game.getPlayers();
+            //we get the list of all the players, so it is iterable.
+            for (int i = 0; i < 4; ++i) {
+                playerList[i] = playerDAO.findById(playerIDList[i]);
+            }
+            GamePlay gamePlay = new GamePlay(game, playerList);
+            game = gamePlay.gameSeq(gameDAO, playerDAO);
             connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -565,12 +596,40 @@ public class PicturePokerGame {
             //Makes a connection, gets a player and the game ID, and tries adding the player to the game.
             Connection connection = dcm.getConnection();
             GameDAO gamedao = new GameDAO(connection);
-            PlayerDAO playerdao = new PlayerDAO(connection);
-            Player player = playerdao.findById(p_id);
+            PlayerDAO playerDAO = new PlayerDAO(connection);
+            Player player = playerDAO.findById(p_id);
+            // Reset player info before joining
+            player.resetPerGameInfo();
+            playerDAO.updateAttributes(player);
+            playerDAO.updateHand(player);
             game = gamedao.findById(g_id);
 
+            int players_before = game.getActivePlayers();
             //stick the player into the game (or at least, it tries)
             game = gamedao.joinGame(game, player);
+            // Once everyone joins, start the game and take away money from players' balances
+            if(game.getActivePlayers() >= 4 && players_before == 3){
+                Player[] playerList = new Player[4];
+                long[] playerIDList = game.getPlayers();
+
+                //we get the list of all the players, so it is iterable.
+                for (int i = 0; i < 4; ++i) {
+                    playerList[i] = playerDAO.findById(playerIDList[i]);
+                }
+                for (Player p : playerList) {
+                    p.resetPerGameInfo();
+                    playerDAO.update_int("tokens", 10, p);
+                    playerDAO.update_int("bet", 1, p);
+                    playerDAO.update_int("rounds_won", 0, p);
+                    playerDAO.update_int("finished_round", 0, p);
+
+                    //drain people's bank accounts and add to pot
+                    p.setDollars(p.getDollars() - game.getBuyIn());
+                    playerDAO.updateAttributes(p);
+                    playerDAO.updateHand(p);
+                    game.setPotQuantity(game.getPotQuantity() + game.getBuyIn());
+                }
+            }
             gamedao.update_all(game);
             connection.close();
         }catch (SQLException e) {

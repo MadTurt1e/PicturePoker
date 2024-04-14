@@ -25,7 +25,7 @@ public class PlayerDAO extends DataAccessObject<Player>{
     private static final String UPDATE_PLAYER_BY_ID_END = " = ? WHERE p_id = ?";
     private static final String GET_ID_BY_NAME = "SELECT p_id FROM player WHERE p_name = ?";
     private static final String GET_CURRENT_GAME = "SELECT g_id FROM player_in_game WHERE p_id = ?";
-    private static final String UPDATE_CARD = "UPDATE player_card SET suit = ? WHERE p_id = ? AND hand_pos = ?";
+    private static final String UPDATE_CARD = "UPDATE player_card SET suit = ?, to_change = ? WHERE p_id = ? AND hand_pos = ?";
     private static final String GET_CARD = "SELECT suit, to_change FROM player_card WHERE p_id = ? AND hand_pos = ?";
     private static final String DELETE_PLAYER = "DELETE FROM player WHERE p_id = ?";
 
@@ -71,6 +71,7 @@ public class PlayerDAO extends DataAccessObject<Player>{
                 player.setBet(rs.getInt("bet"));
                 player.setRoundsWon(rs.getInt("rounds_won"));
                 player.setFinishedRound(rs.getInt("finished_round"));
+                player = getHand(player);
             }
         }
         catch (SQLException e) {
@@ -113,6 +114,8 @@ public class PlayerDAO extends DataAccessObject<Player>{
                 player.setBet(rs.getInt("bet"));
                 player.setRoundsWon(rs.getInt("rounds_won"));
                 player.setFinishedRound(rs.getInt("finished_round"));
+
+                player = getHand(player);
 
                 allPlayers.add(player);
             }
@@ -306,8 +309,9 @@ public class PlayerDAO extends DataAccessObject<Player>{
         for(int i = 0; i < 5; i++){
             try(PreparedStatement statement = this.connection.prepareStatement(UPDATE_CARD)){
                 statement.setString(1, dto.getHand()[i].toString());
-                statement.setLong(2, dto.getID());
-                statement.setInt(3, i);
+                statement.setBoolean(2, dto.getHand()[i].getToChange());
+                statement.setLong(3, dto.getID());
+                statement.setInt(4, i);
                 statement.execute();
             }
             catch (SQLException e) {

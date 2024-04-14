@@ -75,7 +75,7 @@ function CreateGame(){
                 else if (response2.data === null){
                     gameCreation(roundCount, buyIn, navigate, state);
                 }
-                else if(response2.data.curRound !== response2.data.numRounds) {
+                else if(response2.data.curRound <= response2.data.numRounds) {
                     state = "In a game already. ";
                 }
                 else {

@@ -383,6 +383,8 @@ public class PicturePokerGame {
             }
             System.out.println("Player bet is now :" + player.getBet());
             playerDAO.update_int("bet", player.getBet(), player);
+            System.out.println("Player tokens remaining :" + player.getTokens());
+            playerDAO.update_int("tokens", player.getTokens(), player);
             System.out.println(player);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -443,7 +445,17 @@ public class PicturePokerGame {
             gameDAO.update_int("players_finished", curGame.getPlayersFinished(), curGame);
             if(curGame.getPlayersFinished() >= 4){
                 // Do round stuff
-                GamePlay gp = new GamePlay(curGame);
+                Player[] playerList = new Player[4];
+                long[] playerIDList = curGame.getPlayers();
+
+                //we get the list of all the players, so it is iterable.
+                for (int i = 0; i < 4; ++i) {
+                    playerList[i] = playerDAO.findById(playerIDList[i]);
+                    playerList[i].redrawHand();
+                    playerDAO.updateHand(playerList[i]);
+                }
+                GamePlay gp = new GamePlay(curGame, playerList);
+
                 gp.showdownResolution(gameDAO, playerDAO);
                 if(curGame.getCurRound() > curGame.getNumRounds()){
                     // Do end of game stuff
@@ -533,19 +545,24 @@ public class PicturePokerGame {
 
         try {
             Connection connection = dcm.getConnection();
-            GameDAO gamedao = new GameDAO(connection);
-            PlayerDAO playerdao = new PlayerDAO(connection);
+            GameDAO gameDAO = new GameDAO(connection);
+            PlayerDAO playerDAO = new PlayerDAO(connection);
 
             // pseudo lobby system - just reject starting when the game is not full.
-            game = gamedao.findById(g_id);
+            game = gameDAO.findById(g_id);
             int curPlayers = game.getActivePlayers();
             if (curPlayers < 4) {
                 System.out.println("The game is not full yet! We need " + (4 - curPlayers) + " more players. ");
                 return game;
             }
-
-            GamePlay gamePlay = new GamePlay(game);
-            game = gamePlay.gameSeq(gamedao, playerdao);
+            Player[] playerList = new Player[4];
+            long[] playerIDList = game.getPlayers();
+            //we get the list of all the players, so it is iterable.
+            for (int i = 0; i < 4; ++i) {
+                playerList[i] = playerDAO.findById(playerIDList[i]);
+            }
+            GamePlay gamePlay = new GamePlay(game, playerList);
+            game = gamePlay.gameSeq(gameDAO, playerDAO);
         } catch (SQLException e) {
             e.printStackTrace();
         }

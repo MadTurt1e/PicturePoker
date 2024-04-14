@@ -6,7 +6,7 @@ public class GamePlay {
 
     //Relevant variables - current game, and the list of players
     private Game curGame;
-    private final Player[] playerList = new Player[4];
+    private Player[] playerList;
 
     public enum PokerHand {
         HIGH_CARD("High Card"),
@@ -24,11 +24,12 @@ public class GamePlay {
     }
 
     // Constructor since we are using this multiple times within the API calls
-    public GamePlay(Game game){
+    public GamePlay(Game game, Player[] playerList){
         this.curGame = game;
+        this.playerList = playerList;
     }
 
-    private Player executeRoundFromTerminal(Player player) {
+    private Player executeRoundFromTerminal(Player player, GameDAO gameDAO, PlayerDAO playerDAO) {
         System.out.println("\n" + player.getPlayerName() + "'s Turn! ");
         System.out.println(player.getPlayerName() + " has " + player.getTokens() + " tokens!");
 
@@ -41,14 +42,6 @@ public class GamePlay {
 
         //update the hand of the player
         player.setHand(hand);
-
-        // This basically shuffles every card in the hand.
-        for (Card value : hand) {
-            value.redrawSuit();
-        }
-
-        player.setHand(hand);
-
 
         // Prints out the card outputs
         System.out.println(player.getPlayerName() + "'s cards: ");
@@ -94,6 +87,8 @@ public class GamePlay {
         }
         player.setBet(betCount);
         player.setTokens(player.getTokens() - betCount);
+        playerDAO.update_int("tokens", player.getTokens(), player);
+        playerDAO.update_int("bet", player.getBet(), player);
 
         // Step 3: Change out the cards which were selected for changing
         System.out.println("Which cards would you like to change out? ");
@@ -111,14 +106,9 @@ public class GamePlay {
             }
         }
 
-        //we change after choosing just in case the player wants to undo choices.
-        // We don't actually give the player any options, but it is something that can be done.
-        for (Card card : hand) {
-            if (card.getToChange()){
-                card.redrawSuit();
-                player.setCardsChanged(player.getCardsChanged() + 1);
-            }
-        }
+        // We change out desired cards.
+        player.redrawHand();
+        playerDAO.updateHand(player);
 
         // Step 4: Let the player cry at their new cards.
         System.out.println("Here are your new cards!");
@@ -126,9 +116,8 @@ public class GamePlay {
 
         // return the player with the newfangled hand.
         for (int i = 0; i < hand.length; ++i) {
-            System.out.println("Card " + i + ": " + hand[i]);
+            System.out.println("Card " + i + ": " + player.getHand()[i]);
         }
-        player.setHand(hand);
 
         return player;
     }
@@ -445,16 +434,15 @@ public class GamePlay {
         }
     }
 
-    public void gameStartResolution(GameDAO gameDAO, PlayerDAO playerDAO){
-
-    }
-
     public void showdownResolution(GameDAO gameDAO, PlayerDAO playerDAO){
         // this is where we'd execute Luigi's turn.
         executeLuigi();
         gameDAO.updateHand(curGame);
 
         System.out.println("Showdown time!");
+
+        // We want to track the players that ran out of tokens so we can just skip their turns
+        int playersBankrupted = 0;
 
         //Now we run a function which pays out tokens compared to Luigi
         for (Player player : playerList) {
@@ -470,14 +458,18 @@ public class GamePlay {
             System.out.println(player.getPlayerName() + " now has " + player.getTokens() + " tokens. ");
             playerDAO.update_long("tokens", player.getTokens(), player);
             playerDAO.update_int("rounds_won", player.getRoundsWon(), player);
-            player.setFinishedRound(0);
-            playerDAO.update_int("finished_round", 0, player);
+            // Handle bankruptcy logic here
+            playersBankrupted += player.getTokens() > 0 ? 1 : 0;
+            player.setFinishedRound(player.getTokens() > 0 ? 0 : 1);
+            playerDAO.update_int("finished_round", player.getFinishedRound(), player);
+            player.setBet(player.getTokens() > 0 ? 1 : 0);
+            playerDAO.update_int("bet", player.getBet(), player);
             playerDAO.updateAttributes(player);
         }
 
         //we should increment the current round and keep on going.
         curGame.setCurRound(curGame.getCurRound() + 1);
-        curGame.setPlayersFinished(0);
+        curGame.setPlayersFinished(playersBankrupted);
         //update the game at this point to the database.
         gameDAO.update_all(curGame);
     }
@@ -569,14 +561,9 @@ public class GamePlay {
             //we execute everyone's turns now
             curPlayerNum = 0;
             for (Player i : playerArrayList) {
-                i.setFinishedRound(0);
-                playerdao.update_int("finished_round", 0, i);
-                playerList[curPlayerNum++] = executeRoundFromTerminal(i);
+                playerList[curPlayerNum++] = executeRoundFromTerminal(i, gamedao, playerdao);
                 i.setFinishedRound(1);
                 playerdao.update_int("finished_round", 1, i);
-                playerdao.updateHand(i);
-                playerdao.update_int("tokens", i.getTokens(), i);
-                playerdao.update_int("bet", i.getBet(), i);
                 curGame.setPlayersFinished(curGame.getPlayersFinished() + 1);
                 gamedao.update_int("players_finished", curGame.getPlayersFinished(), curGame);
             }

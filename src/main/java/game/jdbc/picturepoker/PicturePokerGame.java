@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.Map;
 import java.util.ArrayList;
 
@@ -177,6 +178,41 @@ public class PicturePokerGame {
             game.setPlayers(gamedao.getPIDsByGame(game));
             System.out.println(game);
             connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return game;
+    }
+
+    //READ Operation - Read a game's full details
+    @GetMapping("/getGameEndDetails/{g_id}")
+    public Game getGameEndDetails(@PathVariable("g_id") long g_id) {
+        System.out.println(g_id);
+        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,
+                "picturepoker", "postgres", "password");
+        Game game = new Game();
+        try {
+            Connection connection = dcm.getConnection();
+            GameDAO gamedao = new GameDAO(connection);
+            PlayerDAO playerDAO = new PlayerDAO(connection);
+            game = gamedao.findById(g_id);
+            if(game.getCurRound() <= game.getNumRounds()){
+                // Game is not yet complete, do not calculate anything
+                return null;
+            }
+            // Sort array of player IDs
+            long[] pidsInGame = gamedao.getPIDsByGame(game);
+            ArrayList<Player> playersInGame = new ArrayList<Player>();
+            for(int i = 0; i < 4; i++){
+                playersInGame.add(playerDAO.findById(pidsInGame[i]));
+            }
+            Collections.sort(playersInGame);
+            for(int i = 0; i < 4; i++){
+                pidsInGame[i] = playersInGame.get(i).getID();
+            }
+            game.setPlayers(pidsInGame);
+
+            System.out.println(game);
         } catch (SQLException e) {
             e.printStackTrace();
         }

@@ -14,16 +14,9 @@
 }
 
 .bordering {
-    -webkit-text-stroke-width: 6px;
+    -webkit-text-stroke-width: 0.2vh;
     -webkit-text-stroke-color: black;
 }
-
-.bordering span span { color: tomato; }
-.bordering span span:nth-child(2n) { color: lightseagreen; }
-.bordering span span:nth-child(3n) { color: orange; }
-.bordering span span:nth-child(4n) { color: dodgerblue; }
-.bordering span span:nth-child(5n) { color: blueviolet; }
-
 .modal-title {
     font-family: MarioFont, serif;
 }

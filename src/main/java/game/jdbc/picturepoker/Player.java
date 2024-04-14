@@ -273,6 +273,7 @@ public class Player implements DataTransferObject, Comparable<Player> {
         tokens = 10;
         bet = 1;
         roundsWon = 0;
+        finishedRound = 0;
         // Reset player hands
         for(int i = 0; i < 5; i++){
             hand[i].setToChange(true);

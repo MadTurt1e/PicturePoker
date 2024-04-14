@@ -6,8 +6,8 @@ import java.sql.*;
 import java.util.ArrayList;
 
 public class GameDAO extends DataAccessObject<Game> {
-    private static final String GET_GAME_BY_GID = "SELECT g_id, cur_round, num_rounds, active_players, buy_in, pot_quantity, difficulty FROM game WHERE g_id = ?";
-    private static final String GET_ALL_GAMES = "SELECT g_id, cur_round, num_rounds, active_players, buy_in, pot_quantity, difficulty FROM game";
+    private static final String GET_GAME_BY_GID = "SELECT g_id, cur_round, num_rounds, active_players, buy_in, pot_quantity, difficulty, players_finished FROM game WHERE g_id = ?";
+    private static final String GET_ALL_GAMES = "SELECT g_id, cur_round, num_rounds, active_players, buy_in, pot_quantity, difficulty, players_finished FROM game";
 
     private static final String GET_PIDS_BY_GID = "SELECT p_id FROM player_in_game WHERE g_id = ?";
     private static final String GET_GID_BY_PID = "SELECT g_id FROM player_in_game WHERE p_id = ?";
@@ -17,7 +17,8 @@ public class GameDAO extends DataAccessObject<Game> {
     private static final String UPDATE_GAME_BY_ID_START = "UPDATE game SET ";
     private static final String UPDATE_GAME_BY_ID_END = " = ? WHERE g_id = ?";
     private static final String MASS_UPDATE_GAME_BY_ID =
-            "UPDATE game SET cur_round = ?, num_rounds = ?, active_players = ?, buy_in = ?, pot_quantity = ?, difficulty = ? WHERE g_id = ?";
+            "UPDATE game SET cur_round = ?, num_rounds = ?, active_players = ?, buy_in = ?, pot_quantity = ?,"+
+                    " difficulty = ?, players_finished = ? WHERE g_id = ?";
     private static final String UPDATE_CARD = "UPDATE dealer_card SET suit = ? WHERE g_id = ? AND hand_pos = ?";
     //insert player
     private static final String ADD_PLAYER_TO_GAME = "INSERT INTO player_in_game (p_id, g_id) VALUES (?, ?)";
@@ -44,6 +45,7 @@ public class GameDAO extends DataAccessObject<Game> {
                 game.setBuyIn(rs.getInt("buy_in"));
                 game.setPotQuantity(rs.getInt("pot_quantity"));
                 game.setDifficulty(rs.getInt("difficulty"));
+                game.setPlayersFinished(rs.getInt("players_finished"));
                 game.setPlayers(getPIDsByGame(game));
             }
         } catch (SQLException e) {
@@ -66,6 +68,7 @@ public class GameDAO extends DataAccessObject<Game> {
                 game.setBuyIn(rs.getInt("active_players"));
                 game.setPotQuantity(rs.getInt("pot_quantity"));
                 game.setDifficulty(rs.getInt("difficulty"));
+                game.setPlayersFinished(rs.getInt("players_finished"));
                 game.setPlayers(getPIDsByGame(game));
 
                 allGames.add(game);
@@ -215,7 +218,6 @@ public class GameDAO extends DataAccessObject<Game> {
         }
     }
 
-    // This is the second time I had to program this. Richard, please don't go around reverting my changes willy-nilly.
     public Game update_all(Game dto) {
         try (PreparedStatement statement = this.connection.prepareStatement(MASS_UPDATE_GAME_BY_ID)) {
             statement.setInt(1, dto.getCurRound());
@@ -224,7 +226,8 @@ public class GameDAO extends DataAccessObject<Game> {
             statement.setInt(4, dto.getBuyIn());
             statement.setInt(5, dto.getPotQuantity());
             statement.setInt(6, dto.getDifficulty());
-            statement.setLong(7, dto.getID());
+            statement.setInt(7, dto.getPlayersFinished());
+            statement.setLong(8, dto.getID());
             statement.execute();
             return dto;
         } catch (SQLException e) {

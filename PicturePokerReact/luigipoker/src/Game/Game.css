@@ -1,0 +1,88 @@
+.cards {
+    display: flex;
+    justify-content: space-around;
+    position: absolute;
+    width: 50%;
+    left: 25%;
+}
+
+.card {
+    width: 10%;
+    transition: all 0.3s ease;
+}
+
+.card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.card:hover,
+.raised {
+    transform: translateY(-50%);
+}
+
+.dealercard {
+    width: 10%;
+    transition: all 0.3s ease;
+}
+
+.dealercard img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.dealercard:hover,
+.dealerraised {
+    transform: translateY(50%);
+}
+
+.bet {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    position: absolute;
+    left: 28%;
+    bottom: 30%;
+    height: auto;
+}
+.endTurnButton{
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    position: absolute;
+    right: 27.5%;
+    bottom: 30%;
+    height: auto;
+}
+
+.token{
+    width: 3vw;
+    position: relative;
+    margin-right: 5px;
+}
+.miniToken{
+    height: 2vh;
+    position: relative;
+    margin-right: 5px;
+}
+.luigi{
+    width: 10vw;
+    left: 3%;
+}
+.tokenCount{
+    font-size: 7vh;
+    position: absolute;
+    left:28%;
+    bottom: 40%;
+
+}
+
+.crispImages{
+    pixelperfect: true;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-crisp-edges;
+    image-rendering: pixelated;
+    -ms-interpolation-mode: nearest-neighbor;
+}

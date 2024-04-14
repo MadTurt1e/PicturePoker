@@ -30,7 +30,8 @@ const Login = () => {
                 //TODO: Implement a more rigourous check for the password info
                 if(data.id !== 0 && data.passcode === loginPassword){
                     // User login info is saved as loggedInUser for future use
-                    const loggedInUser = data;
+                    sessionStorage.setItem('userID', data.id);
+                    sessionStorage.setItem('username', data.playerName);
                     navigate("/menu");
                 } else if (data.id === 0){
                     setError("Username not found")
@@ -61,6 +62,10 @@ const Login = () => {
             if (response.status === 200) {
                 const newUser = response.data;
                 console.log("Successfully created account for", newUser);
+
+                sessionStorage.setItem('userID', response.data.id);
+                sessionStorage.setItem('username', response.data.playerName);
+
                 // User login info is saved as newUser for future use
                 navigate("/menu");
             } else {

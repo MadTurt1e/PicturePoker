@@ -53,6 +53,7 @@ public class PicturePokerGame {
             player.setPasscode(inputMap.get("password"));
             player = playerdao.create(player);
             player = playerdao.createHand(player); // Initialize player hand on creation
+            connection.close();
             System.out.println(player);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -84,7 +85,7 @@ public class PicturePokerGame {
             game = gamedao.create(game);
             game = gamedao.createHand(game);
             // once all the necessary values are created, we can make the game.
-
+            connection.close();
             System.out.println(game);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -107,6 +108,7 @@ public class PicturePokerGame {
             player = playerDAO.findByName(playerName);
             player = playerDAO.getHand(player);
             System.out.println(player);
+            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -128,6 +130,7 @@ public class PicturePokerGame {
             player = playerDAO.findById(p_id);
             player = playerDAO.getHand(player);
             System.out.println(player);
+            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -152,6 +155,7 @@ public class PicturePokerGame {
             }
             game = gameDAO.findById(gid);
             System.out.println(game);
+            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -172,8 +176,8 @@ public class PicturePokerGame {
             game = gamedao.findById(g_id);
             //we need a separate function to get pids because the database is structured poorly
             game.setPlayers(gamedao.getPIDsByGame(game));
-
             System.out.println(game);
+            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -237,6 +241,7 @@ public class PicturePokerGame {
                 System.out.println(p);
             }
             System.out.println(game);
+            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -258,6 +263,7 @@ public class PicturePokerGame {
                 p = playerDAO.getHand(p);
                 System.out.println(p);
             }
+            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -277,6 +283,7 @@ public class PicturePokerGame {
             for (Game g : allGames) {
                 System.out.println(g);
             }
+            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -322,7 +329,7 @@ public class PicturePokerGame {
             //update everything
             playerdao.updateAttributes(updatedPlayer);
             System.out.println(updatedPlayer);
-
+            connection.close();
             return updatedPlayer;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -358,6 +365,7 @@ public class PicturePokerGame {
             // and update it in the database.
             updatedGame = gamedao.update_all(updatedGame);
             System.out.println(updatedGame);
+            connection.close();
             return updatedGame;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -388,6 +396,7 @@ public class PicturePokerGame {
             System.out.println("Player bet is now :" + player.getBet());
             playerDAO.update_int("bet", player.getBet(), player);
             System.out.println(player);
+            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -417,6 +426,7 @@ public class PicturePokerGame {
             hand[pos].setToChange(!hand[pos].getToChange());
             playerDAO.updateHand(player);
             System.out.println(player);
+            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -440,6 +450,7 @@ public class PicturePokerGame {
             }
             player.setFinishedRound(1);
             playerDAO.update_int("finished_round", 1, player);
+            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -459,6 +470,7 @@ public class PicturePokerGame {
             player = playerDAO.deletePlayer(p_id);
 
             System.out.println(player);
+            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -478,6 +490,7 @@ public class PicturePokerGame {
             game = gamedao.deleteGame(g_id);
 
             System.out.println(game);
+            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -504,6 +517,7 @@ public class PicturePokerGame {
                 game = gameDAO.deleteGame(game.getID());
             }
             System.out.println(game);
+            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -533,6 +547,7 @@ public class PicturePokerGame {
 
             GamePlay gamePlay = new GamePlay();
             game = gamePlay.gameSeq(g_id, gamedao, playerdao);
+            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -557,6 +572,7 @@ public class PicturePokerGame {
             //stick the player into the game (or at least, it tries)
             game = gamedao.joinGame(game, player);
             gamedao.update_all(game);
+            connection.close();
         }catch (SQLException e) {
             e.printStackTrace();
         }

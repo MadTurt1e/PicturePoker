@@ -448,6 +448,12 @@ public class PicturePokerGame {
 
             curGame.setPlayersFinished(curGame.getPlayersFinished() + 1);
             gameDAO.update_int("players_finished", curGame.getPlayersFinished(), curGame);
+            if(curGame.getPlayersFinished() >= 4){
+                // Do round stuff
+                if(curGame.getCurRound() > curGame.getNumRounds()){
+                    // Do end of game stuff
+                }
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }

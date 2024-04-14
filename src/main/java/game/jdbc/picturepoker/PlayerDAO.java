@@ -71,6 +71,7 @@ public class PlayerDAO extends DataAccessObject<Player>{
                 player.setBet(rs.getInt("bet"));
                 player.setRoundsWon(rs.getInt("rounds_won"));
                 player.setFinishedRound(rs.getInt("finished_round"));
+                player = getHand(player);
             }
         }
         catch (SQLException e) {
@@ -113,6 +114,8 @@ public class PlayerDAO extends DataAccessObject<Player>{
                 player.setBet(rs.getInt("bet"));
                 player.setRoundsWon(rs.getInt("rounds_won"));
                 player.setFinishedRound(rs.getInt("finished_round"));
+
+                player = getHand(player);
 
                 allPlayers.add(player);
             }

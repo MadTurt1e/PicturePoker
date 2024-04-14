@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class GameDAO extends DataAccessObject<Game> {
     private static final String GET_GAME_BY_GID = "SELECT g_id, cur_round, num_rounds, active_players, buy_in, pot_quantity, difficulty, players_finished FROM game WHERE g_id = ?";
     private static final String GET_ALL_GAMES = "SELECT g_id, cur_round, num_rounds, active_players, buy_in, pot_quantity, difficulty, players_finished FROM game";
-    private static final String GET_CARD = "SELECT suit, to_change FROM dealer_card WHERE p_id = ? AND hand_pos = ?";
+    private static final String GET_CARD = "SELECT suit, to_change FROM dealer_card WHERE g_id = ? AND hand_pos = ?";
     private static final String GET_PIDS_BY_GID = "SELECT p_id FROM player_in_game WHERE g_id = ?";
     private static final String GET_GID_BY_PID = "SELECT g_id FROM player_in_game WHERE p_id = ?";
     private static final String CREATE_NEW_GAME = "INSERT INTO game (num_rounds, active_players, buy_in, pot_quantity, difficulty) VALUES (?, ?, ?, ?, ?) RETURNING g_id";
@@ -47,6 +47,7 @@ public class GameDAO extends DataAccessObject<Game> {
                 game.setDifficulty(rs.getInt("difficulty"));
                 game.setPlayersFinished(rs.getInt("players_finished"));
                 game.setPlayers(getPIDsByGame(game));
+                game = getHand(game);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -70,6 +71,7 @@ public class GameDAO extends DataAccessObject<Game> {
                 game.setDifficulty(rs.getInt("difficulty"));
                 game.setPlayersFinished(rs.getInt("players_finished"));
                 game.setPlayers(getPIDsByGame(game));
+                game = getHand(game);
 
                 allGames.add(game);
             }

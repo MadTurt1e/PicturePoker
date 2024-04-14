@@ -172,7 +172,7 @@ public class PicturePokerGame {
             game = gamedao.findById(g_id);
             //we need a separate function to get pids because the database is structured poorly
             game.setPlayers(gamedao.getPIDsByGame(game));
-
+            game = gamedao.getHand(game);
             System.out.println(game);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -272,9 +272,9 @@ public class PicturePokerGame {
         try {
             Connection connection = dcm.getConnection();
             GameDAO gameDAO = new GameDAO(connection);
-            //we need a separate function to get pids because the database is structured poorly
             allGames = gameDAO.findAllGames();
             for (Game g : allGames) {
+                g = gameDAO.getHand(g);
                 System.out.println(g);
             }
         } catch (SQLException e) {
@@ -354,6 +354,7 @@ public class PicturePokerGame {
             updatedGame.setBuyIn(Integer.parseInt(inputMap.get("buy_in")));
             updatedGame.setPotQuantity(Integer.parseInt(inputMap.get("pot_quant")));
             updatedGame.setDifficulty(Integer.parseInt(inputMap.get("difficulty")));
+            updatedGame.setPlayersFinished(Integer.parseInt(inputMap.get("players_finished")));
 
             // and update it in the database.
             updatedGame = gamedao.update_all(updatedGame);
@@ -431,15 +432,22 @@ public class PicturePokerGame {
         try {
             Connection connection = dcm.getConnection();
             PlayerDAO playerDAO = new PlayerDAO(connection);
+            GameDAO gameDAO = new GameDAO(connection);
 
             player = playerDAO.findById(p_id);
             player = playerDAO.getHand(player);
             if(player.getFinishedRound() > 0){
-                System.out.println("Could not finish round: It is not your turn.");
+                System.out.println("Could not finish round: You have already finished the current round.");
                 return player;
             }
             player.setFinishedRound(1);
             playerDAO.update_int("finished_round", 1, player);
+
+            long curGameID = playerDAO.getCurrentGame(player);
+            Game curGame = gameDAO.findById(curGameID);
+
+            curGame.setPlayersFinished(curGame.getPlayersFinished() + 1);
+            gameDAO.update_int("players_finished", curGame.getPlayersFinished(), curGame);
         } catch (SQLException e) {
             e.printStackTrace();
         }

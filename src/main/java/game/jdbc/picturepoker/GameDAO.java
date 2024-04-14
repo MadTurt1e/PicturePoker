@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class GameDAO extends DataAccessObject<Game> {
     private static final String GET_GAME_BY_GID = "SELECT g_id, cur_round, num_rounds, active_players, buy_in, pot_quantity, difficulty, players_finished FROM game WHERE g_id = ?";
     private static final String GET_ALL_GAMES = "SELECT g_id, cur_round, num_rounds, active_players, buy_in, pot_quantity, difficulty, players_finished FROM game";
-
+    private static final String GET_CARD = "SELECT suit, to_change FROM dealer_card WHERE p_id = ? AND hand_pos = ?";
     private static final String GET_PIDS_BY_GID = "SELECT p_id FROM player_in_game WHERE g_id = ?";
     private static final String GET_GID_BY_PID = "SELECT g_id FROM player_in_game WHERE p_id = ?";
     private static final String CREATE_NEW_GAME = "INSERT INTO game (num_rounds, active_players, buy_in, pot_quantity, difficulty) VALUES (?, ?, ?, ?, ?) RETURNING g_id";
@@ -95,6 +95,27 @@ public class GameDAO extends DataAccessObject<Game> {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+    }
+
+    public Game getHand(Game dto){
+        Card[] result = new Card[5];
+        for(int i = 0; i < 5; i++){
+            try(PreparedStatement statement = this.connection.prepareStatement(GET_CARD)){
+                statement.setLong(1, dto.getID());
+                statement.setInt(2, i);
+                ResultSet rs = statement.executeQuery();
+                while(rs.next()){
+                    result[i] = new Card(Card.Suit.valueOf(rs.getString("suit")));
+                    result[i].setToChange(rs.getBoolean("to_change"));
+                }
+            }
+            catch (SQLException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+        }
+        dto.setHand(result);
+        return dto;
     }
 
     @Override

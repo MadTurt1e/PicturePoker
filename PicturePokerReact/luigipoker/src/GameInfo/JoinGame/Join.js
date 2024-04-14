@@ -82,7 +82,6 @@ function JoinGame() {
     }
 
     const isUserInGame = (players) => {
-        console.log(players);
         const userId = sessionStorage.getItem('userID');
         return players.includes(parseInt(userId));
     }

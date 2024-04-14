@@ -41,7 +41,6 @@ function PlayerList() {
             navigate(`/Game`, { state: { gameId: gid } });
         }
 
-
         // Cleanup interval on unmount
         return () => clearInterval(interval);
 
@@ -73,12 +72,13 @@ function WaitingRoom(){
             });
         if (response.status === 200){
             //if we actually leave, go to the menu
-            let response = await axios.get(`http://localhost:8080/getPlayerActiveGame/${sessionStorage.getItem('userID')}`)
+            let response2 = await axios.get(`http://localhost:8080/getPlayerActiveGame/${sessionStorage.getItem('userID')}`)
                 .catch(function(error){
                     console.log("GetPlayerActiveGame didn\'t work. ");
                 });
-            if (response.data === null)
-                navigate("/menu");
+            console.log(response2.data);
+            if (response2.data === "" || response2.data.players.includes(parseInt(sessionStorage.getItem("userID"))))
+                navigate('/menu');
         }
         setMessage("You can never leave. ")
     }
@@ -97,9 +97,9 @@ function WaitingRoom(){
             <PlayerList/>
             <br/>
 
-            {/*<button className="escapeGame bordering glow" style={{fontSize:"3vh"}}onClick={() => exitGame()}>*/}
-            {/*    <ColorfulText text={"Leave Game?  "}/>*/}
-            {/*</button>*/}
+            <button className="escapeGame bordering glow" style={{fontSize:"3vh"}}onClick={() => exitGame()}>
+                <ColorfulText text={"Leave Game?  "}/>
+            </button>
 
             <div style={{position: "absolute", right: "5%", bottom: "5%", fontSize: "5vh"}} className={ "bordering"}>
                 <ColorfulText text={"Player: " + sessionStorage.getItem('username')}/>

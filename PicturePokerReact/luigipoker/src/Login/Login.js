@@ -62,6 +62,10 @@ const Login = () => {
             if (response.status === 200) {
                 const newUser = response.data;
                 console.log("Successfully created account for", newUser);
+
+                sessionStorage.setItem('userID', response.data.id);
+                sessionStorage.setItem('username', response.data.playerName);
+
                 // User login info is saved as newUser for future use
                 navigate("/menu");
             } else {

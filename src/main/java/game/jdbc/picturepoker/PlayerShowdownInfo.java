@@ -6,7 +6,7 @@ public class PlayerShowdownInfo{
     private long pID;
     private Card[] hand;
     private String handType;
-    private int winLossAmount;
+    private int winLossAmount; // Should be positive if player won, negative if player lost, and zero if player was broke.
     private int newTokens;
 
     public PlayerShowdownInfo(Player p){

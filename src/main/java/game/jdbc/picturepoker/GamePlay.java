@@ -465,7 +465,7 @@ public class GamePlay {
                 }
                 pSD.setWinLossAmount(-player.getBet());
             }
-            pSD.setHandType(scoreToHand(playerScore(player.getHand())).toString());
+            pSD.setHandType(scoreToHand(playerScore(player.getHand())).getHandName());
             player.setTokens(player.getTokens() + coinsWon);
 
             System.out.println(player.getPlayerName() + " now has " + player.getTokens() + " tokens. ");

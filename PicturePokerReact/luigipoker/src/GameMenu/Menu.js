@@ -47,17 +47,17 @@ const ImageComponent = () => {
             height: '100vh',
             width: '100vw'
         }}>
-            <img src={logo} alt="" style={{width: '70%', marginBottom: '10px'}}/>
-            <Link to="/createGame" className="glow">
+            <img src={logo} alt="" className="game-logo"/>
+            <Link to="/createGame" className="glow button">
                 <img src={create} alt="" style={{height: '5vh', marginBottom: '10px'}}/>
             </Link>
-            <Link to="/joinGame" className="glow">
+            <Link to="/joinGame" className="glow button">
                 <img src={join} alt="" style={{height: '5vh', marginBottom: '10px'}}/>
             </Link>
-            <Link to="/statistics" className="glow">
+            <Link to="/statistics" className="glow button">
                 <img src={statistics} alt="" style={{height: '5vh', marginBottom: '10px'}}/>
             </Link>
-            <Link to="/" className="glow">
+            <Link to="/" className="glow button">
                 <img src={exit} alt="" style={{height: '5vh', marginBottom: '10px'}}/>
             </Link>
             ))

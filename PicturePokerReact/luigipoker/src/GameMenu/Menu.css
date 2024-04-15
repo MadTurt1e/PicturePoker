@@ -21,3 +21,20 @@
     background: transparent;
     box-shadow: 0 0 100px greenyellow;
 }
+
+.game-logo {
+    width: 70%;
+    margin-bottom: 10px;
+    align-self: center;
+}
+
+.button {
+    margin: 10px;
+    padding: 10px;
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 20px;
+}

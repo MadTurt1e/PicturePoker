@@ -13,6 +13,8 @@ import java.util.ArrayList;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import javax.swing.plaf.metal.MetalBorders;
+
 // @RequestMapping("/api") We will shift most of the functionality here to be hidden under /api
 @SpringBootApplication
 @CrossOrigin // This is for the front end to be able to access the backend
@@ -443,6 +445,7 @@ public class PicturePokerGame {
 
             curGame.setPlayersFinished(curGame.getPlayersFinished() + 1);
             gameDAO.update_int("players_finished", curGame.getPlayersFinished(), curGame);
+            /*
             if(curGame.getPlayersFinished() >= 4){
                 // Do round stuff
                 Player[] playerList = new Player[4];
@@ -462,10 +465,43 @@ public class PicturePokerGame {
                     gp.gameEndResolution(gameDAO, playerDAO);
                 }
             }
+            */
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return player;
+    }
+
+    @GetMapping("/getEndOfRoundInformation/{g_id}")
+    public ArrayList<PlayerShowdownInfo> getEndOfRoundInformation(@PathVariable long g_id){
+        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,
+                "picturepoker", "postgres", "password");
+        ArrayList<PlayerShowdownInfo> pSDInfo = new ArrayList<PlayerShowdownInfo>();
+        Game game = new Game();
+        try {
+            Connection connection = dcm.getConnection();
+            PlayerDAO playerDAO = new PlayerDAO(connection);
+            GameDAO gameDAO = new GameDAO(connection);
+            game = gameDAO.findById(g_id);
+            if(game.getPlayersFinished() >= 4){
+                // Do round stuff
+                Player[] playerList = new Player[4];
+                long[] playerIDList = game.getPlayers();
+
+                //we get the list of all the players, so it is iterable.
+                for (int i = 0; i < 4; ++i) {
+                    playerList[i] = playerDAO.findById(playerIDList[i]);
+                    playerList[i].redrawHand();
+                    playerDAO.updateHand(playerList[i]);
+                }
+                GamePlay gp = new GamePlay(game, playerList);
+
+                pSDInfo = gp.showdownResolution(gameDAO, playerDAO);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return pSDInfo;
     }
 
     //DELETE Operation - Delete a player

@@ -434,7 +434,7 @@ public class GamePlay {
         }
     }
 
-    public void showdownResolution(GameDAO gameDAO, PlayerDAO playerDAO){
+    public ArrayList<PlayerShowdownInfo> showdownResolution(GameDAO gameDAO, PlayerDAO playerDAO){
         // this is where we'd execute Luigi's turn.
         executeLuigi();
         gameDAO.updateHand(curGame);
@@ -444,27 +444,42 @@ public class GamePlay {
         // We want to track the players that ran out of tokens so we can just skip their turns
         int playersBankrupted = 0;
 
+        // Begin tracking players' end of round information
+
+        ArrayList<PlayerShowdownInfo> pSDList = new ArrayList<PlayerShowdownInfo>();
+
         //Now we run a function which pays out tokens compared to Luigi
         for (Player player : playerList) {
+            PlayerShowdownInfo pSD = new PlayerShowdownInfo(player);
             int coinsWon = determinePayout(player);
             if(coinsWon > 0){
                 System.out.println(player.getPlayerName() + " won " + coinsWon + " tokens!");
+                pSD.setWinLossAmount(coinsWon);
             }
             else{
-                System.out.println(player.getPlayerName() + " lost " + player.getBet() + " tokens.");
+                if(coinsWon < 0) {
+                    System.out.println(player.getPlayerName() + " lost " + player.getBet() + " tokens.");
+                }
+                else{
+                    System.out.println(player.getPlayerName() + " is bankrupt...");
+                }
+                pSD.setWinLossAmount(-player.getBet());
             }
+            pSD.setHandType(scoreToHand(playerScore(player.getHand())).toString());
             player.setTokens(player.getTokens() + coinsWon);
 
             System.out.println(player.getPlayerName() + " now has " + player.getTokens() + " tokens. ");
+            pSD.setNewTokens(player.getTokens());
             playerDAO.update_long("tokens", player.getTokens(), player);
             playerDAO.update_int("rounds_won", player.getRoundsWon(), player);
             // Handle bankruptcy logic here
-            playersBankrupted += player.getTokens() > 0 ? 1 : 0;
+            playersBankrupted += (player.getTokens() > 0 ? 0 : 1);
             player.setFinishedRound(player.getTokens() > 0 ? 0 : 1);
             playerDAO.update_int("finished_round", player.getFinishedRound(), player);
             player.setBet(player.getTokens() > 0 ? 1 : 0);
             playerDAO.update_int("bet", player.getBet(), player);
             playerDAO.updateAttributes(player);
+            pSDList.add(pSD);
         }
 
         //we should increment the current round and keep on going.
@@ -472,6 +487,8 @@ public class GamePlay {
         curGame.setPlayersFinished(playersBankrupted);
         //update the game at this point to the database.
         gameDAO.update_all(curGame);
+
+        return pSDList;
     }
 
     public void gameEndResolution(GameDAO gameDAO, PlayerDAO playerDAO){

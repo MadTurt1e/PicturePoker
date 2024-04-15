@@ -65,6 +65,10 @@ function JoinGame() {
 
     const joinGame = async(gameId) => {
         try {
+            await axios.delete(`http://localhost:8080/leaveCurrentGame/${sessionStorage.getItem('userID')}`)
+                .catch(function(){
+                console.log("leaveCurrentGame didn't work");
+            });
             let response = await axios.put(`http://localhost:8080/joinGame/${gameId}/${sessionStorage.getItem('userID')}`);
             handleJoinGameResponse(response, gameId);
         } catch (error) {

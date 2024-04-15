@@ -173,13 +173,14 @@ function EndOfRound({gid}){
     const [data, setData] = useState(null);
 
     useEffect(() => {
-        const interval = setInterval(() => {
-            axios.get(`http://localhost:8080/getEndOfRoundInformation/${gid}`)
+        const interval = setInterval(async() => {
+            console.log("End Round?");
+            await axios.get(`http://localhost:8080/getEndOfRoundInformation/${gid}`)
                 .then(response => {
                     setData(response.data);
                 })
                 .catch(error => {
-                    console.error('Error with getEndOfRoundInformation', error);
+                    console.log('Error with getEndOfRoundInformation', error);
                 });
         }, 3000);
 
@@ -230,6 +231,7 @@ function Game() {
         }
     }, []);
 
+
     //do stuff when the bet button is clicked
     const [bet, setBet] = useState(0);
     const [tokens, setTokens] = useState(10);
@@ -261,7 +263,7 @@ function Game() {
     };
 
     useEffect(() => {
-        getPlayerData();
+        setInterval(getPlayerData, 3000);
     }, []);
 
     const finishRound = async (pid) => {

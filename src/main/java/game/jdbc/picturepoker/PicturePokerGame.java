@@ -453,7 +453,11 @@ public class PicturePokerGame {
 
             long curGameID = playerDAO.getCurrentGame(player);
             Game curGame = gameDAO.findById(curGameID);
-
+            if(curGame.getCurRound() > curGame.getNumRounds()) {
+                System.out.println("Could not finish round: Game is already over.");
+            }
+                player.setFinishedRound(1);
+            playerDAO.update_int("finished_round", 1, player);
             curGame.setPlayersFinished(curGame.getPlayersFinished() + 1);
             gameDAO.update_int("players_finished", curGame.getPlayersFinished(), curGame);
             /*
@@ -495,7 +499,7 @@ public class PicturePokerGame {
             PlayerDAO playerDAO = new PlayerDAO(connection);
             GameDAO gameDAO = new GameDAO(connection);
             game = gameDAO.findById(g_id);
-            if(game.getPlayersFinished() >= 4){
+            if(game.getCurRound() <= game.getNumRounds() && game.getPlayersFinished() >= 4){
                 // Do round stuff
                 Player[] playerList = new Player[4];
                 long[] playerIDList = game.getPlayers();

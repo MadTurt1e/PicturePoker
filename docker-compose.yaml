@@ -24,3 +24,9 @@ services:
     tty: true
     depends_on:
       - db
+  ui:
+    build: PicturePokerReact/luigipoker/
+    ports:
+      - 3000:3000
+    depends_on:
+      - app

@@ -32,17 +32,32 @@ function PlayerList({gid}) {
     const [pBet, setPBet] = useState([]);
     const [pWaiting, setPWaiting] = useState([]);
     const location = useLocation();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const loadGame = async () => {
             const response = await axios.get(`http://localhost:8080/getByGameID/` + gid)
-                .catch(function(){
+                .catch(function () {
                     console.log("GetbyGameID didn't work. " + gid);
                 });
             setPlayers(response.data.players);
+            
+            if (response.data.curRound > response.data.numRounds) {
+                navigate("/gameEnd", { state: { gameId: gid } })
+            }
         }
+
+        //if we are in the round end, jump to the end screen
+
+        // Call loadGame immediately and then every X milliseconds
         loadGame();
-    }, [gid]); // Remove players from the dependency array
+        const intervalId = setInterval(loadGame, 5000); // 5000 ms = 5 seconds
+        //TODO: Intervals are bad, but we use them a lot. Ideally we don't use them a lot.
+
+        // Clear interval on unmount
+        return () => clearInterval(intervalId);
+    }, [gid]);
+
 
     useEffect(() => {
         if(players) {
@@ -122,25 +137,73 @@ function RoundCount({gid}) {
     )
 }
 
-function WaitingOnTurn(){
-    let waitingOnTurn = false;
+function WaitingOnTurn(turnEnd) {
+    const [finished, setFinished] = useState(0); // Use state to track 'finished'
+
     useEffect(() => {
-        async function getPlayerNames(){
+        async function getPlayerNames() {
             let response = await axios.get(`http://localhost:8080/getByPlayerID/${sessionStorage.getItem("userID")}`)
-                .catch(function(error){
+                .catch(function (error) {
                     console.log('getByPlayerID didn\'t work. ');
                 });
-            if (response.status === 200 && response.data.finishedRound === 1){
-                waitingOnTurn = true;
+            if (response.status === 200 && response.data.finishedRound === 1) {
+                setFinished(1); // Update 'finished' state here
             }
         }
-    }, []);
-    return (
-        <div style = {{fontSize: "2vh"}} className={"bordering"}>
-            <ColorfulText text={"Waiting for round to finish.  "}/>
-        </div>
-    )
+        getPlayerNames();
+    }, [turnEnd]);
+
+    // Conditionally render based on 'finished'
+    if (finished === 1) {
+        return (
+            <div style={{ fontSize: "2vh" }} className={"bordering"}>
+                <ColorfulText text={"Waiting for round to finish.  "} />
+            </div>
+        );
+    } else {
+        return (
+            <div style={{ fontSize: "2vh" }} className={"bordering"}>
+                <ColorfulText text={"Waiting on YOU to finish! "} />
+            </div>
+        )
+    }
 }
+
+function EndOfRound(){
+    const [gid, setGID] = useState(0);
+    const inGame = async () => {
+        const response = await axios.get(`http://localhost:8080/getPlayerActiveGame/${sessionStorage.getItem("userID")}`)
+            .catch(function () {
+                console.log("getByPlayerID API call did not work");
+            });
+        console.log(response.data);
+        if (response.status === 200) {
+            setGID(response.data.id);
+        }
+    }
+    inGame();
+
+    useEffect(() => {
+        const loadGame = async () => {
+            //TODO: UPDATE THIS TO WORK WITH MULTIPLE PLAYERS
+            const response = await axios.get(`http://localhost:8080/getEndOfRoundInformation/${gid}/${true}`)
+                .catch(function () {
+                    console.log("GetbyGameID didn't work. " + gid);
+                });
+        }
+
+        //if we are in the round end, jump to the end screen
+
+        // Call loadGame immediately and then every X milliseconds
+        loadGame();
+        const intervalId = setInterval(loadGame, 5000); // 5000 ms = 5 seconds
+        //TODO: Intervals are bad, but we use them a lot. Ideally we don't use them a lot.
+
+        // Clear interval on unmount
+        return () => clearInterval(intervalId);
+    }, [gid]);
+}
+
 function Game() {
     const images = [cloud, mushroom, fireflower, luigi, mario, star, normalCard, proCard];
     const [cards, setCards] = useState([6, 6, 6, 6, 6]);
@@ -155,18 +218,19 @@ function Game() {
     const [gid, setGID] = useState(0);
     const location = useLocation();
 
+    const [turnEnd, setTurnEnd] = useState(false);
+
     const pid = sessionStorage.getItem('userID');
+
     useEffect(() => {
-        //failsafe
-        if (location.state !== null){
-            setGID(location.state.gameId);
-        }
-        else {
+        setGID(location.state.gameId);
+        if (gid === 0) {
             const inGame = async () => {
                 const response = await axios.get(`http://localhost:8080/getPlayerActiveGame/${pid}`)
                     .catch(function () {
                         console.log("getByPlayerID API call did not work");
                     });
+                console.log(response.data);
                 if (response.status === 200) {
                     setGID(response.data.id);
                 }
@@ -175,9 +239,10 @@ function Game() {
         }
     }, []);
 
+
     //do stuff when the bet button is clicked
-    let bet = 0;
-    let tokens = 10;
+    const [bet, setBet] = useState(0);
+    const [tokens, setTokens] = useState(10);
 
     const getPlayerData = async () => {
         const response = await axios.get('http://localhost:8080/getByPlayerID/' + pid)
@@ -199,13 +264,16 @@ function Game() {
 
             // Use the mapping to convert card suits to their corresponding values
             const hand = response.data.hand.map(card => cardMapping[card.suit]);
-            tokens = (response.data.tokens);
-            bet = (response.data.bet);
+            setTokens(response.data.tokens);
+            setBet(response.data.bet);
             setCards(hand); // Update cards state here
         }
     };
+
     useEffect(() => {
-        getPlayerData();
+        const interval = setInterval(getPlayerData, 3000);
+
+        return () => clearInterval(interval);
     }, []);
 
     const finishRound = async (pid) => {
@@ -243,8 +311,8 @@ function Game() {
                 .catch(function (error) {
                     console.log("raise API call didn't work. ")
                 });
-            bet = response.data.bet;
-            tokens = response.data.tokens;
+            setBet(response.data.bet);
+            setTokens(response.data.tokens);
             setLuigiState(0);
         }
     };
@@ -252,7 +320,7 @@ function Game() {
     const endTurnProcedure = async() => {
         if (bet !== 0)
         {
-            bet = 0;
+            setBet(0);
 
             finishRound(pid);
 
@@ -286,6 +354,8 @@ function Game() {
                 setDealerCards([7, 7, 7, 7, 7])
             }
         }
+
+        setTurnEnd(true);
     }
 
 
@@ -306,7 +376,8 @@ function Game() {
             </div>
             <PlayerList gid = {gid}/>
             <RoundCount gid = {gid}/>
-            <WaitingOnTurn/>
+            <WaitingOnTurn turn={turnEnd} />
+            <EndOfRound gid = {gid}/>
             <div className="cards" style={{
                 top: '5%'
             }}>

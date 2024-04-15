@@ -454,11 +454,11 @@ public class GamePlay {
                 pSD.setWinLossAmount(coinsWon);
             }
             else{
-                if(coinsWon < 0) {
-                    System.out.println(player.getPlayerName() + " lost " + player.getBet() + " tokens.");
+                if(player.getTokens() == 0) {
+                    System.out.println(player.getPlayerName() + " is bankrupt...");
                 }
                 else{
-                    System.out.println(player.getPlayerName() + " is bankrupt...");
+                    System.out.println(player.getPlayerName() + " lost " + player.getBet() + " tokens.");
                 }
                 pSD.setWinLossAmount(-player.getBet());
             }
@@ -471,13 +471,21 @@ public class GamePlay {
                 playerDAO.update_long("tokens", player.getTokens(), player);
                 playerDAO.update_int("rounds_won", player.getRoundsWon(), player);
             }
+
+            //a new bit to reset the player's hand at the end of each round
+            player.resetHand();
+            if(commitResults)
+                playerDAO.updateHand(player);
+
             // Handle bankruptcy logic here
             playersBankrupted += (player.getTokens() > 0 ? 0 : 1);
             player.setFinishedRound(player.getTokens() > 0 ? 0 : 1);
             player.setBet(player.getTokens() > 0 ? 1 : 0);
+            player.setTokens(player.getTokens() > 0 ? player.getTokens() - 1: 0);
             if (commitResults) {
                 playerDAO.update_int("finished_round", player.getFinishedRound(), player);
                 playerDAO.update_int("bet", player.getBet(), player);
+                playerDAO.update_int("tokens", player.getTokens(), player);
                 playerDAO.updateAttributes(player);
             }
             pSDList.add(pSD);

@@ -15,6 +15,7 @@ import Join from './GameInfo/JoinGame/Join';
 import Statistics from './GameInfo/Statistics';
 import WaitingRoom from './Game/WaitingRoom';
 import Game from './Game/Game';
+import GameEnd from './Game/GameEnd';
 import Login from './Login/Login';
 
 import reportWebVitals from './reportWebVitals';
@@ -48,6 +49,7 @@ root.render(
             <Route path="/statistics" element={<Statistics />} />
             <Route path="/game" element={<Game />} />
             <Route path="/WaitingRoom" element={<WaitingRoom />} />
+            <Route path="/gameEnd" element={<GameEnd />} />
         </Routes>
     </BrowserRouter>,
   <React.StrictMode>

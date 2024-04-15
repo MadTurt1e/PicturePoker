@@ -20,3 +20,6 @@ Database\ SQL/databaseCreation.py
 ```
 
 to get the database built up. 
+
+Note that as seen in the report, we have achieved the mandatory test coverage - 50% of the lines have been covered by tests, which is more than enough for our purposes. 
+![img.png](report.png)

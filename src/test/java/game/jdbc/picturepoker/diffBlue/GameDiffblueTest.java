@@ -18,8 +18,10 @@ class GameDiffblueTest {
      *   <li>{@link Game#setDifficulty(int)}
      *   <li>{@link Game#setHand(Card[])}
      *   <li>{@link Game#setID(long)}
+     *   <li>{@link Game#setLuigiFinished(int)}
      *   <li>{@link Game#setNumRounds(int)}
      *   <li>{@link Game#setPlayers(long[])}
+     *   <li>{@link Game#setPlayersFinished(int)}
      *   <li>{@link Game#setPotQuantity(int)}
      *   <li>{@link Game#setWinner(String)}
      *   <li>{@link Game#toString()}
@@ -29,8 +31,10 @@ class GameDiffblueTest {
      *   <li>{@link Game#getDifficulty()}
      *   <li>{@link Game#getHand()}
      *   <li>{@link Game#getID()}
+     *   <li>{@link Game#getLuigiFinished()}
      *   <li>{@link Game#getNumRounds()}
      *   <li>{@link Game#getPlayers()}
+     *   <li>{@link Game#getPlayersFinished()}
      *   <li>{@link Game#getPotQuantity()}
      *   <li>{@link Game#getWinner()}
      * </ul>
@@ -48,9 +52,11 @@ class GameDiffblueTest {
         Card[] hand = new Card[]{new Card()};
         game.setHand(hand);
         game.setID(1L);
+        game.setLuigiFinished(1);
         game.setNumRounds(10);
         long[] players = new long[]{1L, -1L, 1L, -1L};
         game.setPlayers(players);
+        game.setPlayersFinished(1);
         game.setPotQuantity(1);
         game.setWinner("Winner");
         game.toString();
@@ -60,8 +66,10 @@ class GameDiffblueTest {
         int actualDifficulty = game.getDifficulty();
         Card[] actualHand = game.getHand();
         long actualID = game.getID();
+        int actualLuigiFinished = game.getLuigiFinished();
         int actualNumRounds = game.getNumRounds();
         long[] actualPlayers = game.getPlayers();
+        int actualPlayersFinished = game.getPlayersFinished();
         int actualPotQuantity = game.getPotQuantity();
 
         // Assert that nothing has changed
@@ -70,6 +78,8 @@ class GameDiffblueTest {
         assertEquals(1, actualBuyIn);
         assertEquals(1, actualCurRound);
         assertEquals(1, actualDifficulty);
+        assertEquals(1, actualLuigiFinished);
+        assertEquals(1, actualPlayersFinished);
         assertEquals(1, actualPotQuantity);
         assertEquals(10, actualNumRounds);
         assertEquals(1L, actualID);

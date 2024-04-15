@@ -35,27 +35,7 @@ class PicturePokerGameDiffblueTest {
      * Method under test: {@link PicturePokerGame#createNewPlayer(String)}
      */
     @Test
-    @Disabled("TODO: Complete this test")
     void testCreateNewPlayer() throws JsonProcessingException {
-        // TODO: Diffblue Cover was only able to create a partial test for this method:
-        //   Reason: No inputs found that don't throw a trivial exception.
-        //   Diffblue Cover tried to run the arrange/act section, but the method under
-        //   test threw
-        //   java.lang.IllegalArgumentException: argument "content" is null
-        //       at com.fasterxml.jackson.databind.ObjectMapper._assertNotNull(ObjectMapper.java:4980)
-        //       at com.fasterxml.jackson.databind.ObjectMapper.readValue(ObjectMapper.java:3739)
-        //       at game.jdbc.picturepoker.PicturePokerGame.createNewPlayer(PicturePokerGame.java:43)
-        //   See https://diff.blue/R013 to resolve this issue.
-
-        // Arrange and Act
-        (new PicturePokerGame()).createNewPlayer(null);
-    }
-
-    /**
-     * Method under test: {@link PicturePokerGame#createNewPlayer(String)}
-     */
-    @Test
-    void testCreateNewPlayer2() throws JsonProcessingException {
         // TODO: Diffblue Cover was only able to create a partial test for this method:
         //   Diffblue AI was unable to find a test
 
@@ -72,27 +52,7 @@ class PicturePokerGameDiffblueTest {
      * Method under test: {@link PicturePokerGame#createNewGame(String)}
      */
     @Test
-    @Disabled("TODO: Complete this test")
     void testCreateNewGame() throws JsonProcessingException {
-        // TODO: Diffblue Cover was only able to create a partial test for this method:
-        //   Reason: No inputs found that don't throw a trivial exception.
-        //   Diffblue Cover tried to run the arrange/act section, but the method under
-        //   test threw
-        //   java.lang.IllegalArgumentException: argument "content" is null
-        //       at com.fasterxml.jackson.databind.ObjectMapper._assertNotNull(ObjectMapper.java:4980)
-        //       at com.fasterxml.jackson.databind.ObjectMapper.readValue(ObjectMapper.java:3739)
-        //       at game.jdbc.picturepoker.PicturePokerGame.createNewGame(PicturePokerGame.java:67)
-        //   See https://diff.blue/R013 to resolve this issue.
-
-        // Arrange and Act
-        (new PicturePokerGame()).createNewGame(null);
-    }
-
-    /**
-     * Method under test: {@link PicturePokerGame#createNewGame(String)}
-     */
-    @Test
-    void testCreateNewGame2() throws JsonProcessingException {
         // TODO: Diffblue Cover was only able to create a partial test for this method:
         //   Diffblue AI was unable to find a test
 
@@ -121,8 +81,20 @@ class PicturePokerGameDiffblueTest {
      * Method under test: {@link PicturePokerGame#getByPlayerID(String)}
      */
     @Test
-    @Disabled("TODO: Complete this test")
     void testGetByPlayerID() {
+        // TODO: Diffblue Cover was only able to create a partial test for this method:
+        //   Diffblue AI was unable to find a test
+
+        // Arrange and Act
+        (new PicturePokerGame()).getByPlayerID("42");
+    }
+
+    /**
+     * Method under test: {@link PicturePokerGame#getByPlayerID(String)}
+     */
+    @Test
+    @Disabled("TODO: Complete this test")
+    void testGetByPlayerID2() {
         // TODO: Diffblue Cover was only able to create a partial test for this method:
         //   Reason: No inputs found that don't throw a trivial exception.
         //   Diffblue Cover tried to run the arrange/act section, but the method under
@@ -131,23 +103,11 @@ class PicturePokerGameDiffblueTest {
         //       at java.base/java.lang.NumberFormatException.forInputString(NumberFormatException.java:67)
         //       at java.base/java.lang.Long.parseLong(Long.java:709)
         //       at java.base/java.lang.Long.parseLong(Long.java:832)
-        //       at game.jdbc.picturepoker.PicturePokerGame.getByPlayerID(PicturePokerGame.java:117)
+        //       at game.jdbc.picturepoker.PicturePokerGame.getByPlayerID(PicturePokerGame.java:122)
         //   See https://diff.blue/R013 to resolve this issue.
 
         // Arrange and Act
         (new PicturePokerGame()).getByPlayerID("P id Str");
-    }
-
-    /**
-     * Method under test: {@link PicturePokerGame#getByPlayerID(String)}
-     */
-    @Test
-    void testGetByPlayerID2() {
-        // TODO: Diffblue Cover was only able to create a partial test for this method:
-        //   Diffblue AI was unable to find a test
-
-        // Arrange and Act
-        (new PicturePokerGame()).getByPlayerID("42");
     }
 
     /**
@@ -166,8 +126,20 @@ class PicturePokerGameDiffblueTest {
      * Method under test: {@link PicturePokerGame#getByGameID(String)}
      */
     @Test
-    @Disabled("TODO: Complete this test")
     void testGetByGameID() {
+        // TODO: Diffblue Cover was only able to create a partial test for this method:
+        //   Diffblue AI was unable to find a test
+
+        // Arrange and Act
+        (new PicturePokerGame()).getByGameID("42");
+    }
+
+    /**
+     * Method under test: {@link PicturePokerGame#getByGameID(String)}
+     */
+    @Test
+    @Disabled("TODO: Complete this test")
+    void testGetByGameID2() {
         // TODO: Diffblue Cover was only able to create a partial test for this method:
         //   Reason: No inputs found that don't throw a trivial exception.
         //   Diffblue Cover tried to run the arrange/act section, but the method under
@@ -176,7 +148,7 @@ class PicturePokerGameDiffblueTest {
         //       at java.base/java.lang.NumberFormatException.forInputString(NumberFormatException.java:67)
         //       at java.base/java.lang.Long.parseLong(Long.java:709)
         //       at java.base/java.lang.Long.parseLong(Long.java:832)
-        //       at game.jdbc.picturepoker.PicturePokerGame.getByGameID(PicturePokerGame.java:163)
+        //       at game.jdbc.picturepoker.PicturePokerGame.getByGameID(PicturePokerGame.java:170)
         //   See https://diff.blue/R013 to resolve this issue.
 
         // Arrange and Act
@@ -184,15 +156,15 @@ class PicturePokerGameDiffblueTest {
     }
 
     /**
-     * Method under test: {@link PicturePokerGame#getByGameID(String)}
+     * Method under test: {@link PicturePokerGame#getGameEndDetails(long)}
      */
     @Test
-    void testGetByGameID2() {
+    void testGetGameEndDetails() {
         // TODO: Diffblue Cover was only able to create a partial test for this method:
         //   Diffblue AI was unable to find a test
 
         // Arrange and Act
-        (new PicturePokerGame()).getByGameID("42");
+        (new PicturePokerGame()).getGameEndDetails(1L);
     }
 
     /**
@@ -232,58 +204,29 @@ class PicturePokerGameDiffblueTest {
         //   Reason: No inputs found that don't throw a trivial exception.
         //   Diffblue Cover tried to run the arrange/act section, but the method under
         //   test threw
-        //   java.lang.IllegalArgumentException: argument "content" is null
-        //       at com.fasterxml.jackson.databind.ObjectMapper._assertNotNull(ObjectMapper.java:4980)
-        //       at com.fasterxml.jackson.databind.ObjectMapper.readValue(ObjectMapper.java:3739)
-        //       at game.jdbc.picturepoker.PicturePokerGame.updateByPID(PicturePokerGame.java:254)
+        //   com.fasterxml.jackson.core.JsonParseException: Unrecognized token 'Json': was expecting (JSON String, Number, Array, Object or token 'null', 'true' or 'false')
+        //    at [Source: (String)"Json"; line: 1, column: 5]
+        //       at com.fasterxml.jackson.core.JsonParser._constructError(JsonParser.java:2477)
+        //       at com.fasterxml.jackson.core.base.ParserMinimalBase._reportError(ParserMinimalBase.java:760)
+        //       at com.fasterxml.jackson.core.json.ReaderBasedJsonParser._reportInvalidToken(ReaderBasedJsonParser.java:3041)
+        //       at com.fasterxml.jackson.core.json.ReaderBasedJsonParser._handleOddValue(ReaderBasedJsonParser.java:2082)
+        //       at com.fasterxml.jackson.core.json.ReaderBasedJsonParser.nextToken(ReaderBasedJsonParser.java:808)
+        //       at com.fasterxml.jackson.databind.ObjectMapper._initForReading(ObjectMapper.java:4912)
+        //       at com.fasterxml.jackson.databind.ObjectMapper._readMapAndClose(ObjectMapper.java:4818)
+        //       at com.fasterxml.jackson.databind.ObjectMapper.readValue(ObjectMapper.java:3772)
+        //       at com.fasterxml.jackson.databind.ObjectMapper.readValue(ObjectMapper.java:3740)
+        //       at game.jdbc.picturepoker.PicturePokerGame.updateByPID(PicturePokerGame.java:296)
         //   See https://diff.blue/R013 to resolve this issue.
 
         // Arrange and Act
-        (new PicturePokerGame()).updateByPID(1L, null);
-    }
-
-    /**
-     * Method under test: {@link PicturePokerGame#updateByPID(long, String)}
-     */
-    @Test
-    void testUpdateByPID2() throws JsonProcessingException {
-        // TODO: Diffblue Cover was only able to create a partial test for this method:
-        //   Diffblue AI was unable to find a test
-
-        // Arrange
-        PicturePokerGame picturePokerGame = new PicturePokerGame();
-
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        // Act
-        picturePokerGame.updateByPID(1L, objectMapper.writeValueAsString(new HashMap<>()));
+        (new PicturePokerGame()).updateByPID(1L, "Json");
     }
 
     /**
      * Method under test: {@link PicturePokerGame#updateByGID(Long, String)}
      */
     @Test
-    @Disabled("TODO: Complete this test")
     void testUpdateByGID() throws JsonProcessingException {
-        // TODO: Diffblue Cover was only able to create a partial test for this method:
-        //   Reason: No inputs found that don't throw a trivial exception.
-        //   Diffblue Cover tried to run the arrange/act section, but the method under
-        //   test threw
-        //   java.lang.IllegalArgumentException: argument "content" is null
-        //       at com.fasterxml.jackson.databind.ObjectMapper._assertNotNull(ObjectMapper.java:4980)
-        //       at com.fasterxml.jackson.databind.ObjectMapper.readValue(ObjectMapper.java:3739)
-        //       at game.jdbc.picturepoker.PicturePokerGame.updateByGID(PicturePokerGame.java:302)
-        //   See https://diff.blue/R013 to resolve this issue.
-
-        // Arrange and Act
-        (new PicturePokerGame()).updateByGID(1L, null);
-    }
-
-    /**
-     * Method under test: {@link PicturePokerGame#updateByGID(Long, String)}
-     */
-    @Test
-    void testUpdateByGID2() throws JsonProcessingException {
         // TODO: Diffblue Cover was only able to create a partial test for this method:
         //   Diffblue AI was unable to find a test
 
@@ -330,6 +273,16 @@ class PicturePokerGameDiffblueTest {
 
         // Arrange and Act
         (new PicturePokerGame()).finishRound(1L);
+    }
+
+    /**
+     * Method under test:
+     * {@link PicturePokerGame#getEndOfRoundInformation(long, boolean)}
+     */
+    @Test
+    void testGetEndOfRoundInformation() {
+        // Arrange, Act and Assert
+        assertTrue((new PicturePokerGame()).getEndOfRoundInformation(1L, true).isEmpty());
     }
 
     /**

@@ -1,10 +1,9 @@
 package game.jdbc.picturepoker.diffBlue;
 
-import org.junit.Ignore;
-
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
@@ -42,6 +41,7 @@ class GameDAODiffblueTest {
         when(resultSet.getLong(Mockito.<String>any())).thenReturn(1L);
         when(resultSet.next()).thenReturn(true).thenReturn(true).thenReturn(false);
         PreparedStatement preparedStatement = mock(PreparedStatement.class);
+        doNothing().when(preparedStatement).setInt(anyInt(), anyInt());
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         doNothing().when(preparedStatement).setLong(anyInt(), anyLong());
         doNothing().when(preparedStatement).close();
@@ -54,16 +54,20 @@ class GameDAODiffblueTest {
         // Assert
         verify(connection, atLeast(1)).prepareStatement(Mockito.<String>any());
         verify(preparedStatement, atLeast(1)).executeQuery();
+        verify(preparedStatement, atLeast(1)).setInt(eq(2), anyInt());
         verify(preparedStatement, atLeast(1)).setLong(eq(1), eq(1L));
         verify(resultSet, atLeast(1)).getInt(Mockito.<String>any());
         verify(resultSet, atLeast(1)).getLong(Mockito.<String>any());
         verify(resultSet, atLeast(1)).next();
         verify(preparedStatement, atLeast(1)).close();
+        assertNull(actualFindByIdResult.getHand()[0]);
         assertEquals(1, actualFindByIdResult.getActivePlayers());
         assertEquals(1, actualFindByIdResult.getBuyIn());
         assertEquals(1, actualFindByIdResult.getCurRound());
         assertEquals(1, actualFindByIdResult.getDifficulty());
+        assertEquals(1, actualFindByIdResult.getLuigiFinished());
         assertEquals(1, actualFindByIdResult.getNumRounds());
+        assertEquals(1, actualFindByIdResult.getPlayersFinished());
         assertEquals(1, actualFindByIdResult.getPotQuantity());
         assertEquals(1L, actualFindByIdResult.getID());
         assertArrayEquals(new long[]{1L, 0L, 0L, 0L}, actualFindByIdResult.getPlayers());
@@ -77,8 +81,8 @@ class GameDAODiffblueTest {
         // Arrange
         ResultSet resultSet = mock(ResultSet.class);
         when(resultSet.getLong(Mockito.<String>any())).thenThrow(new RuntimeException(
-                "SELECT g_id, cur_round, num_rounds, active_players, buy_in, pot_quantity, difficulty FROM game WHERE"
-                        + " g_id = ?"));
+                "SELECT g_id, cur_round, num_rounds, active_players, buy_in, pot_quantity, difficulty, players_finished,"
+                        + " luigi_finished FROM game WHERE g_id = ?"));
         when(resultSet.next()).thenReturn(true).thenReturn(true).thenReturn(false);
         PreparedStatement preparedStatement = mock(PreparedStatement.class);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
@@ -90,12 +94,44 @@ class GameDAODiffblueTest {
         // Act and Assert
         assertThrows(RuntimeException.class, () -> (new GameDAO(connection)).findById(1L));
         verify(connection).prepareStatement(eq(
-                "SELECT g_id, cur_round, num_rounds, active_players, buy_in, pot_quantity, difficulty FROM game WHERE g_id = ?"));
+                "SELECT g_id, cur_round, num_rounds, active_players, buy_in, pot_quantity, difficulty, players_finished, luigi_finished FROM game WHERE g_id = ?"));
         verify(preparedStatement).executeQuery();
         verify(preparedStatement).setLong(eq(1), eq(1L));
         verify(resultSet).getLong(eq("g_id"));
         verify(resultSet).next();
         verify(preparedStatement).close();
+    }
+
+    /**
+     * Method under test: {@link GameDAO#findById(long)}
+     */
+    @Test
+    void testFindById3() throws SQLException {
+        // Arrange
+        ResultSet resultSet = mock(ResultSet.class);
+        when(resultSet.getString(Mockito.<String>any())).thenThrow(new SQLException());
+        when(resultSet.getInt(Mockito.<String>any())).thenReturn(1);
+        when(resultSet.getLong(Mockito.<String>any())).thenReturn(1L);
+        when(resultSet.next()).thenReturn(true).thenReturn(false).thenReturn(true);
+        PreparedStatement preparedStatement = mock(PreparedStatement.class);
+        doNothing().when(preparedStatement).setInt(anyInt(), anyInt());
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        doNothing().when(preparedStatement).setLong(anyInt(), anyLong());
+        doNothing().when(preparedStatement).close();
+        Connection connection = mock(Connection.class);
+        when(connection.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement);
+
+        // Act and Assert
+        assertThrows(RuntimeException.class, () -> (new GameDAO(connection)).findById(1L));
+        verify(connection, atLeast(1)).prepareStatement(Mockito.<String>any());
+        verify(preparedStatement, atLeast(1)).executeQuery();
+        verify(preparedStatement).setInt(eq(2), eq(0));
+        verify(preparedStatement, atLeast(1)).setLong(eq(1), eq(1L));
+        verify(resultSet, atLeast(1)).getInt(Mockito.<String>any());
+        verify(resultSet).getLong(eq("g_id"));
+        verify(resultSet).getString(eq("suit"));
+        verify(resultSet, atLeast(1)).next();
+        verify(preparedStatement, atLeast(1)).close();
     }
 
     /**
@@ -109,6 +145,7 @@ class GameDAODiffblueTest {
         when(resultSet.getLong(Mockito.<String>any())).thenReturn(1L);
         when(resultSet.next()).thenReturn(true).thenReturn(true).thenReturn(false);
         PreparedStatement preparedStatement = mock(PreparedStatement.class);
+        doNothing().when(preparedStatement).setInt(anyInt(), anyInt());
         doNothing().when(preparedStatement).setLong(anyInt(), anyLong());
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         doNothing().when(preparedStatement).close();
@@ -121,7 +158,8 @@ class GameDAODiffblueTest {
         // Assert
         verify(connection, atLeast(1)).prepareStatement(Mockito.<String>any());
         verify(preparedStatement, atLeast(1)).executeQuery();
-        verify(preparedStatement).setLong(eq(1), eq(1L));
+        verify(preparedStatement, atLeast(1)).setInt(eq(2), anyInt());
+        verify(preparedStatement, atLeast(1)).setLong(eq(1), eq(1L));
         verify(resultSet, atLeast(1)).getInt(Mockito.<String>any());
         verify(resultSet, atLeast(1)).getLong(Mockito.<String>any());
         verify(resultSet, atLeast(1)).next();
@@ -137,7 +175,8 @@ class GameDAODiffblueTest {
         // Arrange
         ResultSet resultSet = mock(ResultSet.class);
         when(resultSet.getLong(Mockito.<String>any())).thenThrow(new RuntimeException(
-                "SELECT g_id, cur_round, num_rounds, active_players, buy_in, pot_quantity, difficulty FROM game"));
+                "SELECT g_id, cur_round, num_rounds, active_players, buy_in, pot_quantity, difficulty, players_finished,"
+                        + " luigi_finished FROM game"));
         when(resultSet.next()).thenReturn(true).thenReturn(true).thenReturn(false);
         PreparedStatement preparedStatement = mock(PreparedStatement.class);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
@@ -147,12 +186,44 @@ class GameDAODiffblueTest {
 
         // Act and Assert
         assertThrows(RuntimeException.class, () -> (new GameDAO(connection)).findAllGames());
-        verify(connection).prepareStatement(
-                eq("SELECT g_id, cur_round, num_rounds, active_players, buy_in, pot_quantity, difficulty FROM game"));
+        verify(connection).prepareStatement(eq(
+                "SELECT g_id, cur_round, num_rounds, active_players, buy_in, pot_quantity, difficulty, players_finished, luigi_finished FROM game"));
         verify(preparedStatement).executeQuery();
         verify(resultSet).getLong(eq("g_id"));
         verify(resultSet).next();
         verify(preparedStatement).close();
+    }
+
+    /**
+     * Method under test: {@link GameDAO#findAllGames()}
+     */
+    @Test
+    void testFindAllGames3() throws SQLException {
+        // Arrange
+        ResultSet resultSet = mock(ResultSet.class);
+        when(resultSet.getString(Mockito.<String>any())).thenThrow(new SQLException());
+        when(resultSet.getInt(Mockito.<String>any())).thenReturn(1);
+        when(resultSet.getLong(Mockito.<String>any())).thenReturn(1L);
+        when(resultSet.next()).thenReturn(true).thenReturn(false).thenReturn(true);
+        PreparedStatement preparedStatement = mock(PreparedStatement.class);
+        doNothing().when(preparedStatement).setInt(anyInt(), anyInt());
+        doNothing().when(preparedStatement).setLong(anyInt(), anyLong());
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        doNothing().when(preparedStatement).close();
+        Connection connection = mock(Connection.class);
+        when(connection.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement);
+
+        // Act and Assert
+        assertThrows(RuntimeException.class, () -> (new GameDAO(connection)).findAllGames());
+        verify(connection, atLeast(1)).prepareStatement(Mockito.<String>any());
+        verify(preparedStatement, atLeast(1)).executeQuery();
+        verify(preparedStatement).setInt(eq(2), eq(0));
+        verify(preparedStatement, atLeast(1)).setLong(eq(1), eq(1L));
+        verify(resultSet, atLeast(1)).getInt(Mockito.<String>any());
+        verify(resultSet).getLong(eq("g_id"));
+        verify(resultSet).getString(eq("suit"));
+        verify(resultSet, atLeast(1)).next();
+        verify(preparedStatement, atLeast(1)).close();
     }
 
     /**
@@ -179,8 +250,10 @@ class GameDAODiffblueTest {
         dto.setDifficulty(1);
         dto.setHand(new Card[]{new Card()});
         dto.setID(1L);
+        dto.setLuigiFinished(1);
         dto.setNumRounds(10);
         dto.setPlayers(new long[]{1L, -1L, 1L, -1L});
+        dto.setPlayersFinished(1);
         dto.setPotQuantity(1);
         dto.setWinner("Winner");
 
@@ -221,8 +294,10 @@ class GameDAODiffblueTest {
         dto.setDifficulty(1);
         dto.setHand(new Card[]{new Card()});
         dto.setID(1L);
+        dto.setLuigiFinished(1);
         dto.setNumRounds(10);
         dto.setPlayers(new long[]{1L, -1L, 1L, -1L});
+        dto.setPlayersFinished(1);
         dto.setPotQuantity(1);
         dto.setWinner("Winner");
 
@@ -261,8 +336,10 @@ class GameDAODiffblueTest {
         dto.setDifficulty(1);
         dto.setHand(new Card[]{new Card()});
         dto.setID(1L);
+        dto.setLuigiFinished(1);
         dto.setNumRounds(10);
         dto.setPlayers(new long[]{1L, -1L, 1L, -1L});
+        dto.setPlayersFinished(1);
         dto.setPotQuantity(1);
         dto.setWinner("Winner");
 
@@ -277,6 +354,95 @@ class GameDAODiffblueTest {
     }
 
     /**
+     * Method under test: {@link GameDAO#getHand(Game)}
+     */
+    @Test
+    void testGetHand() throws SQLException {
+        // Arrange
+        ResultSet resultSet = mock(ResultSet.class);
+        when(resultSet.getString(Mockito.<String>any())).thenThrow(new SQLException());
+        when(resultSet.next()).thenReturn(true).thenReturn(true).thenReturn(false);
+        PreparedStatement preparedStatement = mock(PreparedStatement.class);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        doNothing().when(preparedStatement).setInt(anyInt(), anyInt());
+        doNothing().when(preparedStatement).setLong(anyInt(), anyLong());
+        doNothing().when(preparedStatement).close();
+        Connection connection = mock(Connection.class);
+        when(connection.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement);
+        GameDAO gameDAO = new GameDAO(connection);
+
+        Game dto = new Game();
+        dto.setActivePlayers(1);
+        dto.setBuyIn(1);
+        dto.setCurRound(1);
+        dto.setDifficulty(1);
+        dto.setHand(new Card[]{new Card()});
+        dto.setID(1L);
+        dto.setLuigiFinished(1);
+        dto.setNumRounds(10);
+        dto.setPlayers(new long[]{1L, -1L, 1L, -1L});
+        dto.setPlayersFinished(1);
+        dto.setPotQuantity(1);
+        dto.setWinner("Winner");
+
+        // Act and Assert
+        assertThrows(RuntimeException.class, () -> gameDAO.getHand(dto));
+        verify(connection).prepareStatement(eq("SELECT suit, to_change FROM dealer_card WHERE g_id = ? AND hand_pos = ?"));
+        verify(preparedStatement).executeQuery();
+        verify(preparedStatement).setInt(eq(2), eq(0));
+        verify(preparedStatement).setLong(eq(1), eq(1L));
+        verify(resultSet).getString(eq("suit"));
+        verify(resultSet).next();
+        verify(preparedStatement).close();
+    }
+
+    /**
+     * Method under test: {@link GameDAO#getHand(Game)}
+     */
+    @Test
+    void testGetHand2() throws SQLException {
+        // Arrange
+        ResultSet resultSet = mock(ResultSet.class);
+        when(resultSet.next()).thenReturn(false).thenReturn(false).thenReturn(false);
+        PreparedStatement preparedStatement = mock(PreparedStatement.class);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        doNothing().when(preparedStatement).setInt(anyInt(), anyInt());
+        doNothing().when(preparedStatement).setLong(anyInt(), anyLong());
+        doNothing().when(preparedStatement).close();
+        Connection connection = mock(Connection.class);
+        when(connection.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement);
+        GameDAO gameDAO = new GameDAO(connection);
+
+        Game dto = new Game();
+        dto.setActivePlayers(1);
+        dto.setBuyIn(1);
+        dto.setCurRound(1);
+        dto.setDifficulty(1);
+        dto.setHand(new Card[]{new Card()});
+        dto.setID(1L);
+        dto.setLuigiFinished(1);
+        dto.setNumRounds(10);
+        dto.setPlayers(new long[]{1L, -1L, 1L, -1L});
+        dto.setPlayersFinished(1);
+        dto.setPotQuantity(1);
+        dto.setWinner("Winner");
+
+        // Act
+        Game actualHand = gameDAO.getHand(dto);
+
+        // Assert
+        verify(connection, atLeast(1))
+                .prepareStatement(eq("SELECT suit, to_change FROM dealer_card WHERE g_id = ? AND hand_pos = ?"));
+        verify(preparedStatement, atLeast(1)).executeQuery();
+        verify(preparedStatement, atLeast(1)).setInt(eq(2), anyInt());
+        verify(preparedStatement, atLeast(1)).setLong(eq(1), eq(1L));
+        verify(resultSet, atLeast(1)).next();
+        verify(preparedStatement, atLeast(1)).close();
+        assertNull(actualHand.getHand()[0]);
+        assertSame(dto, actualHand);
+    }
+
+    /**
      * Method under test: {@link GameDAO#update_long(String, long, Game)}
      */
     @Test
@@ -287,6 +453,7 @@ class GameDAODiffblueTest {
         when(resultSet.getLong(Mockito.<String>any())).thenReturn(1L);
         when(resultSet.next()).thenReturn(true).thenReturn(true).thenReturn(false);
         PreparedStatement preparedStatement = mock(PreparedStatement.class);
+        doNothing().when(preparedStatement).setInt(anyInt(), anyInt());
         when(preparedStatement.execute()).thenReturn(true);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         doNothing().when(preparedStatement).setLong(anyInt(), anyLong());
@@ -302,8 +469,10 @@ class GameDAODiffblueTest {
         dto.setDifficulty(1);
         dto.setHand(new Card[]{new Card()});
         dto.setID(1L);
+        dto.setLuigiFinished(1);
         dto.setNumRounds(10);
         dto.setPlayers(new long[]{1L, -1L, 1L, -1L});
+        dto.setPlayersFinished(1);
         dto.setPotQuantity(1);
         dto.setWinner("Winner");
 
@@ -314,16 +483,20 @@ class GameDAODiffblueTest {
         verify(connection, atLeast(1)).prepareStatement(Mockito.<String>any());
         verify(preparedStatement).execute();
         verify(preparedStatement, atLeast(1)).executeQuery();
+        verify(preparedStatement, atLeast(1)).setInt(eq(2), anyInt());
         verify(preparedStatement, atLeast(1)).setLong(anyInt(), anyLong());
         verify(resultSet, atLeast(1)).getInt(Mockito.<String>any());
         verify(resultSet, atLeast(1)).getLong(Mockito.<String>any());
         verify(resultSet, atLeast(1)).next();
         verify(preparedStatement, atLeast(1)).close();
+        assertNull(actualUpdate_longResult.getHand()[0]);
         assertEquals(1, actualUpdate_longResult.getActivePlayers());
         assertEquals(1, actualUpdate_longResult.getBuyIn());
         assertEquals(1, actualUpdate_longResult.getCurRound());
         assertEquals(1, actualUpdate_longResult.getDifficulty());
+        assertEquals(1, actualUpdate_longResult.getLuigiFinished());
         assertEquals(1, actualUpdate_longResult.getNumRounds());
+        assertEquals(1, actualUpdate_longResult.getPlayersFinished());
         assertEquals(1, actualUpdate_longResult.getPotQuantity());
         assertEquals(1L, actualUpdate_longResult.getID());
         assertArrayEquals(new long[]{1L, 0L, 0L, 0L}, actualUpdate_longResult.getPlayers());
@@ -337,8 +510,8 @@ class GameDAODiffblueTest {
         // Arrange
         ResultSet resultSet = mock(ResultSet.class);
         when(resultSet.getLong(Mockito.<String>any())).thenThrow(new RuntimeException(
-                "SELECT g_id, cur_round, num_rounds, active_players, buy_in, pot_quantity, difficulty FROM game WHERE"
-                        + " g_id = ?"));
+                "SELECT g_id, cur_round, num_rounds, active_players, buy_in, pot_quantity, difficulty, players_finished,"
+                        + " luigi_finished FROM game WHERE g_id = ?"));
         when(resultSet.next()).thenReturn(true).thenReturn(true).thenReturn(false);
         PreparedStatement preparedStatement = mock(PreparedStatement.class);
         when(preparedStatement.execute()).thenReturn(true);
@@ -356,8 +529,10 @@ class GameDAODiffblueTest {
         dto.setDifficulty(1);
         dto.setHand(new Card[]{new Card()});
         dto.setID(1L);
+        dto.setLuigiFinished(1);
         dto.setNumRounds(10);
         dto.setPlayers(new long[]{1L, -1L, 1L, -1L});
+        dto.setPlayersFinished(1);
         dto.setPotQuantity(1);
         dto.setWinner("Winner");
 
@@ -368,6 +543,47 @@ class GameDAODiffblueTest {
         verify(preparedStatement).executeQuery();
         verify(preparedStatement, atLeast(1)).setLong(anyInt(), anyLong());
         verify(resultSet).getLong(eq("g_id"));
+        verify(resultSet).next();
+        verify(preparedStatement, atLeast(1)).close();
+    }
+
+    /**
+     * Method under test: {@link GameDAO#update_long(String, long, Game)}
+     */
+    @Test
+    void testUpdate_long3() throws SQLException {
+        // Arrange
+        ResultSet resultSet = mock(ResultSet.class);
+        when(resultSet.next()).thenThrow(new SQLException());
+        PreparedStatement preparedStatement = mock(PreparedStatement.class);
+        when(preparedStatement.execute()).thenReturn(true);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        doNothing().when(preparedStatement).setLong(anyInt(), anyLong());
+        doNothing().when(preparedStatement).close();
+        Connection connection = mock(Connection.class);
+        when(connection.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement);
+        GameDAO gameDAO = new GameDAO(connection);
+
+        Game dto = new Game();
+        dto.setActivePlayers(1);
+        dto.setBuyIn(1);
+        dto.setCurRound(1);
+        dto.setDifficulty(1);
+        dto.setHand(new Card[]{new Card()});
+        dto.setID(1L);
+        dto.setLuigiFinished(1);
+        dto.setNumRounds(10);
+        dto.setPlayers(new long[]{1L, -1L, 1L, -1L});
+        dto.setPlayersFinished(1);
+        dto.setPotQuantity(1);
+        dto.setWinner("Winner");
+
+        // Act and Assert
+        assertThrows(RuntimeException.class, () -> gameDAO.update_long("foo", 1L, dto));
+        verify(connection, atLeast(1)).prepareStatement(Mockito.<String>any());
+        verify(preparedStatement).execute();
+        verify(preparedStatement).executeQuery();
+        verify(preparedStatement, atLeast(1)).setLong(anyInt(), eq(1L));
         verify(resultSet).next();
         verify(preparedStatement, atLeast(1)).close();
     }
@@ -399,8 +615,10 @@ class GameDAODiffblueTest {
         dto.setDifficulty(1);
         dto.setHand(new Card[]{new Card()});
         dto.setID(1L);
+        dto.setLuigiFinished(1);
         dto.setNumRounds(10);
         dto.setPlayers(new long[]{1L, -1L, 1L, -1L});
+        dto.setPlayersFinished(1);
         dto.setPotQuantity(1);
         dto.setWinner("Winner");
 
@@ -411,17 +629,20 @@ class GameDAODiffblueTest {
         verify(connection, atLeast(1)).prepareStatement(Mockito.<String>any());
         verify(preparedStatement).execute();
         verify(preparedStatement, atLeast(1)).executeQuery();
-        verify(preparedStatement).setInt(eq(1), eq(42));
+        verify(preparedStatement, atLeast(1)).setInt(anyInt(), anyInt());
         verify(preparedStatement, atLeast(1)).setLong(anyInt(), eq(1L));
         verify(resultSet, atLeast(1)).getInt(Mockito.<String>any());
         verify(resultSet, atLeast(1)).getLong(Mockito.<String>any());
         verify(resultSet, atLeast(1)).next();
         verify(preparedStatement, atLeast(1)).close();
+        assertNull(actualUpdate_intResult.getHand()[0]);
         assertEquals(1, actualUpdate_intResult.getActivePlayers());
         assertEquals(1, actualUpdate_intResult.getBuyIn());
         assertEquals(1, actualUpdate_intResult.getCurRound());
         assertEquals(1, actualUpdate_intResult.getDifficulty());
+        assertEquals(1, actualUpdate_intResult.getLuigiFinished());
         assertEquals(1, actualUpdate_intResult.getNumRounds());
+        assertEquals(1, actualUpdate_intResult.getPlayersFinished());
         assertEquals(1, actualUpdate_intResult.getPotQuantity());
         assertEquals(1L, actualUpdate_intResult.getID());
         assertArrayEquals(new long[]{1L, 0L, 0L, 0L}, actualUpdate_intResult.getPlayers());
@@ -435,8 +656,8 @@ class GameDAODiffblueTest {
         // Arrange
         ResultSet resultSet = mock(ResultSet.class);
         when(resultSet.getLong(Mockito.<String>any())).thenThrow(new RuntimeException(
-                "SELECT g_id, cur_round, num_rounds, active_players, buy_in, pot_quantity, difficulty FROM game WHERE"
-                        + " g_id = ?"));
+                "SELECT g_id, cur_round, num_rounds, active_players, buy_in, pot_quantity, difficulty, players_finished,"
+                        + " luigi_finished FROM game WHERE g_id = ?"));
         when(resultSet.next()).thenReturn(true).thenReturn(true).thenReturn(false);
         PreparedStatement preparedStatement = mock(PreparedStatement.class);
         when(preparedStatement.execute()).thenReturn(true);
@@ -455,8 +676,10 @@ class GameDAODiffblueTest {
         dto.setDifficulty(1);
         dto.setHand(new Card[]{new Card()});
         dto.setID(1L);
+        dto.setLuigiFinished(1);
         dto.setNumRounds(10);
         dto.setPlayers(new long[]{1L, -1L, 1L, -1L});
+        dto.setPlayersFinished(1);
         dto.setPotQuantity(1);
         dto.setWinner("Winner");
 
@@ -468,6 +691,49 @@ class GameDAODiffblueTest {
         verify(preparedStatement).setInt(eq(1), eq(42));
         verify(preparedStatement, atLeast(1)).setLong(anyInt(), eq(1L));
         verify(resultSet).getLong(eq("g_id"));
+        verify(resultSet).next();
+        verify(preparedStatement, atLeast(1)).close();
+    }
+
+    /**
+     * Method under test: {@link GameDAO#update_int(String, int, Game)}
+     */
+    @Test
+    void testUpdate_int3() throws SQLException {
+        // Arrange
+        ResultSet resultSet = mock(ResultSet.class);
+        when(resultSet.next()).thenThrow(new SQLException());
+        PreparedStatement preparedStatement = mock(PreparedStatement.class);
+        when(preparedStatement.execute()).thenReturn(true);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        doNothing().when(preparedStatement).setInt(anyInt(), anyInt());
+        doNothing().when(preparedStatement).setLong(anyInt(), anyLong());
+        doNothing().when(preparedStatement).close();
+        Connection connection = mock(Connection.class);
+        when(connection.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement);
+        GameDAO gameDAO = new GameDAO(connection);
+
+        Game dto = new Game();
+        dto.setActivePlayers(1);
+        dto.setBuyIn(1);
+        dto.setCurRound(1);
+        dto.setDifficulty(1);
+        dto.setHand(new Card[]{new Card()});
+        dto.setID(1L);
+        dto.setLuigiFinished(1);
+        dto.setNumRounds(10);
+        dto.setPlayers(new long[]{1L, -1L, 1L, -1L});
+        dto.setPlayersFinished(1);
+        dto.setPotQuantity(1);
+        dto.setWinner("Winner");
+
+        // Act and Assert
+        assertThrows(RuntimeException.class, () -> gameDAO.update_int("foo", 1, dto));
+        verify(connection, atLeast(1)).prepareStatement(Mockito.<String>any());
+        verify(preparedStatement).execute();
+        verify(preparedStatement).executeQuery();
+        verify(preparedStatement).setInt(eq(1), eq(1));
+        verify(preparedStatement, atLeast(1)).setLong(anyInt(), eq(1L));
         verify(resultSet).next();
         verify(preparedStatement, atLeast(1)).close();
     }
@@ -496,8 +762,10 @@ class GameDAODiffblueTest {
         dto.setDifficulty(1);
         dto.setHand(new Card[]{new Card()});
         dto.setID(1L);
+        dto.setLuigiFinished(1);
         dto.setNumRounds(10);
         dto.setPlayers(new long[]{1L, -1L, 1L, -1L});
+        dto.setPlayersFinished(1);
         dto.setPotQuantity(1);
         dto.setWinner("Winner");
 
@@ -540,8 +808,10 @@ class GameDAODiffblueTest {
         dto.setDifficulty(1);
         dto.setHand(new Card[]{new Card()});
         dto.setID(1L);
+        dto.setLuigiFinished(1);
         dto.setNumRounds(10);
         dto.setPlayers(new long[]{1L, -1L, 1L, -1L});
+        dto.setPlayersFinished(1);
         dto.setPotQuantity(1);
         dto.setWinner("Winner");
 
@@ -582,8 +852,10 @@ class GameDAODiffblueTest {
         dto.setDifficulty(1);
         dto.setHand(new Card[]{new Card()});
         dto.setID(1L);
+        dto.setLuigiFinished(1);
         dto.setNumRounds(10);
         dto.setPlayers(new long[]{1L, -1L, 1L, -1L});
+        dto.setPlayersFinished(1);
         dto.setPotQuantity(1);
         dto.setWinner("Winner");
 
@@ -599,14 +871,57 @@ class GameDAODiffblueTest {
     }
 
     /**
-     * Method under test: {@link GameDAO#joinGame(long, Player)}
+     * Method under test: {@link GameDAO#joinGame(Game, Player)}
      */
     @Test
     void testJoinGame() throws SQLException {
         // Arrange
         ResultSet resultSet = mock(ResultSet.class);
-        when(resultSet.getInt(Mockito.<String>any())).thenReturn(1);
         when(resultSet.getLong(Mockito.<String>any())).thenReturn(1L);
+        when(resultSet.next()).thenReturn(true).thenReturn(true).thenReturn(false);
+        PreparedStatement preparedStatement = mock(PreparedStatement.class);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        doNothing().when(preparedStatement).setLong(anyInt(), anyLong());
+        doNothing().when(preparedStatement).close();
+        Connection connection = mock(Connection.class);
+        when(connection.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement);
+        GameDAO gameDAO = new GameDAO(connection);
+
+        Game dto = new Game();
+        dto.setActivePlayers(1);
+        dto.setBuyIn(1);
+        dto.setCurRound(1);
+        dto.setDifficulty(1);
+        dto.setHand(new Card[]{new Card()});
+        dto.setID(1L);
+        dto.setLuigiFinished(1);
+        dto.setNumRounds(10);
+        dto.setPlayers(new long[]{1L, -1L, 1L, -1L});
+        dto.setPlayersFinished(1);
+        dto.setPotQuantity(1);
+        dto.setWinner("Winner");
+
+        // Act
+        Game actualJoinGameResult = gameDAO.joinGame(dto, new Player());
+
+        // Assert
+        verify(connection, atLeast(1)).prepareStatement(Mockito.<String>any());
+        verify(preparedStatement, atLeast(1)).executeQuery();
+        verify(preparedStatement, atLeast(1)).setLong(eq(1), anyLong());
+        verify(resultSet, atLeast(1)).getLong(eq("g_id"));
+        verify(resultSet, atLeast(1)).next();
+        verify(preparedStatement, atLeast(1)).close();
+        assertSame(dto, actualJoinGameResult);
+    }
+
+    /**
+     * Method under test: {@link GameDAO#joinGame(Game, Player)}
+     */
+    @Test
+    void testJoinGame2() throws SQLException {
+        // Arrange
+        ResultSet resultSet = mock(ResultSet.class);
+        when(resultSet.getLong(Mockito.<String>any())).thenThrow(new SQLException());
         when(resultSet.next()).thenReturn(true).thenReturn(true).thenReturn(false);
         PreparedStatement preparedStatement = mock(PreparedStatement.class);
         when(preparedStatement.execute()).thenReturn(true);
@@ -618,8 +933,151 @@ class GameDAODiffblueTest {
         when(connection.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement);
         GameDAO gameDAO = new GameDAO(connection);
 
+        Game dto = new Game();
+        dto.setActivePlayers(1);
+        dto.setBuyIn(1);
+        dto.setCurRound(1);
+        dto.setDifficulty(1);
+        dto.setHand(new Card[]{new Card()});
+        dto.setID(1L);
+        dto.setLuigiFinished(1);
+        dto.setNumRounds(10);
+        dto.setPlayers(new long[]{1L, -1L, 1L, -1L});
+        dto.setPlayersFinished(1);
+        dto.setPotQuantity(1);
+        dto.setWinner("Winner");
+
+        // Act and Assert
+        assertThrows(RuntimeException.class, () -> gameDAO.joinGame(dto, new Player()));
+        verify(connection, atLeast(1)).prepareStatement(Mockito.<String>any());
+        verify(preparedStatement, atLeast(1)).execute();
+        verify(preparedStatement, atLeast(1)).executeQuery();
+        verify(preparedStatement).setInt(eq(1), eq(2));
+        verify(preparedStatement, atLeast(1)).setLong(anyInt(), anyLong());
+        verify(resultSet, atLeast(1)).getLong(eq("g_id"));
+        verify(resultSet, atLeast(1)).next();
+        verify(preparedStatement, atLeast(1)).close();
+    }
+
+    /**
+     * Method under test: {@link GameDAO#joinGame(Game, Player)}
+     */
+    @Test
+    void testJoinGame3() throws SQLException {
+        // Arrange
+        ResultSet resultSet = mock(ResultSet.class);
+        when(resultSet.getLong(Mockito.<String>any())).thenThrow(new SQLException());
+        when(resultSet.next()).thenReturn(true).thenReturn(true).thenReturn(false);
+        PreparedStatement preparedStatement = mock(PreparedStatement.class);
+        when(preparedStatement.execute()).thenThrow(new RuntimeException("SELECT g_id FROM player_in_game WHERE p_id = ?"));
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        doNothing().when(preparedStatement).setLong(anyInt(), anyLong());
+        doNothing().when(preparedStatement).close();
+        Connection connection = mock(Connection.class);
+        when(connection.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement);
+        GameDAO gameDAO = new GameDAO(connection);
+
+        Game dto = new Game();
+        dto.setActivePlayers(1);
+        dto.setBuyIn(1);
+        dto.setCurRound(1);
+        dto.setDifficulty(1);
+        dto.setHand(new Card[]{new Card()});
+        dto.setID(1L);
+        dto.setLuigiFinished(1);
+        dto.setNumRounds(10);
+        dto.setPlayers(new long[]{1L, -1L, 1L, -1L});
+        dto.setPlayersFinished(1);
+        dto.setPotQuantity(1);
+        dto.setWinner("Winner");
+
+        // Act and Assert
+        assertThrows(RuntimeException.class, () -> gameDAO.joinGame(dto, new Player()));
+        verify(connection, atLeast(1)).prepareStatement(Mockito.<String>any());
+        verify(preparedStatement).execute();
+        verify(preparedStatement).executeQuery();
+        verify(preparedStatement, atLeast(1)).setLong(anyInt(), anyLong());
+        verify(resultSet).getLong(eq("g_id"));
+        verify(resultSet).next();
+        verify(preparedStatement, atLeast(1)).close();
+    }
+
+    /**
+     * Method under test: {@link GameDAO#joinGame(Game, Player)}
+     */
+    @Test
+    void testJoinGame4() throws SQLException {
+        // Arrange
+        ResultSet resultSet = mock(ResultSet.class);
+        when(resultSet.getLong(Mockito.<String>any())).thenThrow(new SQLException());
+        when(resultSet.next()).thenReturn(false).thenReturn(true).thenReturn(false);
+        PreparedStatement preparedStatement = mock(PreparedStatement.class);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        doNothing().when(preparedStatement).setLong(anyInt(), anyLong());
+        doNothing().when(preparedStatement).close();
+        Connection connection = mock(Connection.class);
+        when(connection.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement);
+        GameDAO gameDAO = new GameDAO(connection);
+
+        Game dto = new Game();
+        dto.setActivePlayers(1);
+        dto.setBuyIn(1);
+        dto.setCurRound(1);
+        dto.setDifficulty(1);
+        dto.setHand(new Card[]{new Card()});
+        dto.setID(1L);
+        dto.setLuigiFinished(1);
+        dto.setNumRounds(10);
+        dto.setPlayers(new long[]{1L, -1L, 1L, -1L});
+        dto.setPlayersFinished(1);
+        dto.setPotQuantity(1);
+        dto.setWinner("Winner");
+
+        // Act and Assert
+        assertThrows(RuntimeException.class, () -> gameDAO.joinGame(dto, new Player()));
+        verify(connection, atLeast(1)).prepareStatement(Mockito.<String>any());
+        verify(preparedStatement, atLeast(1)).executeQuery();
+        verify(preparedStatement, atLeast(1)).setLong(eq(1), eq(0L));
+        verify(resultSet).getLong(eq("g_id"));
+        verify(resultSet, atLeast(1)).next();
+        verify(preparedStatement, atLeast(1)).close();
+    }
+
+    /**
+     * Method under test: {@link GameDAO#joinGame(Game, Player)}
+     */
+    @Test
+    void testJoinGame5() throws SQLException {
+        // Arrange
+        ResultSet resultSet = mock(ResultSet.class);
+        when(resultSet.getLong(Mockito.<String>any())).thenThrow(new SQLException());
+        when(resultSet.next()).thenReturn(true).thenReturn(false).thenReturn(false);
+        PreparedStatement preparedStatement = mock(PreparedStatement.class);
+        when(preparedStatement.execute()).thenReturn(true);
+        doNothing().when(preparedStatement).setInt(anyInt(), anyInt());
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        doNothing().when(preparedStatement).setLong(anyInt(), anyLong());
+        doNothing().when(preparedStatement).close();
+        Connection connection = mock(Connection.class);
+        when(connection.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement);
+        GameDAO gameDAO = new GameDAO(connection);
+
+        Game dto = new Game();
+        dto.setActivePlayers(1);
+        dto.setBuyIn(1);
+        dto.setCurRound(1);
+        dto.setDifficulty(1);
+        dto.setHand(new Card[]{new Card()});
+        dto.setID(1L);
+        dto.setLuigiFinished(1);
+        dto.setNumRounds(10);
+        dto.setPlayers(new long[]{1L, -1L, 1L, -1L});
+        dto.setPlayersFinished(1);
+        dto.setPotQuantity(1);
+        dto.setWinner("Winner");
+
         // Act
-        gameDAO.joinGame(1L, new Player());
+        gameDAO.joinGame(dto, new Player());
 
         // Assert
         verify(connection, atLeast(1)).prepareStatement(Mockito.<String>any());
@@ -627,141 +1085,35 @@ class GameDAODiffblueTest {
         verify(preparedStatement, atLeast(1)).executeQuery();
         verify(preparedStatement).setInt(eq(1), eq(2));
         verify(preparedStatement, atLeast(1)).setLong(anyInt(), anyLong());
-        verify(resultSet, atLeast(1)).getInt(Mockito.<String>any());
-        verify(resultSet, atLeast(1)).getLong(Mockito.<String>any());
+        verify(resultSet).getLong(eq("g_id"));
         verify(resultSet, atLeast(1)).next();
         verify(preparedStatement, atLeast(1)).close();
     }
 
     /**
-     * Method under test: {@link GameDAO#joinGame(long, Player)}
+     * Method under test: {@link GameDAO#joinGame(Game, Player)}
      */
     @Test
-    void testJoinGame2() throws SQLException {
+    void testJoinGame6() {
         // Arrange
-        ResultSet resultSet = mock(ResultSet.class);
-        when(resultSet.getLong(Mockito.<String>any())).thenThrow(new RuntimeException(
-                "SELECT g_id, cur_round, num_rounds, active_players, buy_in, pot_quantity, difficulty FROM game WHERE"
-                        + " g_id = ?"));
-        when(resultSet.next()).thenReturn(true).thenReturn(true).thenReturn(false);
-        PreparedStatement preparedStatement = mock(PreparedStatement.class);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
-        doNothing().when(preparedStatement).setLong(anyInt(), anyLong());
-        doNothing().when(preparedStatement).close();
-        Connection connection = mock(Connection.class);
-        when(connection.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement);
-        GameDAO gameDAO = new GameDAO(connection);
+        GameDAO gameDAO = new GameDAO(mock(Connection.class));
+
+        Game dto = new Game();
+        dto.setActivePlayers(4);
+        dto.setBuyIn(1);
+        dto.setCurRound(1);
+        dto.setDifficulty(1);
+        dto.setHand(new Card[]{new Card()});
+        dto.setID(1L);
+        dto.setLuigiFinished(1);
+        dto.setNumRounds(10);
+        dto.setPlayers(new long[]{1L, -1L, 1L, -1L});
+        dto.setPlayersFinished(1);
+        dto.setPotQuantity(1);
+        dto.setWinner("Winner");
 
         // Act and Assert
-        assertThrows(RuntimeException.class, () -> gameDAO.joinGame(1L, new Player()));
-        verify(connection).prepareStatement(eq(
-                "SELECT g_id, cur_round, num_rounds, active_players, buy_in, pot_quantity, difficulty FROM game WHERE g_id = ?"));
-        verify(preparedStatement).executeQuery();
-        verify(preparedStatement).setLong(eq(1), eq(1L));
-        verify(resultSet).getLong(eq("g_id"));
-        verify(resultSet).next();
-        verify(preparedStatement).close();
-    }
-
-    /**
-     * Method under test: {@link GameDAO#joinGame(long, Player)}
-     */
-    @Test
-    void testJoinGame3() throws SQLException {
-        // Arrange
-        ResultSet resultSet = mock(ResultSet.class);
-        when(resultSet.getInt(Mockito.<String>any())).thenReturn(4);
-        when(resultSet.getLong(Mockito.<String>any())).thenReturn(1L);
-        when(resultSet.next()).thenReturn(true).thenReturn(true).thenReturn(false);
-        PreparedStatement preparedStatement = mock(PreparedStatement.class);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
-        doNothing().when(preparedStatement).setLong(anyInt(), anyLong());
-        doNothing().when(preparedStatement).close();
-        Connection connection = mock(Connection.class);
-        when(connection.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement);
-        GameDAO gameDAO = new GameDAO(connection);
-
-        // Act
-        Game actualJoinGameResult = gameDAO.joinGame(1L, new Player());
-
-        // Assert
-        verify(connection, atLeast(1)).prepareStatement(Mockito.<String>any());
-        verify(preparedStatement, atLeast(1)).executeQuery();
-        verify(preparedStatement, atLeast(1)).setLong(eq(1), eq(1L));
-        verify(resultSet, atLeast(1)).getInt(Mockito.<String>any());
-        verify(resultSet, atLeast(1)).getLong(Mockito.<String>any());
-        verify(resultSet, atLeast(1)).next();
-        verify(preparedStatement, atLeast(1)).close();
-        assertEquals(1L, actualJoinGameResult.getID());
-        assertEquals(4, actualJoinGameResult.getActivePlayers());
-        assertEquals(4, actualJoinGameResult.getBuyIn());
-        assertEquals(4, actualJoinGameResult.getCurRound());
-        assertEquals(4, actualJoinGameResult.getDifficulty());
-        assertEquals(4, actualJoinGameResult.getNumRounds());
-        assertEquals(4, actualJoinGameResult.getPotQuantity());
-        assertArrayEquals(new long[]{1L, 0L, 0L, 0L}, actualJoinGameResult.getPlayers());
-    }
-
-    /**
-     * Method under test: {@link GameDAO#joinGame(long, Player)}
-     */
-    @Test
-    void testJoinGame4() throws SQLException {
-        // Arrange
-        ResultSet resultSet = mock(ResultSet.class);
-        when(resultSet.getLong(Mockito.<String>any())).thenReturn(1L);
-        when(resultSet.next()).thenReturn(false).thenReturn(true).thenReturn(false);
-        PreparedStatement preparedStatement = mock(PreparedStatement.class);
-        when(preparedStatement.execute()).thenReturn(true);
-        doNothing().when(preparedStatement).setInt(anyInt(), anyInt());
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
-        doNothing().when(preparedStatement).setLong(anyInt(), anyLong());
-        doNothing().when(preparedStatement).close();
-        Connection connection = mock(Connection.class);
-        when(connection.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement);
-        GameDAO gameDAO = new GameDAO(connection);
-
-        // Act
-        gameDAO.joinGame(1L, new Player());
-
-        // Assert
-        verify(connection, atLeast(1)).prepareStatement(Mockito.<String>any());
-        verify(preparedStatement, atLeast(1)).execute();
-        verify(preparedStatement, atLeast(1)).executeQuery();
-        verify(preparedStatement).setInt(eq(1), eq(1));
-        verify(preparedStatement, atLeast(1)).setLong(anyInt(), anyLong());
-        verify(resultSet).getLong(eq("g_id"));
-        verify(resultSet, atLeast(1)).next();
-        verify(preparedStatement, atLeast(1)).close();
-    }
-
-    /**
-     * Method under test: {@link GameDAO#joinGame(long, Player)}
-     */
-    @Test
-    void testJoinGame5() throws SQLException {
-        // Arrange
-        ResultSet resultSet = mock(ResultSet.class);
-        when(resultSet.getLong(Mockito.<String>any())).thenThrow(new RuntimeException(
-                "SELECT g_id, cur_round, num_rounds, active_players, buy_in, pot_quantity, difficulty FROM game WHERE"
-                        + " g_id = ?"));
-        when(resultSet.next()).thenReturn(false).thenReturn(true).thenReturn(false);
-        PreparedStatement preparedStatement = mock(PreparedStatement.class);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
-        doNothing().when(preparedStatement).setLong(anyInt(), anyLong());
-        doNothing().when(preparedStatement).close();
-        Connection connection = mock(Connection.class);
-        when(connection.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement);
-        GameDAO gameDAO = new GameDAO(connection);
-
-        // Act and Assert
-        assertThrows(RuntimeException.class, () -> gameDAO.joinGame(1L, new Player()));
-        verify(connection, atLeast(1)).prepareStatement(Mockito.<String>any());
-        verify(preparedStatement, atLeast(1)).executeQuery();
-        verify(preparedStatement, atLeast(1)).setLong(eq(1), anyLong());
-        verify(resultSet).getLong(eq("g_id"));
-        verify(resultSet, atLeast(1)).next();
-        verify(preparedStatement, atLeast(1)).close();
+        assertSame(dto, gameDAO.joinGame(dto, new Player()));
     }
 
     /**
@@ -787,8 +1139,10 @@ class GameDAODiffblueTest {
         dto.setDifficulty(1);
         dto.setHand(new Card[]{new Card()});
         dto.setID(1L);
+        dto.setLuigiFinished(1);
         dto.setNumRounds(10);
         dto.setPlayers(new long[]{1L, -1L, 1L, -1L});
+        dto.setPlayersFinished(1);
         dto.setPotQuantity(1);
         dto.setWinner("Winner");
 
@@ -836,8 +1190,10 @@ class GameDAODiffblueTest {
         dto.setDifficulty(1);
         dto.setHand(new Card[]{new Card()});
         dto.setID(1L);
+        dto.setLuigiFinished(1);
         dto.setNumRounds(10);
         dto.setPlayers(new long[]{1L, -1L, 1L, -1L});
+        dto.setPlayersFinished(1);
         dto.setPotQuantity(1);
         dto.setWinner("Winner");
 
@@ -870,8 +1226,10 @@ class GameDAODiffblueTest {
         dto.setDifficulty(1);
         dto.setHand(new Card[]{new Card()});
         dto.setID(1L);
+        dto.setLuigiFinished(1);
         dto.setNumRounds(10);
         dto.setPlayers(new long[]{1L, -1L, 1L, -1L});
+        dto.setPlayersFinished(1);
         dto.setPotQuantity(1);
         dto.setWinner("Winner");
 
@@ -907,8 +1265,10 @@ class GameDAODiffblueTest {
         dto.setDifficulty(1);
         dto.setHand(new Card[]{new Card()});
         dto.setID(1L);
+        dto.setLuigiFinished(1);
         dto.setNumRounds(10);
         dto.setPlayers(new long[]{1L, -1L, 1L, -1L});
+        dto.setPlayersFinished(1);
         dto.setPotQuantity(1);
         dto.setWinner("Winner");
 
@@ -941,8 +1301,10 @@ class GameDAODiffblueTest {
         dto.setDifficulty(1);
         dto.setHand(new Card[]{new Card()});
         dto.setID(1L);
+        dto.setLuigiFinished(1);
         dto.setNumRounds(10);
         dto.setPlayers(new long[]{1L, -1L, 1L, -1L});
+        dto.setPlayersFinished(1);
         dto.setPotQuantity(1);
         dto.setWinner("Winner");
 
@@ -951,10 +1313,10 @@ class GameDAODiffblueTest {
 
         // Assert
         verify(connection).prepareStatement(eq(
-                "UPDATE game SET cur_round = ?, num_rounds = ?, active_players = ?, buy_in = ?, pot_quantity = ?, difficulty = ? WHERE g_id = ?"));
+                "UPDATE game SET cur_round = ?, num_rounds = ?, active_players = ?, buy_in = ?, pot_quantity = ?, difficulty = ?, players_finished = ?, luigi_finished = ? WHERE g_id = ?"));
         verify(preparedStatement).execute();
         verify(preparedStatement, atLeast(1)).setInt(anyInt(), anyInt());
-        verify(preparedStatement).setLong(eq(7), eq(1L));
+        verify(preparedStatement).setLong(eq(9), eq(1L));
         verify(preparedStatement).close();
         assertSame(dto, actualUpdate_allResult);
     }
@@ -968,10 +1330,12 @@ class GameDAODiffblueTest {
         PreparedStatement preparedStatement = mock(PreparedStatement.class);
         doThrow(new RuntimeException(
                 "UPDATE game SET cur_round = ?, num_rounds = ?, active_players = ?, buy_in = ?, pot_quantity = ?,"
-                        + " difficulty = ? WHERE g_id = ?")).when(preparedStatement).setInt(anyInt(), anyInt());
+                        + " difficulty = ?, players_finished = ?, luigi_finished = ? WHERE g_id = ?")).when(preparedStatement)
+                .setInt(anyInt(), anyInt());
         doThrow(new RuntimeException(
                 "UPDATE game SET cur_round = ?, num_rounds = ?, active_players = ?, buy_in = ?, pot_quantity = ?,"
-                        + " difficulty = ? WHERE g_id = ?")).when(preparedStatement).close();
+                        + " difficulty = ?, players_finished = ?, luigi_finished = ? WHERE g_id = ?")).when(preparedStatement)
+                .close();
         Connection connection = mock(Connection.class);
         when(connection.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement);
         GameDAO gameDAO = new GameDAO(connection);
@@ -983,15 +1347,17 @@ class GameDAODiffblueTest {
         dto.setDifficulty(1);
         dto.setHand(new Card[]{new Card()});
         dto.setID(1L);
+        dto.setLuigiFinished(1);
         dto.setNumRounds(10);
         dto.setPlayers(new long[]{1L, -1L, 1L, -1L});
+        dto.setPlayersFinished(1);
         dto.setPotQuantity(1);
         dto.setWinner("Winner");
 
         // Act and Assert
         assertThrows(RuntimeException.class, () -> gameDAO.update_all(dto));
         verify(connection).prepareStatement(eq(
-                "UPDATE game SET cur_round = ?, num_rounds = ?, active_players = ?, buy_in = ?, pot_quantity = ?, difficulty = ? WHERE g_id = ?"));
+                "UPDATE game SET cur_round = ?, num_rounds = ?, active_players = ?, buy_in = ?, pot_quantity = ?, difficulty = ?, players_finished = ?, luigi_finished = ? WHERE g_id = ?"));
         verify(preparedStatement).setInt(eq(1), eq(1));
         verify(preparedStatement).close();
     }
@@ -999,15 +1365,14 @@ class GameDAODiffblueTest {
     /**
      * Method under test: {@link GameDAO#updateHand(Game)}
      */
-    @Ignore
     @Test
     void testUpdateHand() throws SQLException {
         // Arrange
         PreparedStatement preparedStatement = mock(PreparedStatement.class);
-        doThrow(new RuntimeException("UPDATE dealer_card SET suit = ? WHERE g_id = ? AND hand_pos = ?"))
+        doThrow(new RuntimeException("UPDATE dealer_card SET suit = ?, to_change = ? WHERE g_id = ? AND hand_pos = ?"))
                 .when(preparedStatement)
                 .setString(anyInt(), Mockito.<String>any());
-        doThrow(new RuntimeException("UPDATE dealer_card SET suit = ? WHERE g_id = ? AND hand_pos = ?"))
+        doThrow(new RuntimeException("UPDATE dealer_card SET suit = ?, to_change = ? WHERE g_id = ? AND hand_pos = ?"))
                 .when(preparedStatement)
                 .close();
         Connection connection = mock(Connection.class);
@@ -1021,13 +1386,18 @@ class GameDAODiffblueTest {
         dto.setDifficulty(1);
         dto.setHand(new Card[]{new Card()});
         dto.setID(1L);
+        dto.setLuigiFinished(1);
         dto.setNumRounds(10);
         dto.setPlayers(new long[]{1L, -1L, 1L, -1L});
+        dto.setPlayersFinished(1);
         dto.setPotQuantity(1);
         dto.setWinner("Winner");
 
         // Act and Assert
         assertThrows(RuntimeException.class, () -> gameDAO.updateHand(dto));
+//        verify(connection)
+//                .prepareStatement(eq("UPDATE dealer_card SET suit = ?, to_change = ? WHERE g_id = ? AND hand_pos = ?"));
+//        verify(preparedStatement).setString(eq(1), eq("MARIO"));
         verify(preparedStatement).close();
     }
 
@@ -1045,8 +1415,10 @@ class GameDAODiffblueTest {
         dto.setDifficulty(1);
         dto.setHand(new Card[]{new Card()});
         dto.setID(1L);
+        dto.setLuigiFinished(1);
         dto.setNumRounds(10);
         dto.setPlayers(new long[]{1L, -1L, 1L, -1L});
+        dto.setPlayersFinished(1);
         dto.setPotQuantity(1);
         dto.setWinner("Winner");
         dto.setActivePlayers(4);
@@ -1082,8 +1454,10 @@ class GameDAODiffblueTest {
         dto.setDifficulty(1);
         dto.setHand(new Card[]{new Card()});
         dto.setID(1L);
+        dto.setLuigiFinished(1);
         dto.setNumRounds(10);
         dto.setPlayers(new long[]{1L, -1L, 1L, -1L});
+        dto.setPlayersFinished(1);
         dto.setPotQuantity(1);
         dto.setWinner("Winner");
 
@@ -1094,17 +1468,20 @@ class GameDAODiffblueTest {
         verify(connection, atLeast(1)).prepareStatement(Mockito.<String>any());
         verify(preparedStatement, atLeast(1)).execute();
         verify(preparedStatement, atLeast(1)).executeQuery();
-        verify(preparedStatement).setInt(eq(1), eq(0));
+        verify(preparedStatement, atLeast(1)).setInt(anyInt(), anyInt());
         verify(preparedStatement, atLeast(1)).setLong(anyInt(), eq(1L));
         verify(resultSet, atLeast(1)).getInt(Mockito.<String>any());
         verify(resultSet, atLeast(1)).getLong(Mockito.<String>any());
         verify(resultSet, atLeast(1)).next();
         verify(preparedStatement, atLeast(1)).close();
+        assertNull(actualRemovePlayerFromGameResult.getHand()[0]);
         assertEquals(1, actualRemovePlayerFromGameResult.getActivePlayers());
         assertEquals(1, actualRemovePlayerFromGameResult.getBuyIn());
         assertEquals(1, actualRemovePlayerFromGameResult.getCurRound());
         assertEquals(1, actualRemovePlayerFromGameResult.getDifficulty());
+        assertEquals(1, actualRemovePlayerFromGameResult.getLuigiFinished());
         assertEquals(1, actualRemovePlayerFromGameResult.getNumRounds());
+        assertEquals(1, actualRemovePlayerFromGameResult.getPlayersFinished());
         assertEquals(1, actualRemovePlayerFromGameResult.getPotQuantity());
         assertEquals(1L, actualRemovePlayerFromGameResult.getID());
         assertArrayEquals(new long[]{1L, 0L, 0L, 0L}, actualRemovePlayerFromGameResult.getPlayers());
@@ -1137,8 +1514,10 @@ class GameDAODiffblueTest {
         dto.setDifficulty(1);
         dto.setHand(new Card[]{new Card()});
         dto.setID(1L);
+        dto.setLuigiFinished(1);
         dto.setNumRounds(10);
         dto.setPlayers(new long[]{1L, -1L, 1L, -1L});
+        dto.setPlayersFinished(1);
         dto.setPotQuantity(1);
         dto.setWinner("Winner");
 
@@ -1169,8 +1548,10 @@ class GameDAODiffblueTest {
         dto.setDifficulty(1);
         dto.setHand(new Card[]{new Card()});
         dto.setID(1L);
+        dto.setLuigiFinished(1);
         dto.setNumRounds(10);
         dto.setPlayers(new long[]{});
+        dto.setPlayersFinished(1);
         dto.setPotQuantity(1);
         dto.setWinner("Winner");
 
@@ -1202,8 +1583,10 @@ class GameDAODiffblueTest {
         dto.setDifficulty(1);
         dto.setHand(new Card[]{new Card()});
         dto.setID(1L);
+        dto.setLuigiFinished(1);
         dto.setNumRounds(10);
         dto.setPlayers(new long[]{1L, -1L, 1L, -1L});
+        dto.setPlayersFinished(1);
         dto.setPotQuantity(1);
         dto.setWinner("Winner");
         dto.setActivePlayers(3);
@@ -1230,6 +1613,7 @@ class GameDAODiffblueTest {
         when(resultSet.getLong(Mockito.<String>any())).thenReturn(1L);
         when(resultSet.next()).thenReturn(true).thenReturn(true).thenReturn(false);
         PreparedStatement preparedStatement = mock(PreparedStatement.class);
+        doNothing().when(preparedStatement).setInt(anyInt(), anyInt());
         when(preparedStatement.execute()).thenReturn(true);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
         doNothing().when(preparedStatement).setLong(anyInt(), anyLong());
@@ -1244,16 +1628,20 @@ class GameDAODiffblueTest {
         verify(connection, atLeast(1)).prepareStatement(Mockito.<String>any());
         verify(preparedStatement).execute();
         verify(preparedStatement, atLeast(1)).executeQuery();
+        verify(preparedStatement, atLeast(1)).setInt(eq(2), anyInt());
         verify(preparedStatement, atLeast(1)).setLong(eq(1), eq(1L));
         verify(resultSet, atLeast(1)).getInt(Mockito.<String>any());
         verify(resultSet, atLeast(1)).getLong(Mockito.<String>any());
         verify(resultSet, atLeast(1)).next();
         verify(preparedStatement, atLeast(1)).close();
+        assertNull(actualDeleteGameResult.getHand()[0]);
         assertEquals(1, actualDeleteGameResult.getActivePlayers());
         assertEquals(1, actualDeleteGameResult.getBuyIn());
         assertEquals(1, actualDeleteGameResult.getCurRound());
         assertEquals(1, actualDeleteGameResult.getDifficulty());
+        assertEquals(1, actualDeleteGameResult.getLuigiFinished());
         assertEquals(1, actualDeleteGameResult.getNumRounds());
+        assertEquals(1, actualDeleteGameResult.getPlayersFinished());
         assertEquals(1, actualDeleteGameResult.getPotQuantity());
         assertEquals(1L, actualDeleteGameResult.getID());
         assertArrayEquals(new long[]{1L, 0L, 0L, 0L}, actualDeleteGameResult.getPlayers());
@@ -1267,8 +1655,8 @@ class GameDAODiffblueTest {
         // Arrange
         ResultSet resultSet = mock(ResultSet.class);
         when(resultSet.getLong(Mockito.<String>any())).thenThrow(new RuntimeException(
-                "SELECT g_id, cur_round, num_rounds, active_players, buy_in, pot_quantity, difficulty FROM game WHERE"
-                        + " g_id = ?"));
+                "SELECT g_id, cur_round, num_rounds, active_players, buy_in, pot_quantity, difficulty, players_finished,"
+                        + " luigi_finished FROM game WHERE g_id = ?"));
         when(resultSet.next()).thenReturn(true).thenReturn(true).thenReturn(false);
         PreparedStatement preparedStatement = mock(PreparedStatement.class);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
@@ -1280,12 +1668,44 @@ class GameDAODiffblueTest {
         // Act and Assert
         assertThrows(RuntimeException.class, () -> (new GameDAO(connection)).deleteGame(1L));
         verify(connection).prepareStatement(eq(
-                "SELECT g_id, cur_round, num_rounds, active_players, buy_in, pot_quantity, difficulty FROM game WHERE g_id = ?"));
+                "SELECT g_id, cur_round, num_rounds, active_players, buy_in, pot_quantity, difficulty, players_finished, luigi_finished FROM game WHERE g_id = ?"));
         verify(preparedStatement).executeQuery();
         verify(preparedStatement).setLong(eq(1), eq(1L));
         verify(resultSet).getLong(eq("g_id"));
         verify(resultSet).next();
         verify(preparedStatement).close();
+    }
+
+    /**
+     * Method under test: {@link GameDAO#deleteGame(long)}
+     */
+    @Test
+    void testDeleteGame3() throws SQLException {
+        // Arrange
+        ResultSet resultSet = mock(ResultSet.class);
+        when(resultSet.getString(Mockito.<String>any())).thenThrow(new SQLException());
+        when(resultSet.getInt(Mockito.<String>any())).thenReturn(1);
+        when(resultSet.getLong(Mockito.<String>any())).thenReturn(1L);
+        when(resultSet.next()).thenReturn(true).thenReturn(false).thenReturn(true);
+        PreparedStatement preparedStatement = mock(PreparedStatement.class);
+        doNothing().when(preparedStatement).setInt(anyInt(), anyInt());
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        doNothing().when(preparedStatement).setLong(anyInt(), anyLong());
+        doNothing().when(preparedStatement).close();
+        Connection connection = mock(Connection.class);
+        when(connection.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement);
+
+        // Act and Assert
+        assertThrows(RuntimeException.class, () -> (new GameDAO(connection)).deleteGame(1L));
+        verify(connection, atLeast(1)).prepareStatement(Mockito.<String>any());
+        verify(preparedStatement, atLeast(1)).executeQuery();
+        verify(preparedStatement).setInt(eq(2), eq(0));
+        verify(preparedStatement, atLeast(1)).setLong(eq(1), eq(1L));
+        verify(resultSet, atLeast(1)).getInt(Mockito.<String>any());
+        verify(resultSet).getLong(eq("g_id"));
+        verify(resultSet).getString(eq("suit"));
+        verify(resultSet, atLeast(1)).next();
+        verify(preparedStatement, atLeast(1)).close();
     }
 
     /**

@@ -514,6 +514,7 @@ public class PicturePokerGame {
                 GamePlay gp = new GamePlay(game, playerList);
                 if(game.getLuigiFinished() < 1) {
                     gp.executeLuigi();
+                    gameDAO.updateHand(game);
                 }
                 pSDInfo = gp.showdownResolution(gameDAO, playerDAO, commit_results);
             }
@@ -579,6 +580,10 @@ public class PicturePokerGame {
             game = gameDAO.findById(gid);
             game = gameDAO.removePlayerFromGame(game, p_id);
             p.resetPerGameInfo();
+            playerDAO.update_int("tokens", 9, p);
+            playerDAO.update_int("bet", 1, p);
+            playerDAO.update_int("rounds_won", 0, p);
+            playerDAO.update_int("finished_round", 0, p);
             playerDAO.updateAttributes(p);
             playerDAO.updateHand(p);
             // Clean up once all players leave.
@@ -641,10 +646,6 @@ public class PicturePokerGame {
             GameDAO gamedao = new GameDAO(connection);
             PlayerDAO playerDAO = new PlayerDAO(connection);
             Player player = playerDAO.findById(p_id);
-            // Reset player info before joining
-            player.resetPerGameInfo();
-            playerDAO.updateAttributes(player);
-            playerDAO.updateHand(player);
             game = gamedao.findById(g_id);
 
             int players_before = game.getActivePlayers();
@@ -661,15 +662,15 @@ public class PicturePokerGame {
                 }
                 for (Player p : playerList) {
                     p.resetPerGameInfo();
-                    playerDAO.update_int("tokens", 10, p);
+                    playerDAO.update_int("tokens", 9, p);
                     playerDAO.update_int("bet", 1, p);
                     playerDAO.update_int("rounds_won", 0, p);
                     playerDAO.update_int("finished_round", 0, p);
+                    playerDAO.updateHand(p);
 
                     //drain people's bank accounts and add to pot
                     p.setDollars(p.getDollars() - game.getBuyIn());
                     playerDAO.updateAttributes(p);
-                    playerDAO.updateHand(p);
                     game.setPotQuantity(game.getPotQuantity() + game.getBuyIn());
                 }
             }

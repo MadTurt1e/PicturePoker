@@ -270,7 +270,7 @@ public class Player implements DataTransferObject, Comparable<Player> {
     }
 
     public void resetPerGameInfo(){
-        tokens = 10;
+        tokens = 9;
         bet = 1;
         roundsWon = 0;
         finishedRound = 0;

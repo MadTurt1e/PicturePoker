@@ -1,6 +1,7 @@
-import "../CreateGame/Create.css";
+import './Join.css';
 
 import join from "../../resources/menuIcons/joingame.png";
+import back from "../../resources/misIcons/back.png";
 import backdrop from "../../resources/menuIcons/luigisCasino.jpg";
 
 import {Link, useNavigate} from "react-router-dom";
@@ -65,10 +66,14 @@ function JoinGame() {
 
     const joinGame = async(gameId) => {
         try {
+            await axios.delete(`http://localhost:8080/leaveCurrentGame/${sessionStorage.getItem('userID')}`)
+                .catch(function(){
+                console.log("leaveCurrentGame didn't work");
+            });
             let response = await axios.put(`http://localhost:8080/joinGame/${gameId}/${sessionStorage.getItem('userID')}`);
             handleJoinGameResponse(response, gameId);
         } catch (error) {
-            console.error("Error joining game: ", error);
+            console.log("Error joining game: ", error);
             setMessage("An error occurred while trying to join the game. Please try again.");
         }
     }
@@ -77,6 +82,7 @@ function JoinGame() {
         if (isUserInGame(response.data.players)) {
             navigate(`/WaitingRoom`, { state: { gameId: gameId } });
         } else {
+            console.log(response.data.players);
             setMessage("You can't join this game. Try getting better?");
         }
     }
@@ -88,34 +94,33 @@ function JoinGame() {
 
 
     return (
-        <div style={{
-            backgroundImage: `url(${backdrop})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            height: '100vh',
-            width: '100vw'
-        }}>
-            <Link to="/menu">
-                <img src={join} alt="" style={{width: '60%', marginBottom: '10vh'}}/>
-            </Link>
-            <br/>
-            <div style={{fontSize: '5vh'}} className="bordering">
-                <ColorfulText text={message}/>
+        <div className="create-background">
+            <div className="create-header">
+                <img src={join} alt="Create Game" className="create-title"/>
+                <Link to="/menu" className="back-button-container">
+                    <img src={back} alt="Back" className="back-button glow"/>
+                </Link>
             </div>
-            <br/>
-            <div style={{fontSize: '5vh'}} className="bordering">
-                <ColorfulText text="Game ID"/>
-                <form>
-                    <input type="number" value={inputValue} onChange={handleInputChange} onKeyDown={handleKeyPress}
-                           style={{fontFamily: "MarioFont", fontSize: "5vh", color: "red"}} pattern="\d*"/>
-                </form>
-            </div>
+            <div className="centered-container">
+                <div className="message">
+                    <ColorfulText text={message}/>
+                </div>
 
-            <div style={{fontSize: '5vh'}} className="bordering">
-                <ColorfulText text={"Game ID List: "}/>
-                <br/>
-
-                <GameList/>
+                <div className="input-and-list-container">
+                    <div className="input-container">
+                        <div className="game-id-title">
+                            <ColorfulText text="Game ID"/>
+                        </div>
+                        <input type="number" value={inputValue} onChange={handleInputChange} onKeyDown={handleKeyPress}
+                            className="game-id-input"/>
+                    </div>
+                    <div className="game-id-list-title">
+                        <ColorfulText text="Game ID List:"/>
+                    </div>
+                    <div className="game-id-list">
+                        <GameList/>
+                    </div>
+                </div>
             </div>
             <br/>
             <div style={{position: "absolute", right: "5%", bottom: "5%", fontSize: "5vh"}} className={"bordering"}>

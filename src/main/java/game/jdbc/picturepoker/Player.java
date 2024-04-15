@@ -290,6 +290,13 @@ public class Player implements DataTransferObject, Comparable<Player> {
         }
     }
 
+    //redraw the entire hand
+    public void resetHand(){
+        for(int i = 0; i < 5; i++){
+            hand[i].setToChange(true);
+            hand[i].redrawSuit();
+        }
+    }
     // Statistic aggregation functions
     public int getGamesPlayed(){
         return getFirstPlaces() + getSecondPlaces() + getThirdPlaces() + getFourthPlaces();

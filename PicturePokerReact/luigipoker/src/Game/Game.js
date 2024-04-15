@@ -169,30 +169,38 @@ function WaitingOnTurn(turnEnd) {
     }
 }
 
-function EndOfRound({gid}){
-    const [data, setData] = useState(null);
+function EndOfRound(){
+    const [gid, setGID] = useState(0);
+    const inGame = async () => {
+        const response = await axios.get(`http://localhost:8080/getPlayerActiveGame/${sessionStorage.getItem("userID")}`)
+            .catch(function () {
+                console.log("getByPlayerID API call did not work");
+            });
+        console.log(response.data);
+        if (response.status === 200) {
+            setGID(response.data.id);
+        }
+    }
+    inGame();
 
     useEffect(() => {
-        const interval = setInterval(async() => {
-            console.log("End Round?");
-            await axios.get(`http://localhost:8080/getEndOfRoundInformation/${gid}`)
-                .then(response => {
-                    setData(response.data);
-                })
-                .catch(error => {
-                    console.log('Error with getEndOfRoundInformation', error);
+        const loadGame = async () => {
+            const response = await axios.get(`http://localhost:8080/getEndOfRoundInformation/` + gid)
+                .catch(function () {
+                    console.log("GetbyGameID didn't work. " + gid);
                 });
-        }, 3000);
+        }
 
-        return () => clearInterval(interval); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
-    }, []);
+        //if we are in the round end, jump to the end screen
 
-    //TODO: FINISH THIS (and preferably have it look nice)
-    return (
-        <div>
-            {/* Render your data here */}
-        </div>
-    );
+        // Call loadGame immediately and then every X milliseconds
+        loadGame();
+        const intervalId = setInterval(loadGame, 5000); // 5000 ms = 5 seconds
+        //TODO: Intervals are bad, but we use them a lot. Ideally we don't use them a lot.
+
+        // Clear interval on unmount
+        return () => clearInterval(intervalId);
+    }, [gid]);
 }
 
 function Game() {
@@ -212,17 +220,16 @@ function Game() {
     const [turnEnd, setTurnEnd] = useState(false);
 
     const pid = sessionStorage.getItem('userID');
+
     useEffect(() => {
-        //failsafe
-        if (location.state !== null){
-            setGID(location.state.gameId);
-        }
-        else {
+        setGID(location.state.gameId);
+        if (gid === 0) {
             const inGame = async () => {
                 const response = await axios.get(`http://localhost:8080/getPlayerActiveGame/${pid}`)
                     .catch(function () {
                         console.log("getByPlayerID API call did not work");
                     });
+                console.log(response.data);
                 if (response.status === 200) {
                     setGID(response.data.id);
                 }
@@ -263,7 +270,9 @@ function Game() {
     };
 
     useEffect(() => {
-        setInterval(getPlayerData, 3000);
+        const interval = setInterval(getPlayerData, 3000);
+
+        return () => clearInterval(interval);
     }, []);
 
     const finishRound = async (pid) => {
@@ -367,7 +376,7 @@ function Game() {
             <PlayerList gid = {gid}/>
             <RoundCount gid = {gid}/>
             <WaitingOnTurn turn={turnEnd} />
-            
+            <EndOfRound gid = {gid}/>
             <div className="cards" style={{
                 top: '5%'
             }}>
@@ -416,7 +425,6 @@ function Game() {
                     </div>
                 ))}
             </div>
-            <EndOfRound gid = {gid}/>
         </div>
     );
 }

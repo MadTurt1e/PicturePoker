@@ -72,7 +72,7 @@ function JoinGame() {
             let response = await axios.put(`http://localhost:8080/joinGame/${gameId}/${sessionStorage.getItem('userID')}`);
             handleJoinGameResponse(response, gameId);
         } catch (error) {
-            console.error("Error joining game: ", error);
+            console.log("Error joining game: ", error);
             setMessage("An error occurred while trying to join the game. Please try again.");
         }
     }
@@ -81,6 +81,7 @@ function JoinGame() {
         if (isUserInGame(response.data.players)) {
             navigate(`/WaitingRoom`, { state: { gameId: gameId } });
         } else {
+            console.log(response.data.players);
             setMessage("You can't join this game. Try getting better?");
         }
     }

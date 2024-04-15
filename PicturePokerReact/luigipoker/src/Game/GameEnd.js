@@ -13,7 +13,7 @@ function PlayerList({ gid }) {
     const [players, setPlayers] = useState(null);
     const [pNames, setPNames] = useState([]);
     const [pTokens, setPTokens] = useState([]);
-    const [pBet, setPBet] = useState([]);
+    const [buyIn, setBuyIn] = useState([]);
     const [pWaiting, setPWaiting] = useState([]);
     const location = useLocation();
 
@@ -25,6 +25,7 @@ function PlayerList({ gid }) {
                 });
             console.log(gid);
             setPlayers(response.data.players);
+            setBuyIn(response.data.buyIn);
         }
         //if we are in the round end, jump to the end screen
         loadGame();
@@ -56,6 +57,8 @@ function PlayerList({ gid }) {
             getPlayerNames();
         }
     }, [players]); // Use a separate useEffect hook to update pNames when players changes
+
+    const winnings = [0.55, 0.3, 0.15, 0];
     return (
         <div style={{ fontSize: "3vh" }} className={"bordering"}>
             {pNames.map((value, i) => (
@@ -64,6 +67,7 @@ function PlayerList({ gid }) {
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                         <ColorfulText text={"Tokens: \t" + pTokens[i]} />
                     </div>
+                    <ColorfulText text={"Winnings: $" + (winnings[i] * (buyIn*4))} />
                     <br/>
                 </React.Fragment>
             ))}

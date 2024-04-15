@@ -185,7 +185,8 @@ function EndOfRound(){
 
     useEffect(() => {
         const loadGame = async () => {
-            const response = await axios.get(`http://localhost:8080/getEndOfRoundInformation/` + gid)
+            //TODO: UPDATE THIS TO WORK WITH MULTIPLE PLAYERS
+            const response = await axios.get(`http://localhost:8080/getEndOfRoundInformation/${gid}/${true}`)
                 .catch(function () {
                     console.log("GetbyGameID didn't work. " + gid);
                 });

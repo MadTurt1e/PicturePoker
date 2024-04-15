@@ -169,6 +169,30 @@ function WaitingOnTurn(turnEnd) {
     }
 }
 
+function EndOfRound({gid}){
+    const [data, setData] = useState(null);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            axios.get(`http://localhost:8080/getEndOfRoundInformation/${gid}`)
+                .then(response => {
+                    setData(response.data);
+                })
+                .catch(error => {
+                    console.error('Error with getEndOfRoundInformation', error);
+                });
+        }, 3000);
+
+        return () => clearInterval(interval); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
+    }, []);
+
+    //TODO: FINISH THIS (and preferably have it look nice)
+    return (
+        <div>
+            {/* Render your data here */}
+        </div>
+    );
+}
 
 function Game() {
     const images = [cloud, mushroom, fireflower, luigi, mario, star, normalCard, proCard];
@@ -390,6 +414,7 @@ function Game() {
                     </div>
                 ))}
             </div>
+            <EndOfRound gid = {gid}/>
         </div>
     );
 }

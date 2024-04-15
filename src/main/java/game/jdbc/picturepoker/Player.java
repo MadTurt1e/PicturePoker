@@ -312,7 +312,7 @@ public class Player implements DataTransferObject, Comparable<Player> {
     }
     //Gets the average lifetime bet - we'd expect this to be a decimal.
     public double getAvgBet(){
-        return (double)getLifetimeTotalBet()/getGamesPlayed();
+        return (double)getLifetimeTotalBet()/getHandsPlayed();
     }
     //Gets the average number of cards changed per hand played - we'd expect this to be a decimal.
     public double getAvgCardsChanged(){

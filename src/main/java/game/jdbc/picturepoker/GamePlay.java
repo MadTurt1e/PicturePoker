@@ -149,7 +149,6 @@ public class GamePlay {
             for (Integer toSwapIndex : cardToSwapIndex) {
                 luigiHand[toSwapIndex].setToChange(true);
             }
-
         }
 
         // Step 3: that's it.

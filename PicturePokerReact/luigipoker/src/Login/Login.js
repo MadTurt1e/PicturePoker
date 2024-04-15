@@ -85,7 +85,7 @@ const Login = () => {
                 </div>
                 <div className="form-container">
                     <div className="login">
-                        <img src={loginP} alt="" style={{width: '100hh', marginBottom: '50px'}}/>
+                        <img className="header" src={loginP} alt="" style={{width: '100hh', marginBottom: '50px'}}/>
                         <form onSubmit={handleSubmission}>
                         <label>
                                 <img src={usernameP} alt="Username" />
@@ -107,12 +107,13 @@ const Login = () => {
                                 type="image" 
                                 src={loginP} 
                                 alt="Login" 
+                                className ="glow"
                                 style={{ width: '100px', margin: '10px 0' }} 
                             />
                         </form>
                     </div>
                     <div className="register">
-                        <img src={registerP} alt="" style={{width: '400px', marginBottom: '50px'}}/>
+                        <img className="header" src={registerP} alt="" style={{width: '400px', marginBottom: '50px'}}/>
                         <form onSubmit={handleAccountCreation}>
                         <label>
                                 <img src={usernameP} alt="Username" />
@@ -134,6 +135,7 @@ const Login = () => {
                                 type="image" 
                                 src={registerP} 
                                 alt="Create Account" 
+                                className ="glow"
                                 style={{ width: '100px', margin: '10px 0' }} 
                             />
                         </form>

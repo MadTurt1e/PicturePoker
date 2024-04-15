@@ -13,6 +13,8 @@ import java.util.ArrayList;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import javax.swing.plaf.metal.MetalBorders;
+
 // @RequestMapping("/api") We will shift most of the functionality here to be hidden under /api
 @SpringBootApplication
 @CrossOrigin // This is for the front end to be able to access the backend
@@ -358,6 +360,7 @@ public class PicturePokerGame {
             updatedGame.setPotQuantity(Integer.parseInt(inputMap.get("pot_quant")));
             updatedGame.setDifficulty(Integer.parseInt(inputMap.get("difficulty")));
             updatedGame.setPlayersFinished(Integer.parseInt(inputMap.get("players_finished")));
+            updatedGame.setLuigiFinished(Integer.parseInt(inputMap.get("luigi_finished")));
 
             // and update it in the database.
             updatedGame = gamedao.update_all(updatedGame);
@@ -451,9 +454,14 @@ public class PicturePokerGame {
 
             long curGameID = playerDAO.getCurrentGame(player);
             Game curGame = gameDAO.findById(curGameID);
-
+            if(curGame.getCurRound() > curGame.getNumRounds()) {
+                System.out.println("Could not finish round: Game is already over.");
+            }
+                player.setFinishedRound(1);
+            playerDAO.update_int("finished_round", 1, player);
             curGame.setPlayersFinished(curGame.getPlayersFinished() + 1);
             gameDAO.update_int("players_finished", curGame.getPlayersFinished(), curGame);
+            /*
             if(curGame.getPlayersFinished() >= 4){
                 // Do round stuff
                 Player[] playerList = new Player[4];
@@ -467,17 +475,52 @@ public class PicturePokerGame {
                 }
                 GamePlay gp = new GamePlay(curGame, playerList);
 
-                gp.showdownResolution(gameDAO, playerDAO);
+                gp.showdownResolution(gameDAO, playerDAO, true);
                 if(curGame.getCurRound() > curGame.getNumRounds()){
                     // Do end of game stuff
                     gp.gameEndResolution(gameDAO, playerDAO);
                 }
             }
             connection.close();
+            */
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return player;
+    }
+
+    @GetMapping("/getEndOfRoundInformation/{g_id}/{commit_results}")
+    public ArrayList<PlayerShowdownInfo> getEndOfRoundInformation(@PathVariable long g_id, @PathVariable boolean commit_results){
+        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,
+                "picturepoker", "postgres", "password");
+        ArrayList<PlayerShowdownInfo> pSDInfo = new ArrayList<PlayerShowdownInfo>();
+        Game game = new Game();
+        try {
+            Connection connection = dcm.getConnection();
+            PlayerDAO playerDAO = new PlayerDAO(connection);
+            GameDAO gameDAO = new GameDAO(connection);
+            game = gameDAO.findById(g_id);
+            if(game.getCurRound() <= game.getNumRounds() && game.getPlayersFinished() >= 4){
+                // Do round stuff
+                Player[] playerList = new Player[4];
+                long[] playerIDList = game.getPlayers();
+
+                //we get the list of all the players, so it is iterable.
+                for (int i = 0; i < 4; ++i) {
+                    playerList[i] = playerDAO.findById(playerIDList[i]);
+                    playerList[i].redrawHand();
+                    playerDAO.updateHand(playerList[i]);
+                }
+                GamePlay gp = new GamePlay(game, playerList);
+                if(game.getLuigiFinished() < 1) {
+                    gp.executeLuigi();
+                }
+                pSDInfo = gp.showdownResolution(gameDAO, playerDAO, commit_results);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return pSDInfo;
     }
 
     //DELETE Operation - Delete a player

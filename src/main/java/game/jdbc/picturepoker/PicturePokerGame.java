@@ -360,6 +360,7 @@ public class PicturePokerGame {
             updatedGame.setPotQuantity(Integer.parseInt(inputMap.get("pot_quant")));
             updatedGame.setDifficulty(Integer.parseInt(inputMap.get("difficulty")));
             updatedGame.setPlayersFinished(Integer.parseInt(inputMap.get("players_finished")));
+            updatedGame.setLuigiFinished(Integer.parseInt(inputMap.get("luigi_finished")));
 
             // and update it in the database.
             updatedGame = gamedao.update_all(updatedGame);
@@ -474,7 +475,7 @@ public class PicturePokerGame {
                 }
                 GamePlay gp = new GamePlay(curGame, playerList);
 
-                gp.showdownResolution(gameDAO, playerDAO);
+                gp.showdownResolution(gameDAO, playerDAO, true);
                 if(curGame.getCurRound() > curGame.getNumRounds()){
                     // Do end of game stuff
                     gp.gameEndResolution(gameDAO, playerDAO);
@@ -488,8 +489,8 @@ public class PicturePokerGame {
         return player;
     }
 
-    @GetMapping("/getEndOfRoundInformation/{g_id}")
-    public ArrayList<PlayerShowdownInfo> getEndOfRoundInformation(@PathVariable long g_id){
+    @GetMapping("/getEndOfRoundInformation/{g_id}/{commit_results}")
+    public ArrayList<PlayerShowdownInfo> getEndOfRoundInformation(@PathVariable long g_id, @PathVariable boolean commit_results){
         DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,
                 "picturepoker", "postgres", "password");
         ArrayList<PlayerShowdownInfo> pSDInfo = new ArrayList<PlayerShowdownInfo>();
@@ -511,8 +512,10 @@ public class PicturePokerGame {
                     playerDAO.updateHand(playerList[i]);
                 }
                 GamePlay gp = new GamePlay(game, playerList);
-
-                pSDInfo = gp.showdownResolution(gameDAO, playerDAO);
+                if(game.getLuigiFinished() < 1) {
+                    gp.executeLuigi();
+                }
+                pSDInfo = gp.showdownResolution(gameDAO, playerDAO, commit_results);
             }
         } catch (SQLException e) {
             e.printStackTrace();

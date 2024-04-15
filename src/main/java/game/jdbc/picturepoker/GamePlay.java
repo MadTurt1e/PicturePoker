@@ -471,12 +471,11 @@ public class GamePlay {
                 playerDAO.update_long("tokens", player.getTokens(), player);
                 playerDAO.update_int("rounds_won", player.getRoundsWon(), player);
             }
-            playerDAO.update_long("tokens", player.getTokens(), player);
-            playerDAO.update_int("rounds_won", player.getRoundsWon(), player);
 
             //a new bit to reset the player's hand at the end of each round
             player.resetHand();
-            playerDAO.updateHand(player);
+            if(commitResults)
+                playerDAO.updateHand(player);
 
             // Handle bankruptcy logic here
             playersBankrupted += (player.getTokens() > 0 ? 0 : 1);

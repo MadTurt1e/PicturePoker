@@ -2,6 +2,7 @@ import "./Create.css"
 import React, {useState } from 'react';
 import create from "../../resources/menuIcons/creategame.png";
 import backdrop from "../../resources/menuIcons/luigisCasino.jpg";
+import back from "../../resources/misIcons/back.png";
 
 import buyin from "../../resources/menuIcons/buy-in-4-3-2024.png"
 import rounds from "../../resources/menuIcons/number-of-rounds-4-3-2024.png"
@@ -91,54 +92,51 @@ function CreateGame(){
     }
 
     return (
-        <div style={{
-            backgroundImage: `url(${backdrop})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            height: '100vh',
-            width: '100vw'
-        }}>
-            <Link to="/menu">
-                <img src={create} alt="" style={{width: '60%', marginBottom: '10vh'}}/>
-            </Link>
-
-            <br/>
-            <div className="RoundCount" style={{display: 'flex'}}>
-                <img src={rounds} style={{height: '10vh'}} alt={"Round Count"}/>
-                <button
-                    onClick={() => roundCount > 0 && setRoundCount(roundCount - 1)}
-                    className="glow">
-                    <img src={arrow} alt="arrow pointing upwards" className="rotate90"/>
-                </button>
-                <div style={{fontSize: '10vh'}} className="bordering">
-                    <ColorfulText text={roundCount}/>
+        <div className="create-background">
+            <div className="create-header">
+                <img src={create} alt="Create Game" className="create-title"/>
+                <Link to="/menu" className="back-button-container">
+                    <img src={back} alt="Back" className="back-button glow"/>
+                </Link>
+            </div>
+            <div className="config-container">
+                <div className="config-section">
+                    <img src={rounds} style={{height: '175px'}} alt={"Round Count"}/>
+                    <button
+                        onClick={() => roundCount > 0 && setRoundCount(roundCount - 1)}
+                        className="glow">
+                        <img src={arrow} alt="arrow pointing upwards" className="rotate90"/>
+                    </button>
+                    <div style={{fontSize: '14vh'}} className="bordering">
+                        <ColorfulText text={roundCount}/>
+                    </div>
+                    <button
+                        onClick={() => roundCount < 11 && setRoundCount(roundCount + 1)}
+                        className="glow">
+                        <img src={arrow} alt="arrow pointing downwards" className="rotateneg90"/>
+                    </button>
                 </div>
-                <button
-                    onClick={() => roundCount < 11 && setRoundCount(roundCount + 1)}
-                    className="glow">
-                    <img src={arrow} alt="arrow pointing downwards" className="rotateneg90"/>
-                </button>
-            </div>
-            <br/>
-            <div className="Buy In" style={{display: 'flex'}}>
-                <img src={buyin} style={{height: '10vh'}} alt={"buyin"}/>
-                <button
-                    onClick={() => buyIn > 0 && setCounter10(buyIn - 10)}
-                    className="glow">
-                    <img src={arrow} alt="arrow pointing upwards" className="rotate90"/>
-                </button>
-                <span style={{fontSize: '10vh', fontFamily: "MarioFont", color: "green"}} className="bordering">
-                    <ColorfulText text={buyIn}/>
-                </span>
-                <button
-                    onClick={() => setCounter10(buyIn + 10)}
-                    className="glow">
-                    <img src={arrow} alt="arrow pointing downwards" className="rotateneg90"/>
-                </button>
+                <br/>
+                <div className="config-section">
+                    <img src={buyin} style={{height: '150px'}} alt={"buyin"}/>
+                    <button
+                        onClick={() => buyIn > 0 && setCounter10(buyIn - 10)}
+                        className="glow">
+                        <img src={arrow} alt="arrow pointing upwards" className="rotate90"/>
+                    </button>
+                    <span style={{fontSize: '15vh', fontFamily: "MarioFont", color: "green"}} className="bordering">
+                        <ColorfulText text={buyIn}/>
+                    </span>
+                    <button
+                        onClick={() => setCounter10(buyIn + 10)}
+                        className="glow">
+                        <img src={arrow} alt="arrow pointing downwards" className="rotateneg90"/>
+                    </button>
+                </div>
             </div>
 
             <br/>
-            <div>
+            <div className="config-section">
                 <button type={"button"} style={{height: '10vh', width: '20hh', border: "black", borderWidth: "10px"}}
                         className="glow" onClick={() => checkIfGood()}>
                     <div style={{fontSize: '5vh'}} className="bordering">

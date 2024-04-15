@@ -468,7 +468,7 @@ public class PicturePokerGame {
                 long[] playerIDList = curGame.getPlayers();
 
                 //we get the list of all the players, so it is iterable.
-                for (int i = 0; i < 4; ++i) {
+                for (int i = 0; i < 4; i++) {
                     playerList[i] = playerDAO.findById(playerIDList[i]);
                     playerList[i].redrawHand();
                     playerDAO.updateHand(playerList[i]);
@@ -626,7 +626,7 @@ public class PicturePokerGame {
             Player[] playerList = new Player[4];
             long[] playerIDList = game.getPlayers();
             //we get the list of all the players, so it is iterable.
-            for (int i = 0; i < 4; ++i) {
+            for (int i = 0; i < 4; i++) {
                 playerList[i] = playerDAO.findById(playerIDList[i]);
             }
             GamePlay gamePlay = new GamePlay(game, playerList);
@@ -662,7 +662,7 @@ public class PicturePokerGame {
                 long[] playerIDList = game.getPlayers();
 
                 //we get the list of all the players, so it is iterable.
-                for (int i = 0; i < 4; ++i) {
+                for (int i = 0; i < 4; i++) {
                     playerList[i] = playerDAO.findById(playerIDList[i]);
                 }
                 for (Player p : playerList) {

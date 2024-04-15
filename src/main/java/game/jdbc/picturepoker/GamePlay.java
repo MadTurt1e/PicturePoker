@@ -122,7 +122,7 @@ public class GamePlay {
         return player;
     }
 
-    private void executeLuigi() {
+    public void executeLuigi() {
         // Luigi is an external game force.
         Card[] luigiHand = new Card[5];
         //initialize values
@@ -434,11 +434,8 @@ public class GamePlay {
         }
     }
 
-    public ArrayList<PlayerShowdownInfo> showdownResolution(GameDAO gameDAO, PlayerDAO playerDAO){
-        // this is where we'd execute Luigi's turn.
-        executeLuigi();
-        gameDAO.updateHand(curGame);
-
+    // If commitResults is false, the results of the showdown will not be recorded in the database
+    public ArrayList<PlayerShowdownInfo> showdownResolution(GameDAO gameDAO, PlayerDAO playerDAO, boolean commitResults){
         System.out.println("Showdown time!");
 
         // We want to track the players that ran out of tokens so we can just skip their turns
@@ -470,24 +467,31 @@ public class GamePlay {
 
             System.out.println(player.getPlayerName() + " now has " + player.getTokens() + " tokens. ");
             pSD.setNewTokens(player.getTokens());
-            playerDAO.update_long("tokens", player.getTokens(), player);
-            playerDAO.update_int("rounds_won", player.getRoundsWon(), player);
+            if(commitResults) {
+                playerDAO.update_long("tokens", player.getTokens(), player);
+                playerDAO.update_int("rounds_won", player.getRoundsWon(), player);
+            }
             // Handle bankruptcy logic here
             playersBankrupted += (player.getTokens() > 0 ? 0 : 1);
             player.setFinishedRound(player.getTokens() > 0 ? 0 : 1);
-            playerDAO.update_int("finished_round", player.getFinishedRound(), player);
             player.setBet(player.getTokens() > 0 ? 1 : 0);
-            playerDAO.update_int("bet", player.getBet(), player);
-            playerDAO.updateAttributes(player);
+            if (commitResults) {
+                playerDAO.update_int("finished_round", player.getFinishedRound(), player);
+                playerDAO.update_int("bet", player.getBet(), player);
+                playerDAO.updateAttributes(player);
+            }
             pSDList.add(pSD);
         }
 
         //we should increment the current round and keep on going.
         curGame.setCurRound(curGame.getCurRound() + 1);
         curGame.setPlayersFinished(playersBankrupted);
-        //update the game at this point to the database.
-        gameDAO.update_all(curGame);
-
+        //update the game at this point to the database, and reenable Luigi to act.
+        if(commitResults) {
+            curGame.setLuigiFinished(0);
+            gameDAO.update_int("luigi_finished", 0, curGame);
+            gameDAO.update_all(curGame);
+        }
         return pSDList;
     }
 
@@ -584,8 +588,12 @@ public class GamePlay {
                 curGame.setPlayersFinished(curGame.getPlayersFinished() + 1);
                 gamedao.update_int("players_finished", curGame.getPlayersFinished(), curGame);
             }
+            // this is where we'd execute Luigi's turn.
+            executeLuigi();
+            gamedao.updateHand(curGame);
+
             // Runs Luigi logic then pays out to players
-            showdownResolution(gamedao, playerdao);
+            showdownResolution(gamedao, playerdao, true);
         }
 
         //once we break out of the loop, all rounds are over and we can determine the winner.

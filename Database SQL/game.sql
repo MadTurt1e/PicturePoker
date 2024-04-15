@@ -8,5 +8,7 @@ CREATE TABLE game (
     buy_in int NOT NULL,
     pot_quantity int NOT NULL DEFAULT 0, -- Calculated on game initialization once players join
     difficulty int NOT NULL,
+    players_finished int NOT NULL DEFAULT 0, -- Perform showdown and advance round once this equals 4
+    luigi_finished int NOT NULL DEFAULT 0,
     PRIMARY KEY (g_id)
 );

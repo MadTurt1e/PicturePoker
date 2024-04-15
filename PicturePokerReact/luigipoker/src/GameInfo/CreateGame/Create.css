@@ -14,16 +14,53 @@
 }
 
 .bordering {
-    -webkit-text-stroke-width: 6px;
+    -webkit-text-stroke-width: 0.2vh;
     -webkit-text-stroke-color: black;
 }
-
-.bordering span span { color: tomato; }
-.bordering span span:nth-child(2n) { color: lightseagreen; }
-.bordering span span:nth-child(3n) { color: orange; }
-.bordering span span:nth-child(4n) { color: dodgerblue; }
-.bordering span span:nth-child(5n) { color: blueviolet; }
-
 .modal-title {
     font-family: MarioFont, serif;
+}
+
+.create-background {
+    background-image: url('../../resources/menuIcons/luigisCasino.jpg');
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    width: 100vw;
+}
+
+.create-header {
+    display: flex;
+    justify-content: center;
+    position: relative;
+}
+
+.create-title {
+    font-size: 5vh;
+    margin-top: 10vh;
+    margin-bottom: 100px;
+    width: 700px;
+}
+
+.back-button-container {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 20px;
+}
+
+.back-button {
+    width: 150px;
+}
+
+.configuration-container {
+    display: flex;
+    flex-direction: column;
+    vertical-align: center;
+}
+
+.config-section {
+    display: flex;
+    justify-content: center;
+    margin: 20px;
 }

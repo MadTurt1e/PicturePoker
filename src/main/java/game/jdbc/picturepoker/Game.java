@@ -16,6 +16,8 @@ public class Game implements DataTransferObject
     private int buy_in;
     private int pot_quantity;
     private int difficulty;
+    private int playersFinished;
+    private int luigiFinished;
     private String winner;
     private Card[] hand;
 
@@ -84,6 +86,22 @@ public class Game implements DataTransferObject
         this.difficulty = difficulty;
     }
 
+    public int getPlayersFinished() {
+        return playersFinished;
+    }
+
+    public void setPlayersFinished(int playersFinished) {
+        this.playersFinished = playersFinished;
+    }
+
+    public int getLuigiFinished() {
+        return luigiFinished;
+    }
+
+    public void setLuigiFinished(int luigiFinished) {
+        this.luigiFinished = luigiFinished;
+    }
+
     public String getWinner(){
         return winner;
     }
@@ -112,6 +130,8 @@ public class Game implements DataTransferObject
                 ", buy_in=" + buy_in +
                 ", pot_quantity=" + pot_quantity +
                 ", difficulty=" + difficulty +
+                ", players_finished=" + playersFinished +
+                ", luigi_finished=" + luigiFinished +
                 ", winner='" + winner + '\'' +
                 ", hand=" + Arrays.toString(hand) +
                 '}';

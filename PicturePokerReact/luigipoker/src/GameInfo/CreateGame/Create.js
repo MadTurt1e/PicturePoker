@@ -14,9 +14,7 @@ import axios from "axios";
 
 import ColorfulText from "../../index";
 
-function gameCreation(rounds, buyin, navigate, state){
-    //TODO: Check to make sure the game creator can actually join the game
-    // game check implemented here
+function gameCreation(rounds, buyin, navigate, setReason){
 
     const makeGame = async () => {
         const gameDetails = {
@@ -29,7 +27,6 @@ function gameCreation(rounds, buyin, navigate, state){
             .catch(function(){
                 console.log("Error with createNewGame");
             });
-
         //try joining the game we just made
         let response2 = await axios.put(`http://localhost:8080/joinGame/${response.data.id}/${sessionStorage.getItem('userID')}`)
             .catch(function () {
@@ -37,13 +34,14 @@ function gameCreation(rounds, buyin, navigate, state){
             });
         //a quick check to see if the player was able to join by scanning the player list. Only than do we let them in.
         for (let i=0; i < response2.data.players.length; i++){
-            if (response2.data.players[i] === sessionStorage.getItem('userID')){
+            if (response2.data.players[i] === parseInt(sessionStorage.getItem('userID'))){
                 navigate(`/WaitingRoom`, { state: { gameId: response2.data.id } });
             }
         }
-        state = "Player couldn't join the game";
     }
     makeGame();
+
+    setReason( "Player couldn't join the game");
 }
 
 function CreateGame(){
@@ -54,6 +52,7 @@ function CreateGame(){
     const [message, setMessage] = useState("");
     const navigate = useNavigate();
 
+    const [reason, setReason] = useState("");
     const checkIfGood = async () => {
         const response = await axios.get(`http://localhost:8080/getByPlayerID/${sessionStorage.getItem('userID')}`)
             .catch(function(){
@@ -70,20 +69,25 @@ function CreateGame(){
             //only if we pass all these checks do we let the player create a game.
             if (response.status === 200)
                 if (response.data.dollars < buyIn) {
-                    state = "Too broke. Your funds: $" + response.data.dollars;
+                    setReason("Too broke. Your funds: $" + response.data.dollars);
                 }
                 else if (response2.data === null){
-                    gameCreation(roundCount, buyIn, navigate, state);
+                    gameCreation(roundCount, buyIn, navigate, setReason);
                 }
                 else if(response2.data.curRound <= response2.data.numRounds) {
-                    state = "In a game already. ";
+                    setReason("In a game already. ");
                 }
                 else {
-                    gameCreation(roundCount, buyIn, navigate, state);
+                    console.log(response2);
+                    await axios.delete(`http://localhost:8080/leaveCurrentGame/${sessionStorage.getItem('userID')}`)
+                        .catch(function() {
+                            console.log("Error with leaveCurrentGame API call");
+                    });
+                    gameCreation(roundCount, buyIn, navigate, setReason);
                 }
         }
         //we only get here if we couldn't actually make the game.
-        setMessage("You cannot join the game. Reason: " + state);
+        setMessage("You cannot join the game. Reason: " + reason);
     }
 
     return (

@@ -488,7 +488,6 @@ public class PicturePokerGame {
         }
         return player;
     }
-    }
 
     @GetMapping("/getEndOfRoundInformation/{g_id}/{commit_results}")
     public ArrayList<PlayerShowdownInfo> getEndOfRoundInformation(@PathVariable long g_id, @PathVariable boolean commit_results){

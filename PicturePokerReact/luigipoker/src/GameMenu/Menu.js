@@ -25,7 +25,7 @@ const ImageComponent = () => {
         const inGame = async () => {
             const response = await axios.get(`http://localhost:8080/getPlayerActiveGame/${sessionStorage.getItem('userID')}`)
                 .catch(function(error){
-                    console.log("getByPlayerID API call did not work");
+                    console.log("getByPlayerID API call did not work" + sessionStorage.getItem('userID'));
                 });
             console.log(response);
             if(response.status === 200 && response.data !== null && (response.data.curRound <= response.data.numRounds)) {

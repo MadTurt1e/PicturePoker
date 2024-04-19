@@ -1,0 +1,442 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PlayerDAO</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">game.jdbc.picturepoker</a>
+</div>
+
+<h1>Coverage Summary for Class: PlayerDAO (game.jdbc.picturepoker)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PlayerDAO</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    26.7%
+  </span>
+  <span class="absValue">
+    (4/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    12.4%
+  </span>
+  <span class="absValue">
+    (27/218)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package game.jdbc.picturepoker;
+&nbsp;
+&nbsp;import game.jdbc.picturepoker.util.DataAccessObject;
+&nbsp;
+&nbsp;import java.sql.Connection;
+&nbsp;import java.sql.PreparedStatement;
+&nbsp;import java.sql.ResultSet;
+&nbsp;import java.sql.SQLException;
+&nbsp;import java.util.ArrayList;
+&nbsp;
+&nbsp;public class PlayerDAO extends DataAccessObject&lt;Player&gt;{
+&nbsp;    private static final String GET_PLAYER_BY_ID = &quot;SELECT &quot;
+&nbsp;            + &quot;p_id, p_name, passcode, dollars, first_places, second_places, third_places, &quot;
+&nbsp;            + &quot;fourth_places, lifetime_tokens, flushes, quads, full_houses, triples, two_pairs, &quot;
+&nbsp;            + &quot;one_pairs, high_cards, cards_changed, lifetime_rounds_won, lifetime_total_bet, &quot;
+&nbsp;            +&quot; tokens, bet, rounds_won, finished_round FROM player WHERE p_id = ?&quot;;
+&nbsp;    private static final String GET_ALL_PLAYERS = &quot;SELECT &quot;
+&nbsp;            + &quot;p_id, p_name, passcode, dollars, first_places, second_places, third_places, &quot;
+&nbsp;            + &quot;fourth_places, lifetime_tokens, flushes, quads, full_houses, triples, two_pairs, &quot;
+&nbsp;            + &quot;one_pairs, high_cards, cards_changed, lifetime_rounds_won, lifetime_total_bet, &quot;
+&nbsp;            +&quot; tokens, bet, rounds_won, finished_round FROM player&quot;;
+&nbsp;    private static final String CREATE_NEW_PLAYER = &quot;INSERT INTO player (p_name, passcode) VALUES (?, ?) RETURNING p_id&quot;;
+&nbsp;    private static final String CREATE_NEW_CARD = &quot;INSERT INTO player_card (p_id, hand_pos, suit) VALUES (?, ?, ?)&quot;;
+&nbsp;    private static final String UPDATE_PLAYER_BY_ID_START = &quot;UPDATE player SET &quot;;
+&nbsp;    private static final String UPDATE_PLAYER_BY_ID_END = &quot; = ? WHERE p_id = ?&quot;;
+&nbsp;    private static final String GET_ID_BY_NAME = &quot;SELECT p_id FROM player WHERE p_name = ?&quot;;
+&nbsp;    private static final String GET_CURRENT_GAME = &quot;SELECT g_id FROM player_in_game WHERE p_id = ?&quot;;
+&nbsp;    private static final String UPDATE_CARD = &quot;UPDATE player_card SET suit = ?, to_change = ? WHERE p_id = ? AND hand_pos = ?&quot;;
+&nbsp;    private static final String GET_CARD = &quot;SELECT suit, to_change FROM player_card WHERE p_id = ? AND hand_pos = ?&quot;;
+&nbsp;    private static final String DELETE_PLAYER = &quot;DELETE FROM player WHERE p_id = ?&quot;;
+&nbsp;
+&nbsp;    private static final String UPDATE_ATTRIBUTES =
+&nbsp;            &quot;UPDATE player SET p_name = ?, passcode = ?, dollars = ?,&quot;
+&nbsp;                    + &quot; first_places = ?, second_places = ?, third_places = ?, fourth_places = ?, lifetime_tokens = ?,&quot;
+&nbsp;                    + &quot;flushes = ?, quads = ?, full_houses = ?, triples = ?, two_pairs = ?, one_pairs = ?, &quot;
+&nbsp;                    + &quot;high_cards = ?, cards_changed = ?, lifetime_rounds_won = ?, lifetime_total_bet = ?, &quot;
+&nbsp;                    + &quot;finished_round = ? WHERE p_id = ?&quot;;
+&nbsp;    public PlayerDAO(Connection connection){
+<b class="fc">&nbsp;        super(connection);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Player findById(long id){
+<b class="nc">&nbsp;        Player player = new Player();</b>
+<b class="nc">&nbsp;        try(PreparedStatement statement = this.connection.prepareStatement(GET_PLAYER_BY_ID)){</b>
+<b class="nc">&nbsp;            statement.setLong(1, id);</b>
+<b class="nc">&nbsp;            ResultSet rs = statement.executeQuery();</b>
+<b class="nc">&nbsp;            while(rs.next()){</b>
+<b class="nc">&nbsp;                player.setID(rs.getLong(&quot;p_id&quot;));</b>
+<b class="nc">&nbsp;                player.setPlayerName(rs.getString(&quot;p_name&quot;));</b>
+<b class="nc">&nbsp;                player.setPasscode(rs.getString(&quot;passcode&quot;));</b>
+<b class="nc">&nbsp;                player.setDollars(rs.getInt(&quot;dollars&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;                player.setFirstPlaces(rs.getInt(&quot;first_places&quot;));</b>
+<b class="nc">&nbsp;                player.setSecondPlaces(rs.getInt(&quot;second_places&quot;));</b>
+<b class="nc">&nbsp;                player.setThirdPlaces(rs.getInt(&quot;third_places&quot;));</b>
+<b class="nc">&nbsp;                player.setFourthPlaces(rs.getInt(&quot;fourth_places&quot;));</b>
+<b class="nc">&nbsp;                player.setLifetimeTokens(rs.getInt(&quot;lifetime_tokens&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;                player.setFlushes(rs.getInt(&quot;flushes&quot;));</b>
+<b class="nc">&nbsp;                player.setQuads(rs.getInt(&quot;quads&quot;));</b>
+<b class="nc">&nbsp;                player.setFullHouses(rs.getInt(&quot;full_houses&quot;));</b>
+<b class="nc">&nbsp;                player.setTriples(rs.getInt(&quot;triples&quot;));</b>
+<b class="nc">&nbsp;                player.setTwoPairs(rs.getInt(&quot;two_pairs&quot;));</b>
+<b class="nc">&nbsp;                player.setOnePairs(rs.getInt(&quot;one_pairs&quot;));</b>
+<b class="nc">&nbsp;                player.setHighCards(rs.getInt(&quot;high_cards&quot;));</b>
+<b class="nc">&nbsp;                player.setCardsChanged(rs.getInt(&quot;cards_changed&quot;));</b>
+<b class="nc">&nbsp;                player.setLifetimeRoundsWon(rs.getInt(&quot;lifetime_rounds_won&quot;));</b>
+<b class="nc">&nbsp;                player.setLifetimeTotalBet(rs.getInt(&quot;lifetime_total_bet&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;                player.setTokens(rs.getInt(&quot;tokens&quot;));</b>
+<b class="nc">&nbsp;                player.setBet(rs.getInt(&quot;bet&quot;));</b>
+<b class="nc">&nbsp;                player.setRoundsWon(rs.getInt(&quot;rounds_won&quot;));</b>
+<b class="nc">&nbsp;                player.setFinishedRound(rs.getInt(&quot;finished_round&quot;));</b>
+<b class="nc">&nbsp;                player = getHand(player);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        catch (SQLException e) {</b>
+<b class="nc">&nbsp;            e.printStackTrace();</b>
+<b class="nc">&nbsp;            throw new RuntimeException(e);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return player;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ArrayList&lt;Player&gt; findAllPlayers(){
+<b class="nc">&nbsp;        ArrayList&lt;Player&gt; allPlayers = new ArrayList&lt;Player&gt;();</b>
+<b class="nc">&nbsp;        try(PreparedStatement statement = this.connection.prepareStatement(GET_ALL_PLAYERS)){</b>
+<b class="nc">&nbsp;            ResultSet rs = statement.executeQuery();</b>
+<b class="nc">&nbsp;            while(rs.next()){</b>
+<b class="nc">&nbsp;                Player player = new Player();</b>
+&nbsp;
+<b class="nc">&nbsp;                player.setID(rs.getLong(&quot;p_id&quot;));</b>
+<b class="nc">&nbsp;                player.setPlayerName(rs.getString(&quot;p_name&quot;));</b>
+<b class="nc">&nbsp;                player.setPasscode(rs.getString(&quot;passcode&quot;));</b>
+<b class="nc">&nbsp;                player.setDollars(rs.getInt(&quot;dollars&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;                player.setFirstPlaces(rs.getInt(&quot;first_places&quot;));</b>
+<b class="nc">&nbsp;                player.setSecondPlaces(rs.getInt(&quot;second_places&quot;));</b>
+<b class="nc">&nbsp;                player.setThirdPlaces(rs.getInt(&quot;third_places&quot;));</b>
+<b class="nc">&nbsp;                player.setFourthPlaces(rs.getInt(&quot;fourth_places&quot;));</b>
+<b class="nc">&nbsp;                player.setLifetimeTokens(rs.getInt(&quot;lifetime_tokens&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;                player.setFlushes(rs.getInt(&quot;flushes&quot;));</b>
+<b class="nc">&nbsp;                player.setQuads(rs.getInt(&quot;quads&quot;));</b>
+<b class="nc">&nbsp;                player.setFullHouses(rs.getInt(&quot;full_houses&quot;));</b>
+<b class="nc">&nbsp;                player.setTriples(rs.getInt(&quot;triples&quot;));</b>
+<b class="nc">&nbsp;                player.setTwoPairs(rs.getInt(&quot;two_pairs&quot;));</b>
+<b class="nc">&nbsp;                player.setOnePairs(rs.getInt(&quot;one_pairs&quot;));</b>
+<b class="nc">&nbsp;                player.setHighCards(rs.getInt(&quot;high_cards&quot;));</b>
+<b class="nc">&nbsp;                player.setCardsChanged(rs.getInt(&quot;cards_changed&quot;));</b>
+<b class="nc">&nbsp;                player.setLifetimeRoundsWon(rs.getInt(&quot;lifetime_rounds_won&quot;));</b>
+<b class="nc">&nbsp;                player.setLifetimeTotalBet(rs.getInt(&quot;lifetime_total_bet&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;                player.setTokens(rs.getInt(&quot;tokens&quot;));</b>
+<b class="nc">&nbsp;                player.setBet(rs.getInt(&quot;bet&quot;));</b>
+<b class="nc">&nbsp;                player.setRoundsWon(rs.getInt(&quot;rounds_won&quot;));</b>
+<b class="nc">&nbsp;                player.setFinishedRound(rs.getInt(&quot;finished_round&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;                player = getHand(player);</b>
+&nbsp;
+<b class="nc">&nbsp;                allPlayers.add(player);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        catch (SQLException e) {</b>
+<b class="nc">&nbsp;            e.printStackTrace();</b>
+<b class="nc">&nbsp;            throw new RuntimeException(e);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return allPlayers;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public long findIDByName(String name){
+<b class="nc">&nbsp;        long foundID = 0;</b>
+<b class="nc">&nbsp;        try(PreparedStatement statement = this.connection.prepareStatement(GET_ID_BY_NAME)){</b>
+&nbsp;            // We make a new SQL statement, and we want to go from player name to id
+<b class="nc">&nbsp;            statement.setString(1, name);</b>
+<b class="nc">&nbsp;            ResultSet rs = statement.executeQuery();</b>
+<b class="nc">&nbsp;            while(rs.next()) {</b>
+&nbsp;                // and this statement gets the player id and returns it
+<b class="nc">&nbsp;                foundID = rs.getLong(&quot;p_id&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        catch (SQLException e){</b>
+<b class="nc">&nbsp;            e.printStackTrace();</b>
+<b class="nc">&nbsp;            throw new RuntimeException(e);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        // returned
+<b class="nc">&nbsp;        return foundID;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //Way to find the player by name, instead of by ID, which seems to be more &quot;colloquial&quot;
+&nbsp;    // This will be deprecated eventually, but left in for now in case my changes are too spicy.
+&nbsp;    public Player findByName(String name){
+<b class="nc">&nbsp;        long playerID = findIDByName(name);</b>
+<b class="nc">&nbsp;        return findById(playerID);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Player create(Player dto){
+<b class="fc">&nbsp;        try(PreparedStatement statement = this.connection.prepareStatement(CREATE_NEW_PLAYER)){</b>
+<b class="fc">&nbsp;            statement.setString(1, dto.getPlayerName());</b>
+<b class="fc">&nbsp;            statement.setString(2, dto.getPasscode());</b>
+&nbsp;
+&nbsp;            // now we create the player that we&#39;re returning
+<b class="fc">&nbsp;            Player player = new Player();</b>
+<b class="fc">&nbsp;            player.setPlayerName(dto.getPlayerName());</b>
+<b class="fc">&nbsp;            player.setPasscode(dto.getPasscode());</b>
+<b class="fc">&nbsp;            ResultSet rs = statement.executeQuery();</b>
+<b class="fc">&nbsp;            while (rs.next()){</b>
+<b class="fc">&nbsp;                player.setID(rs.getLong(&quot;p_id&quot;));</b>
+&nbsp;            }
+<b class="fc">&nbsp;            return player;</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        catch (SQLException e) {</b>
+<b class="fc">&nbsp;            e.printStackTrace();</b>
+<b class="fc">&nbsp;            throw new RuntimeException(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public long getCurrentGame(Player dto){
+<b class="nc">&nbsp;        long foundGID = -1;</b>
+<b class="nc">&nbsp;        try(PreparedStatement statement = this.connection.prepareStatement(GET_CURRENT_GAME)){</b>
+<b class="nc">&nbsp;            statement.setLong(1, dto.getID());</b>
+<b class="nc">&nbsp;            ResultSet rs = statement.executeQuery();</b>
+<b class="nc">&nbsp;            while(rs.next()) {</b>
+&nbsp;                // and this statement gets the player id and returns it
+<b class="nc">&nbsp;                foundGID = rs.getLong(&quot;g_id&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return foundGID;</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        catch (SQLException e) {</b>
+<b class="nc">&nbsp;            e.printStackTrace();</b>
+<b class="nc">&nbsp;            throw new RuntimeException(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public Player getHand(Player dto){
+<b class="nc">&nbsp;        Card[] result = new Card[5];</b>
+<b class="nc">&nbsp;        for(int i = 0; i &lt; 5; i++){</b>
+<b class="nc">&nbsp;            try(PreparedStatement statement = this.connection.prepareStatement(GET_CARD)){</b>
+<b class="nc">&nbsp;                statement.setLong(1, dto.getID());</b>
+<b class="nc">&nbsp;                statement.setInt(2, i);</b>
+<b class="nc">&nbsp;                ResultSet rs = statement.executeQuery();</b>
+<b class="nc">&nbsp;                while(rs.next()){</b>
+<b class="nc">&nbsp;                    result[i] = new Card(Card.Suit.valueOf(rs.getString(&quot;suit&quot;)));</b>
+<b class="nc">&nbsp;                    result[i].setToChange(rs.getBoolean(&quot;to_change&quot;));</b>
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            catch (SQLException e) {</b>
+<b class="nc">&nbsp;                e.printStackTrace();</b>
+<b class="nc">&nbsp;                throw new RuntimeException(e);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+<b class="nc">&nbsp;        dto.setHand(result);</b>
+<b class="nc">&nbsp;        return dto;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Player createHand(Player dto){
+<b class="nc">&nbsp;        Card[] newHand = new Card[5];</b>
+<b class="nc">&nbsp;        for(int i = 0; i &lt; 5; i++){</b>
+<b class="nc">&nbsp;            newHand[i] = new Card();</b>
+<b class="nc">&nbsp;            try(PreparedStatement statement = this.connection.prepareStatement(CREATE_NEW_CARD)){</b>
+<b class="nc">&nbsp;                statement.setLong(1, dto.getID());</b>
+<b class="nc">&nbsp;                statement.setInt(2, i);</b>
+<b class="nc">&nbsp;                statement.setString(3, newHand[i].toString());</b>
+<b class="nc">&nbsp;                statement.execute();</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            catch (SQLException e) {</b>
+<b class="nc">&nbsp;                e.printStackTrace();</b>
+<b class="nc">&nbsp;                throw new RuntimeException(e);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+<b class="nc">&nbsp;        dto.setHand(newHand);</b>
+<b class="nc">&nbsp;        return dto;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Player update_long(String attribute, long value, Player dto){
+<b class="fc">&nbsp;        try(PreparedStatement statement = this.connection.prepareStatement(UPDATE_PLAYER_BY_ID_START + attribute + UPDATE_PLAYER_BY_ID_END)){</b>
+<b class="fc">&nbsp;            statement.setLong(1, value);</b>
+<b class="fc">&nbsp;            statement.setLong(2, dto.getID());</b>
+<b class="fc">&nbsp;            statement.execute();</b>
+<b class="fc">&nbsp;            return dto;</b>
+<b class="fc">&nbsp;        }</b>
+<b class="nc">&nbsp;        catch(SQLException e){</b>
+<b class="nc">&nbsp;            e.printStackTrace();</b>
+<b class="nc">&nbsp;            throw new RuntimeException(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public Player update_int(String attribute, int value, Player dto){
+<b class="fc">&nbsp;        try(PreparedStatement statement = this.connection.prepareStatement(UPDATE_PLAYER_BY_ID_START + attribute + UPDATE_PLAYER_BY_ID_END)){</b>
+<b class="fc">&nbsp;            statement.setInt(1, value);</b>
+<b class="fc">&nbsp;            statement.setLong(2, dto.getID());</b>
+<b class="fc">&nbsp;            statement.execute();</b>
+<b class="fc">&nbsp;            return dto;</b>
+<b class="fc">&nbsp;        }</b>
+<b class="nc">&nbsp;        catch(SQLException e){</b>
+<b class="nc">&nbsp;            e.printStackTrace();</b>
+<b class="nc">&nbsp;            throw new RuntimeException(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    public Player update_string(String attribute, String data, Player dto){
+<b class="nc">&nbsp;        try(PreparedStatement statement = this.connection.prepareStatement(UPDATE_PLAYER_BY_ID_START + attribute + UPDATE_PLAYER_BY_ID_END)){</b>
+<b class="nc">&nbsp;            statement.setString(1, data);</b>
+<b class="nc">&nbsp;            statement.setLong(2, dto.getID());</b>
+<b class="nc">&nbsp;            statement.execute();</b>
+<b class="nc">&nbsp;            return dto;</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        catch(SQLException e){</b>
+<b class="nc">&nbsp;            e.printStackTrace();</b>
+<b class="nc">&nbsp;            throw new RuntimeException(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public Player updateAttributes(Player dto) {
+<b class="nc">&nbsp;        try (PreparedStatement statement = this.connection.prepareStatement(UPDATE_ATTRIBUTES)) {</b>
+<b class="nc">&nbsp;            statement.setString(1, dto.getPlayerName());</b>
+<b class="nc">&nbsp;            statement.setString(2, dto.getPasscode());</b>
+<b class="nc">&nbsp;            statement.setInt(3, dto.getDollars());</b>
+<b class="nc">&nbsp;            statement.setInt(4, dto.getFirstPlaces());</b>
+<b class="nc">&nbsp;            statement.setInt(5, dto.getSecondPlaces());</b>
+<b class="nc">&nbsp;            statement.setInt(6, dto.getThirdPlaces());</b>
+<b class="nc">&nbsp;            statement.setInt(7, dto.getFourthPlaces());</b>
+<b class="nc">&nbsp;            statement.setLong(8, dto.getLifetimeTokens());</b>
+<b class="nc">&nbsp;            statement.setInt(9, dto.getFlushes());</b>
+<b class="nc">&nbsp;            statement.setInt(10, dto.getQuads());</b>
+<b class="nc">&nbsp;            statement.setInt(11, dto.getFullHouses());</b>
+<b class="nc">&nbsp;            statement.setInt(12, dto.getTriples());</b>
+<b class="nc">&nbsp;            statement.setInt(13, dto.getTwoPairs());</b>
+<b class="nc">&nbsp;            statement.setInt(14, dto.getOnePairs());</b>
+<b class="nc">&nbsp;            statement.setInt(15, dto.getHighCards());</b>
+<b class="nc">&nbsp;            statement.setInt(16, dto.getCardsChanged());</b>
+<b class="nc">&nbsp;            statement.setInt(17, dto.getLifetimeRoundsWon());</b>
+<b class="nc">&nbsp;            statement.setInt(18, dto.getLifetimeTotalBet());</b>
+<b class="nc">&nbsp;            statement.setInt(19, dto.getFinishedRound());</b>
+<b class="nc">&nbsp;            statement.setLong(20, dto.getID());</b>
+&nbsp;
+<b class="nc">&nbsp;            statement.execute();</b>
+<b class="nc">&nbsp;            return dto;</b>
+<b class="nc">&nbsp;        } catch (SQLException e) {</b>
+<b class="nc">&nbsp;            e.printStackTrace();</b>
+<b class="nc">&nbsp;            throw new RuntimeException(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public Player updateHand(Player dto){
+<b class="nc">&nbsp;        for(int i = 0; i &lt; 5; i++){</b>
+<b class="nc">&nbsp;            try(PreparedStatement statement = this.connection.prepareStatement(UPDATE_CARD)){</b>
+<b class="nc">&nbsp;                statement.setString(1, dto.getHand()[i].toString());</b>
+<b class="nc">&nbsp;                statement.setBoolean(2, dto.getHand()[i].getToChange());</b>
+<b class="nc">&nbsp;                statement.setLong(3, dto.getID());</b>
+<b class="nc">&nbsp;                statement.setInt(4, i);</b>
+<b class="nc">&nbsp;                statement.execute();</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            catch (SQLException e) {</b>
+<b class="nc">&nbsp;                e.printStackTrace();</b>
+<b class="nc">&nbsp;                throw new RuntimeException(e);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return dto;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //one part of CRUD - honestly this is not necessary, but it must be done.
+&nbsp;    public Player deletePlayer(long p_id) {
+<b class="nc">&nbsp;        Player player = findById(p_id);</b>
+<b class="nc">&nbsp;        try (PreparedStatement statement = this.connection.prepareStatement(DELETE_PLAYER)) {</b>
+&nbsp;            //RIP player
+<b class="nc">&nbsp;            statement.setLong(1, p_id);</b>
+<b class="nc">&nbsp;            statement.execute();</b>
+<b class="nc">&nbsp;        } catch (SQLException e) {</b>
+<b class="nc">&nbsp;            e.printStackTrace();</b>
+<b class="nc">&nbsp;            throw new RuntimeException(e);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return player;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-16 21:55</div>
+</div>
+</body>
+</html>

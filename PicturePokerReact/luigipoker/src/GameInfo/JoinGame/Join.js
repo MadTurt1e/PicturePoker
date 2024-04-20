@@ -10,8 +10,10 @@ import axios from "axios";
 
 import ColorfulText from "../../index";
 
-function GameList() {
+function GameList({joinFxn}) {
+    const navigate = useNavigate();
     const [data, setData] = useState(null);
+
     useEffect(() => {
         const loadGame = async () => {
             const response = await axios.get(`http://localhost:8080/getAllGames`)
@@ -28,7 +30,9 @@ function GameList() {
         return (
             <div style={{height: '30vh', overflow: 'scroll'}}>
                 {gameIDs.map((value) =>
-                    <ColorfulText text={JSON.stringify(value, null, 2)}/>
+                    <div onClick={() => joinFxn(value)}>
+                        <ColorfulText text={JSON.stringify(value, null, 2)}/>
+                    </div>
                 )}
             </div>
         );
@@ -73,7 +77,7 @@ function JoinGame() {
             let response = await axios.put(`http://localhost:8080/joinGame/${gameId}/${sessionStorage.getItem('userID')}`);
             handleJoinGameResponse(response, gameId);
         } catch (error) {
-            console.log("Error joining game: ", error);
+            console.log("JoinGame didn't work. " + gameId);
             setMessage("An error occurred while trying to join the game. Please try again.");
         }
     }
@@ -118,7 +122,7 @@ function JoinGame() {
                         <ColorfulText text="Game ID List:"/>
                     </div>
                     <div className="game-id-list">
-                        <GameList/>
+                        <GameList joinFxn = {joinGame}/>
                     </div>
                 </div>
             </div>

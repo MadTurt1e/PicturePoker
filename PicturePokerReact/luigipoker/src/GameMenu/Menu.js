@@ -44,7 +44,6 @@ const ImageComponent = () => {
                 .catch(function(error){
                     console.log("getByPlayerID API call did not work" + sessionStorage.getItem('userID'));
                 });
-            console.log(response);
             if(response.status === 200 && response.data !== null && (response.data.curRound <= response.data.numRounds)) {
                 setGid(response.data.id);
             }

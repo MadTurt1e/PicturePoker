@@ -508,9 +508,12 @@ public class PicturePokerGame {
                 //we get the list of all the players, so it is iterable.
                 for (int i = 0; i < 4; i++) {
                     playerList[i] = playerDAO.findById(playerIDList[i]);
-                    playerList[i].redrawHand();
-                    playerDAO.updateHand(playerList[i]);
-                    playerDAO.updateAttributes(playerList[i]);
+                    //we only redraw for players who have finished the round
+                    if (playerList[i].getFinishedRound() == 1) {
+                        playerList[i].redrawHand();
+                        playerDAO.updateHand(playerList[i]);
+                        playerDAO.updateAttributes(playerList[i]);
+                    }
                 }
                 GamePlay gp = new GamePlay(game, playerList);
                 if(game.getLuigiFinished() < 1) {
@@ -518,7 +521,8 @@ public class PicturePokerGame {
                     gameDAO.updateHand(game);
                 }
                 pSDInfo = gp.showdownResolution(gameDAO, playerDAO, commit_results);
-                if(game.getCurRound() > game.getNumRounds()){
+                //Only end the game in the case that everybody is done with the game.
+                if(commit_results && game.getCurRound() > game.getNumRounds()){
                     // Do end of game stuff
                     gp.gameEndResolution(gameDAO, playerDAO);
                 }

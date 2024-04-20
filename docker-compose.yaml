@@ -1,5 +1,6 @@
 services:
   db:
+    build: Database SQL/
     image: postgres
     volumes:
       - $HOME/srv/postgres:/var/lib/postgresql/data

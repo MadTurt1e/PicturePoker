@@ -47,8 +47,8 @@ function gameCreation(rounds, buyin, navigate, setReason){
 
 function CreateGame(){
     // counter which counts
-    const [roundCount, setRoundCount] = useState(0);
-    const [buyIn, setCounter10] = useState(0);
+    const [roundCount, setRoundCount] = useState(1);
+    const [buyIn, setBuyIn] = useState(5);
 
     const [message, setMessage] = useState("");
     const navigate = useNavigate();
@@ -103,7 +103,7 @@ function CreateGame(){
                 <div className="config-section">
                     <img src={rounds} style={{height: '175px'}} alt={"Round Count"}/>
                     <button
-                        onClick={() => roundCount > 0 && setRoundCount(roundCount - 1)}
+                        onClick={() => roundCount > 1 && setRoundCount(roundCount - 1)}
                         className="glow">
                         <img src={arrow} alt="arrow pointing upwards" className="rotate90"/>
                     </button>
@@ -120,7 +120,7 @@ function CreateGame(){
                 <div className="config-section">
                     <img src={buyin} style={{height: '150px'}} alt={"buyin"}/>
                     <button
-                        onClick={() => buyIn > 0 && setCounter10(buyIn - 10)}
+                        onClick={() => buyIn > 5 && setBuyIn(buyIn - 5)}
                         className="glow">
                         <img src={arrow} alt="arrow pointing upwards" className="rotate90"/>
                     </button>
@@ -128,7 +128,7 @@ function CreateGame(){
                         <ColorfulText text={buyIn}/>
                     </span>
                     <button
-                        onClick={() => setCounter10(buyIn + 10)}
+                        onClick={() => setBuyIn(buyIn + 5)}
                         className="glow">
                         <img src={arrow} alt="arrow pointing downwards" className="rotateneg90"/>
                     </button>

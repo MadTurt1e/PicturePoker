@@ -13,29 +13,34 @@ function PlayerList() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const interval = setInterval(async () => {
+        //this should be on an interval - it runs once, then it runs every 10 seconds.
+        async function doStuff () {
             const response = await axios.get(`http://localhost:8080/getByGameID/` + gid)
-                .catch(function(){
+                .catch(function () {
                     console.log("GetbyGameID didn't work. ");
                 });
             setPlayers(response.data.players);
 
-            if(players) {
+            if (players) {
                 const filteredPlayers = players.filter(player => player !== 0);
                 let newPNames = [];
-                for(let i=0; i < filteredPlayers.length; i++) {
+                for (let i = 0; i < filteredPlayers.length; i++) {
                     let response = await axios.get(`http://localhost:8080/getByPlayerID/${filteredPlayers[i]}`)
-                        .catch(function(error){
+                        .catch(function (error) {
                             console.log('getByPlayerID didn\'t work');
                         });
                     newPNames.push(response.data.playerName);
                 }
                 setPNames(newPNames);
             }
-        }, 1000);
+        }
+        doStuff();
+        const interval = setInterval(async () => {
+            doStuff();
+        }, 10000);
         //TIME: for debugging purposes. Set to 10 seconds in real life.
 
-        //LEAVE THE WAITING ROOM
+        // Leave the waiting room immediately after we hit 4 players.
         if (pNames.length === 4) {
             navigate(`/Game`, { state: { gameId: gid } });
         }
@@ -43,7 +48,7 @@ function PlayerList() {
         // Cleanup interval on unmount
         return () => clearInterval(interval);
 
-    }, [players]); // Re-run effect when `players` changes
+    }, []);
 
 
     return (
@@ -63,6 +68,7 @@ function PlayerList() {
 function WaitingRoom(){
     const navigate = useNavigate();
     const [message, setMessage] = useState("Welcome to the Waiting Room. Enjoy your stay!");
+    //we have a function to check if a player is allowed to leave.
     const exitGame = async() => {
         //leave game
         let response = await axios.delete(`http://localhost:8080/leaveCurrentGame/${sessionStorage.getItem('userID')}`)
@@ -78,7 +84,7 @@ function WaitingRoom(){
             if (response2.data === "" || response2.data.players.includes(parseInt(sessionStorage.getItem("userID"))))
                 navigate('/menu');
         }
-        setMessage("You can never leave. ")
+        setMessage("You cannot leave. ")
     }
 
     return (
@@ -89,7 +95,7 @@ function WaitingRoom(){
             height: '100vh',
             width: '100vw'
         }}>
-            <div style={{fontSize: "10vh"}} className={"bordering"}>
+            <div style={{fontSize: "4vh"}} className={"bordering"}>
                 <ColorfulText text={message}/>
             </div>
             <PlayerList/>

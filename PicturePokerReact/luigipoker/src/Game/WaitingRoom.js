@@ -23,7 +23,6 @@ function PlayerList() {
             if(players) {
                 const filteredPlayers = players.filter(player => player !== 0);
                 let newPNames = [];
-                console.log(filteredPlayers);
                 for(let i=0; i < filteredPlayers.length; i++) {
                     let response = await axios.get(`http://localhost:8080/getByPlayerID/${filteredPlayers[i]}`)
                         .catch(function(error){

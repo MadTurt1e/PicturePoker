@@ -155,7 +155,7 @@ public class GamePlay {
         for (int i = 0; i < luigiHand.length; ++i) {
             if (luigiHand[i].getToChange()) {
                 System.out.println("Luigi is changing out card " + i + "!");
-                luigiHand[i].setSuit(Card.Suit.values()[(int) (Math.random() * 6)]);
+                luigiHand[i].redrawSuit();
             }
         }
 

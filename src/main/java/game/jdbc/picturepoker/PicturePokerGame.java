@@ -509,6 +509,7 @@ public class PicturePokerGame {
                 for (int i = 0; i < 4; i++) {
                     playerList[i] = playerDAO.findById(playerIDList[i]);
                     //we only redraw for players who have finished the round
+                    // Well actually we assume that all players have already finished the round before entering but whatever
                     if (playerList[i].getFinishedRound() == 1) {
                         playerList[i].redrawHand();
                         playerDAO.updateHand(playerList[i]);

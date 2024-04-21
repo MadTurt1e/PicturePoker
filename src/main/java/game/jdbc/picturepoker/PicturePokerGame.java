@@ -490,10 +490,10 @@ public class PicturePokerGame {
     }
 
     @GetMapping("/getEndOfRoundInformation/{g_id}/{commit_results}")
-    public ArrayList<PlayerShowdownInfo> getEndOfRoundInformation(@PathVariable long g_id, @PathVariable boolean commit_results){
+    public ShowdownInfo getEndOfRoundInformation(@PathVariable long g_id, @PathVariable boolean commit_results){
         DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,
                 "picturepoker", "postgres", "password");
-        ArrayList<PlayerShowdownInfo> pSDInfo = new ArrayList<PlayerShowdownInfo>();
+        ShowdownInfo sdInfo = new ShowdownInfo();
         Game game = new Game();
         try {
             Connection connection = dcm.getConnection();
@@ -519,9 +519,9 @@ public class PicturePokerGame {
                 GamePlay gp = new GamePlay(game, playerList);
                 if(game.getLuigiFinished() < 1) {
                     gp.executeLuigi();
-                    gameDAO.updateHand(game);
+                    gameDAO.updateHand(gp.getCurGame());
                 }
-                pSDInfo = gp.showdownResolution(gameDAO, playerDAO, commit_results);
+                sdInfo = gp.showdownResolution(gameDAO, playerDAO, commit_results);
                 //Only end the game in the case that everybody is done with the game.
                 if(commit_results && game.getCurRound() > game.getNumRounds()){
                     // Do end of game stuff
@@ -531,7 +531,7 @@ public class PicturePokerGame {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return pSDInfo;
+        return sdInfo;
     }
 
     //DELETE Operation - Delete a player

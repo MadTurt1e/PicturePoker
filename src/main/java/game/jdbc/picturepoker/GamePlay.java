@@ -29,6 +29,10 @@ public class GamePlay {
         this.playerList = playerList;
     }
 
+    public Game getCurGame() {
+        return curGame;
+    }
+
     private Player executeRoundFromTerminal(Player player, GameDAO gameDAO, PlayerDAO playerDAO) {
         System.out.println("\n" + player.getPlayerName() + "'s Turn! ");
         System.out.println(player.getPlayerName() + " has " + player.getTokens() + " tokens!");
@@ -434,7 +438,7 @@ public class GamePlay {
     }
 
     // If commitResults is false, the results of the showdown will not be recorded in the database
-    public ArrayList<PlayerShowdownInfo> showdownResolution(GameDAO gameDAO, PlayerDAO playerDAO, boolean commitResults){
+    public ShowdownInfo showdownResolution(GameDAO gameDAO, PlayerDAO playerDAO, boolean commitResults){
         System.out.println("Showdown time!");
 
         // We want to track the players that ran out of tokens so we can just skip their turns
@@ -442,6 +446,8 @@ public class GamePlay {
 
         // Begin tracking players' end of round information
 
+        ShowdownInfo sdInfo = new ShowdownInfo();
+        sdInfo.setLuigiHand(curGame.getHand());
         ArrayList<PlayerShowdownInfo> pSDList = new ArrayList<PlayerShowdownInfo>();
 
         //Now we run a function which pays out tokens compared to Luigi
@@ -499,7 +505,8 @@ public class GamePlay {
             gameDAO.update_int("luigi_finished", 0, curGame);
             gameDAO.update_all(curGame);
         }
-        return pSDList;
+        sdInfo.setPlayerShowdownInfos(pSDList);
+        return sdInfo;
     }
 
     public void gameEndResolution(GameDAO gameDAO, PlayerDAO playerDAO){

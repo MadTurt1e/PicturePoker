@@ -25,6 +25,7 @@ import backdrop from "../resources/pokerSprites/table.png";
 import axios from "axios";
 import ColorfulText from "../index";
 
+
 function PlayerList({gid}) {
     const [players, setPlayers] = useState(null);
     const [pNames, setPNames] = useState([]);
@@ -142,16 +143,10 @@ function WaitingOnTurn(turnEnd) {
     const [finished, setFinished] = useState(0); // Use state to track 'finished'
 
     useEffect(() => {
-        async function getPlayerNames() {
-            let response = await axios.get(`http://localhost:8080/getByPlayerID/${sessionStorage.getItem("userID")}`)
-                .catch(function () {
-                    console.log('getByPlayerID didn\'t work. ');
-                });
-            if (response.status === 200 && response.data.finishedRound === 1) {
-                setFinished(1); // Update 'finished' state here
-            }
-        }
-        getPlayerNames();
+        if (turnEnd === 1)
+            setFinished(1);
+        else
+            setFinished(0);
     }, [turnEnd]);
 
     // Conditionally render based on 'finished'
@@ -191,13 +186,54 @@ function cards2Int(hand){
 
 }
 
+function EndOfRoundList({info}) {
+    const [players, setPlayers] = useState([]);
+
+    useEffect(() => {
+        async function getPlayerNames() {
+            const names = [];
+
+            for(let i=0; i < info.length; i++) {
+                let response = await axios.get(`http://localhost:8080/getByPlayerID/${info[i].pID}`)
+                    .catch(function(){
+                        console.log('getByPlayerID didn\'t work ' + info[i].pID);
+                    });
+                names.push(response.data.playerName);
+            }
+            setPlayers(names);
+        }
+        getPlayerNames();
+    }, [info]);
+
+    return (
+        <div>
+            {players.map((value, i) => (
+                <React.Fragment key={i}>
+                    <ColorfulText text={players[i] + ": " + (info[i].winLossAmount > 0 ? "+" : "")+info[i].winLossAmount + " token" + (Math.abs(info[i].winLossAmount) > 1 ? "s" : "")}/>
+                </React.Fragment>
+            ))}
+        </div>
+    )
+}
+
+function nextRound(gid){
+    const endRound = async () => {
+        // api call once and done
+        const response = await axios.get(`http://localhost:8080/getEndOfRoundInformation/${gid}/${false}`)
+            .catch(function () {
+                console.log("GetEndOfRoundInformation didn't work. " + gid);
+            });
+    }
+    endRound();
+}
 function EndOfRound({gid, turnEnd, showCards}){
     const [data, setData] = useState(null);
+    const [dispResults, setDispResults] = useState(false);
     useEffect(() => {
         const endRound = async () => {
             //we only start API calling when our turn ends.
             if (turnEnd) {
-                const response = await axios.get(`http://localhost:8080/getEndOfRoundInformation/${gid}/${false}`)
+                const response = await axios.get(`http://localhost:8080/getEndOfRoundInformation/${gid}/${true}`)
                     .catch(function () {
                         console.log("GetEndOfRoundInformation didn't work. " + gid);
                     });
@@ -206,14 +242,14 @@ function EndOfRound({gid, turnEnd, showCards}){
         }
         endRound();
 
-        const intervalId = setInterval(endRound, 1000); // 5000 ms = 5 seconds
+        const intervalId = setInterval(endRound, 5000); // 5000 ms = 5 seconds
         //TODO: Intervals are bad, but we use them a lot. Ideally we don't use them a lot.
 
         // Clear interval on unmount
         return () => clearInterval(intervalId);
     }, [gid, turnEnd]);
 
-    console.log(data);
+    const placement = ["Quite well", "Okay", "kind of badly", "terribly"]
     //this is the case where our game is now over
     if (turnEnd && data !== null && data.playerShowdownInfos.length !== 0){
         //scan through for our player ID
@@ -221,17 +257,41 @@ function EndOfRound({gid, turnEnd, showCards}){
             if (data.playerShowdownInfos[i].pID === parseInt(sessionStorage.getItem("userID"))){
                 // With this information, we can do stuff.
 
-                //First, we can kind of showcase the results via something from the parent function
-                showCards(data.playerShowdownInfos[i]);
+                //First, we showcase the results of the drawing
+                showCards(data, i);
 
+                //Set a timer to wait for a bit before we display results
+                setTimeout(() => {
+                    setDispResults(true);
+                }, 10000); // give it like 10 seconds
+
+                //Set a timer to go on to the next round after a while
+                setTimeout(() => {
+                    nextRound(gid);
+                    setDispResults(false);
+                }, 30000); // let the user bask in the results for like 30 seconds
+
+                //Next, we return a splash screen of the results
                 return(
-                    <div style={{display: "flex", fontSize: "2vh"}}>
-                        <ColorfulText text = {JSON.stringify(data.playerShowdownInfos[i])}/>
+                    <div>
+                        {dispResults &&
+                            <div className="splashScreen bordering">
+                                <ColorfulText text = {"You drew: " + (data.playerShowdownInfos[i].handType) + "!"}/>
+                                <ColorfulText text={"Current standings: "}/>
+                                <EndOfRoundList info = {data.playerShowdownInfos} />
+                            </div>
+                        }
                     </div>
                 );
             }
         }
     }
+    //return nothing if we don't have anything
+    return (
+        <div>
+
+        </div>
+    )
 }
 
 function Game() {
@@ -346,7 +406,6 @@ function Game() {
         } else {
             setSelectedCards([...selectedCards, index]);
         }
-        console.log(selectedCards);
     };
 
 
@@ -400,16 +459,20 @@ function Game() {
     }, [turnEnd]);
 
     //function that goes through a sequence for the card data
-    const showCards = (eorData) => {
+    const showCards = (eorData, idx) => {
         //update hand
-        setHand(eorData.hand);
+        setHand(eorData.playerShowdownInfos[idx].hand);
 
-        //reset selected cards
-        setSelectedCards([]);
+        //reset the cards selected to nothing
+        setTimeout(() => {
+            if (selectedCards.length !== 0)
+                setSelectedCards([]);
+        }, 3000);
 
-        //TODO: Show Luigi's cards
-
-        //show the hand "power"
+        //let the player stare at their cards for a bit before updating Luigi's hand
+        setTimeout(() => {
+            setDealerHand(eorData.luigiHand);
+        }, 4000);
     }
 
     return (

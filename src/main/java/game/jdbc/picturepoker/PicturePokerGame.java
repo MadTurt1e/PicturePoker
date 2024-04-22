@@ -490,10 +490,10 @@ public class PicturePokerGame {
     }
 
     @GetMapping("/getEndOfRoundInformation/{g_id}/{commit_results}")
-    public ArrayList<PlayerShowdownInfo> getEndOfRoundInformation(@PathVariable long g_id, @PathVariable boolean commit_results){
+    public ShowdownInfo getEndOfRoundInformation(@PathVariable long g_id, @PathVariable boolean commit_results){
         DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,
                 "picturepoker", "postgres", "password");
-        ArrayList<PlayerShowdownInfo> pSDInfo = new ArrayList<PlayerShowdownInfo>();
+        ShowdownInfo sdInfo = new ShowdownInfo();
         Game game = new Game();
         try {
             Connection connection = dcm.getConnection();
@@ -508,17 +508,21 @@ public class PicturePokerGame {
                 //we get the list of all the players, so it is iterable.
                 for (int i = 0; i < 4; i++) {
                     playerList[i] = playerDAO.findById(playerIDList[i]);
+                    // Well actually we assume that all players have already finished the round before entering so no need to check
                     playerList[i].redrawHand();
                     playerDAO.updateHand(playerList[i]);
                     playerDAO.updateAttributes(playerList[i]);
+                    System.out.println(playerList[i]);
                 }
                 GamePlay gp = new GamePlay(game, playerList);
                 if(game.getLuigiFinished() < 1) {
                     gp.executeLuigi();
-                    gameDAO.updateHand(game);
+                    gameDAO.updateHand(gp.getCurGame());
+                    gameDAO.update_int("luigi_finished", 1, gp.getCurGame());
                 }
-                pSDInfo = gp.showdownResolution(gameDAO, playerDAO, commit_results);
-                if(game.getCurRound() > game.getNumRounds()){
+                sdInfo = gp.showdownResolution(gameDAO, playerDAO, commit_results);
+                //Only end the game in the case that everybody is done with the game.
+                if(commit_results && game.getCurRound() > game.getNumRounds()){
                     // Do end of game stuff
                     gp.gameEndResolution(gameDAO, playerDAO);
                 }
@@ -526,7 +530,7 @@ public class PicturePokerGame {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return pSDInfo;
+        return sdInfo;
     }
 
     //DELETE Operation - Delete a player

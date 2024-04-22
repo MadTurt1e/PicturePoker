@@ -1,0 +1,798 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PicturePokerGame</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">game.jdbc.picturepoker</a>
+</div>
+
+<h1>Coverage Summary for Class: PicturePokerGame (game.jdbc.picturepoker)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PicturePokerGame</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    92%
+  </span>
+  <span class="absValue">
+    (23/25)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    36%
+  </span>
+  <span class="absValue">
+    (151/419)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package game.jdbc.picturepoker;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.core.JsonProcessingException;
+&nbsp;import org.springframework.boot.SpringApplication;
+&nbsp;import org.springframework.boot.autoconfigure.SpringBootApplication;
+&nbsp;import org.springframework.web.bind.annotation.*;
+&nbsp;
+&nbsp;import java.sql.Connection;
+&nbsp;import java.sql.SQLException;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.ArrayList;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.databind.ObjectMapper;
+&nbsp;
+&nbsp;import javax.swing.plaf.metal.MetalBorders;
+&nbsp;
+&nbsp;// @RequestMapping(&quot;/api&quot;) We will shift most of the functionality here to be hidden under /api
+&nbsp;@SpringBootApplication
+&nbsp;@CrossOrigin // This is for the front end to be able to access the backend
+&nbsp;@RestController
+<b class="fc">&nbsp;public class PicturePokerGame {</b>
+&nbsp;
+&nbsp;    // Set the hostname as a pseudo global so that we can change it later
+<b class="fc">&nbsp;    private final String hostname = &quot;db&quot;;</b>
+&nbsp;
+&nbsp;    // Test operation - is this thing on?
+&nbsp;    @GetMapping(&quot;/helloWorld&quot;)
+&nbsp;    public String helloWorld() {
+<b class="fc">&nbsp;        System.out.println(&quot;Hello, World!&quot;);</b>
+<b class="fc">&nbsp;        return (&quot;HELLO WORLD&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // homepage
+&nbsp;    @GetMapping(&quot;/&quot;)
+&nbsp;    public String homepage() {
+<b class="fc">&nbsp;        System.out.println(&quot;Welcome to PicturePoker&quot;);</b>
+<b class="fc">&nbsp;        return (&quot;Welcome to Luigi&#39;s Picture Poker&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // CREATE Operation: Make new player
+&nbsp;    @PostMapping(&quot;/createNewPlayer&quot;)
+&nbsp;    public Player createNewPlayer(@RequestBody String json) throws JsonProcessingException {
+<b class="fc">&nbsp;        System.out.println(json);</b>
+<b class="fc">&nbsp;        ObjectMapper objectMapper = new ObjectMapper();</b>
+<b class="fc">&nbsp;        Map&lt;String, String&gt; inputMap = objectMapper.readValue(json, Map.class);</b>
+<b class="fc">&nbsp;        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,</b>
+&nbsp;                &quot;picturepoker&quot;, &quot;postgres&quot;, &quot;password&quot;);
+<b class="fc">&nbsp;        Player player = new Player();</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            Connection connection = dcm.getConnection();</b>
+<b class="nc">&nbsp;            PlayerDAO playerdao = new PlayerDAO(connection);</b>
+&nbsp;            // essentially, a (new) player consists of a player name and a password, and that is it.
+<b class="nc">&nbsp;            player.setPlayerName(inputMap.get(&quot;playerName&quot;));</b>
+<b class="nc">&nbsp;            player.setPasscode(inputMap.get(&quot;password&quot;));</b>
+<b class="nc">&nbsp;            player = playerdao.create(player);</b>
+<b class="nc">&nbsp;            player = playerdao.createHand(player); // Initialize player hand on creation</b>
+<b class="nc">&nbsp;            connection.close();</b>
+<b class="nc">&nbsp;            System.out.println(player);</b>
+<b class="fc">&nbsp;        } catch (SQLException e) {</b>
+<b class="fc">&nbsp;            e.printStackTrace();</b>
+<b class="nc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return player;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // CREATE Operation: creates new game
+&nbsp;    @PostMapping(&quot;/createNewGame&quot;)
+&nbsp;    public Game createNewGame(@RequestBody String json) throws JsonProcessingException {
+<b class="fc">&nbsp;        System.out.println(json);</b>
+<b class="fc">&nbsp;        ObjectMapper objectMapper = new ObjectMapper();</b>
+<b class="fc">&nbsp;        Map&lt;String, String&gt; inputMap = objectMapper.readValue(json, Map.class);</b>
+<b class="fc">&nbsp;        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,</b>
+&nbsp;                &quot;picturepoker&quot;, &quot;postgres&quot;, &quot;password&quot;);
+<b class="fc">&nbsp;        Game game = new Game();</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            Connection connection = dcm.getConnection();</b>
+<b class="nc">&nbsp;            GameDAO gamedao = new GameDAO(connection);</b>
+&nbsp;
+&nbsp;            // A new game consists a chosen number of rounds, a buy in value (dollar
+&nbsp;            // stakes), and difficulty
+<b class="nc">&nbsp;            game.setNumRounds(Integer.parseInt(inputMap.get(&quot;rounds&quot;)));</b>
+<b class="nc">&nbsp;            game.setBuyIn(Integer.parseInt(inputMap.get(&quot;buyIn&quot;)));</b>
+<b class="nc">&nbsp;            game.setDifficulty(Integer.parseInt(inputMap.get(&quot;difficulty&quot;)));</b>
+&nbsp;            // Default attributes
+<b class="nc">&nbsp;            game.setCurRound(1);</b>
+<b class="nc">&nbsp;            game.setPotQuantity(0);</b>
+<b class="nc">&nbsp;            game = gamedao.create(game);</b>
+<b class="nc">&nbsp;            game = gamedao.createHand(game);</b>
+&nbsp;            // once all the necessary values are created, we can make the game.
+<b class="nc">&nbsp;            connection.close();</b>
+<b class="nc">&nbsp;            System.out.println(game);</b>
+<b class="fc">&nbsp;        } catch (SQLException e) {</b>
+<b class="fc">&nbsp;            e.printStackTrace();</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="fc">&nbsp;        return game;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // READ Operation - Read a player&#39;s full details
+&nbsp;    @GetMapping(&quot;/getByPlayerName/{playerName}&quot;)
+&nbsp;    public Player getByPlayerName(@PathVariable(&quot;playerName&quot;) String playerName) {
+<b class="fc">&nbsp;        System.out.println(playerName);</b>
+<b class="fc">&nbsp;        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,</b>
+&nbsp;                &quot;picturepoker&quot;, &quot;postgres&quot;, &quot;password&quot;);
+<b class="fc">&nbsp;        Player player = new Player();</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            Connection connection = dcm.getConnection();</b>
+<b class="nc">&nbsp;            PlayerDAO playerDAO = new PlayerDAO(connection);</b>
+&nbsp;
+<b class="nc">&nbsp;            player = playerDAO.findByName(playerName);</b>
+<b class="nc">&nbsp;            System.out.println(player);</b>
+<b class="nc">&nbsp;            connection.close();</b>
+<b class="fc">&nbsp;        } catch (SQLException e) {</b>
+<b class="fc">&nbsp;            e.printStackTrace();</b>
+<b class="nc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return player;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //READ Operation - Read a player&#39;s full details
+&nbsp;    @GetMapping(&quot;/getByPlayerID/{p_idStr}&quot;)
+&nbsp;    public Player getByPlayerID(@PathVariable(&quot;p_idStr&quot;) String p_idStr) {
+<b class="fc">&nbsp;        long p_id = Long.parseLong(p_idStr);</b>
+<b class="fc">&nbsp;        System.out.println(p_id);</b>
+<b class="fc">&nbsp;        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,</b>
+&nbsp;                &quot;picturepoker&quot;, &quot;postgres&quot;, &quot;password&quot;);
+<b class="fc">&nbsp;        Player player = new Player();</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            Connection connection = dcm.getConnection();</b>
+<b class="nc">&nbsp;            PlayerDAO playerDAO = new PlayerDAO(connection);</b>
+&nbsp;
+<b class="nc">&nbsp;            player = playerDAO.findById(p_id);</b>
+<b class="nc">&nbsp;            System.out.println(player);</b>
+<b class="nc">&nbsp;            connection.close();</b>
+<b class="fc">&nbsp;        } catch (SQLException e) {</b>
+<b class="fc">&nbsp;            e.printStackTrace();</b>
+<b class="nc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return player;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //READ Operation - Read a player&#39;s full details
+&nbsp;    @GetMapping(&quot;/getPlayerActiveGame/{pid}&quot;)
+&nbsp;    public Game getPlayerActiveGame(@PathVariable(&quot;pid&quot;) long pid) {
+<b class="fc">&nbsp;        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,</b>
+&nbsp;                &quot;picturepoker&quot;, &quot;postgres&quot;, &quot;password&quot;);
+<b class="fc">&nbsp;        Game game = new Game();</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            Connection connection = dcm.getConnection();</b>
+<b class="nc">&nbsp;            PlayerDAO playerDAO = new PlayerDAO(connection);</b>
+<b class="nc">&nbsp;            GameDAO gameDAO = new GameDAO(connection);</b>
+<b class="nc">&nbsp;            Player p = playerDAO.findById(pid);</b>
+<b class="nc">&nbsp;            long gid = playerDAO.getCurrentGame(p);</b>
+<b class="nc">&nbsp;            if(gid &lt; 0){</b>
+<b class="nc">&nbsp;                System.out.println(&quot;Player is not in any games!&quot;);</b>
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            game = gameDAO.findById(gid);</b>
+<b class="nc">&nbsp;            game.setPlayers(gameDAO.getPIDsByGame(game));</b>
+<b class="nc">&nbsp;            System.out.println(game);</b>
+<b class="nc">&nbsp;            connection.close();</b>
+<b class="fc">&nbsp;        } catch (SQLException e) {</b>
+<b class="fc">&nbsp;            e.printStackTrace();</b>
+<b class="nc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return game;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //READ Operation - Read a game&#39;s full details
+&nbsp;    @GetMapping(&quot;/getByGameID/{g_id}&quot;)
+&nbsp;    public Game getByGameID(@PathVariable(&quot;g_id&quot;) String g_idStr) {
+<b class="fc">&nbsp;        System.out.println(g_idStr);</b>
+<b class="fc">&nbsp;        long g_id = Long.parseLong(g_idStr);</b>
+<b class="fc">&nbsp;        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,</b>
+&nbsp;                &quot;picturepoker&quot;, &quot;postgres&quot;, &quot;password&quot;);
+<b class="fc">&nbsp;        Game game = new Game();</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            Connection connection = dcm.getConnection();</b>
+<b class="nc">&nbsp;            GameDAO gamedao = new GameDAO(connection);</b>
+<b class="nc">&nbsp;            game = gamedao.findById(g_id);</b>
+&nbsp;            //we need a separate function to get pids because the database is structured poorly
+<b class="nc">&nbsp;            game.setPlayers(gamedao.getPIDsByGame(game));</b>
+<b class="nc">&nbsp;            System.out.println(game);</b>
+<b class="nc">&nbsp;            connection.close();</b>
+<b class="fc">&nbsp;        } catch (SQLException e) {</b>
+<b class="fc">&nbsp;            e.printStackTrace();</b>
+<b class="nc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return game;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //READ Operation - Read a game&#39;s full details
+&nbsp;    @GetMapping(&quot;/getGameEndDetails/{g_id}&quot;)
+&nbsp;    public Game getGameEndDetails(@PathVariable(&quot;g_id&quot;) long g_id) {
+<b class="fc">&nbsp;        System.out.println(g_id);</b>
+<b class="fc">&nbsp;        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,</b>
+&nbsp;                &quot;picturepoker&quot;, &quot;postgres&quot;, &quot;password&quot;);
+<b class="fc">&nbsp;        Game game = new Game();</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            Connection connection = dcm.getConnection();</b>
+<b class="nc">&nbsp;            GameDAO gamedao = new GameDAO(connection);</b>
+<b class="nc">&nbsp;            PlayerDAO playerDAO = new PlayerDAO(connection);</b>
+<b class="nc">&nbsp;            game = gamedao.findById(g_id);</b>
+<b class="nc">&nbsp;            if(game.getCurRound() &lt;= game.getNumRounds()){</b>
+&nbsp;                // Game is not yet complete, do not calculate anything
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;            }
+&nbsp;            // Sort array of player IDs
+<b class="nc">&nbsp;            long[] pidsInGame = gamedao.getPIDsByGame(game);</b>
+<b class="nc">&nbsp;            ArrayList&lt;Player&gt; playersInGame = new ArrayList&lt;Player&gt;();</b>
+<b class="nc">&nbsp;            for(int i = 0; i &lt; 4; i++){</b>
+<b class="nc">&nbsp;                playersInGame.add(playerDAO.findById(pidsInGame[i]));</b>
+&nbsp;            }
+<b class="nc">&nbsp;            Collections.sort(playersInGame);</b>
+<b class="nc">&nbsp;            for(int i = 0; i &lt; 4; i++){</b>
+<b class="nc">&nbsp;                pidsInGame[i] = playersInGame.get(i).getID();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            game.setPlayers(pidsInGame);</b>
+&nbsp;
+<b class="nc">&nbsp;            System.out.println(game);</b>
+<b class="fc">&nbsp;        } catch (SQLException e) {</b>
+<b class="fc">&nbsp;            e.printStackTrace();</b>
+<b class="nc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return game;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //READ Operation - Reads players from a game
+&nbsp;    @GetMapping(&quot;/getPlayersByGame/{g_id}&quot;)
+&nbsp;    public ArrayList&lt;Player&gt; getPlayersByGame(@PathVariable(&quot;g_id&quot;) String g_idStr) {
+<b class="fc">&nbsp;        System.out.println(g_idStr);</b>
+<b class="fc">&nbsp;        long g_id = Long.parseLong(g_idStr);</b>
+<b class="fc">&nbsp;        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,</b>
+&nbsp;                &quot;picturepoker&quot;, &quot;postgres&quot;, &quot;password&quot;);
+<b class="fc">&nbsp;        ArrayList&lt;Player&gt; playersInGame = new ArrayList&lt;Player&gt;();Game game = new Game();</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            Connection connection = dcm.getConnection();</b>
+<b class="nc">&nbsp;            GameDAO gamedao = new GameDAO(connection);</b>
+<b class="nc">&nbsp;            PlayerDAO playerDAO = new PlayerDAO(connection);</b>
+<b class="nc">&nbsp;            game = gamedao.findById(g_id);</b>
+<b class="nc">&nbsp;            long[] gamePIDs = gamedao.getPIDsByGame(game);</b>
+<b class="nc">&nbsp;            for(int i = 0; i &lt; 4; i++){</b>
+<b class="nc">&nbsp;                playersInGame.add(playerDAO.findById(gamePIDs[i]));</b>
+&nbsp;            }
+<b class="nc">&nbsp;            for(Player p : playersInGame){</b>
+<b class="nc">&nbsp;                System.out.println(p);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            System.out.println(game);</b>
+<b class="nc">&nbsp;            connection.close();</b>
+<b class="fc">&nbsp;        } catch (SQLException e) {</b>
+<b class="fc">&nbsp;            e.printStackTrace();</b>
+<b class="nc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return playersInGame;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //READ Operation - Reads all players
+&nbsp;    @GetMapping(&quot;/getAllPlayers&quot;)
+&nbsp;    public ArrayList&lt;Player&gt; getAllPlayers() {
+<b class="fc">&nbsp;        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,</b>
+&nbsp;                &quot;picturepoker&quot;, &quot;postgres&quot;, &quot;password&quot;);
+<b class="fc">&nbsp;        ArrayList&lt;Player&gt; allPlayers = new ArrayList&lt;Player&gt;();</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            Connection connection = dcm.getConnection();</b>
+<b class="nc">&nbsp;            PlayerDAO playerDAO = new PlayerDAO(connection);</b>
+&nbsp;
+<b class="nc">&nbsp;            allPlayers = playerDAO.findAllPlayers();</b>
+<b class="nc">&nbsp;            for (Player p : allPlayers) {</b>
+<b class="nc">&nbsp;                System.out.println(p);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            connection.close();</b>
+<b class="fc">&nbsp;        } catch (SQLException e) {</b>
+<b class="fc">&nbsp;            e.printStackTrace();</b>
+<b class="nc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return allPlayers;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/getAllGames&quot;)
+&nbsp;    public ArrayList&lt;Game&gt; getAllGames() {
+<b class="fc">&nbsp;        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,</b>
+&nbsp;                &quot;picturepoker&quot;, &quot;postgres&quot;, &quot;password&quot;);
+<b class="fc">&nbsp;        ArrayList&lt;Game&gt; allGames = new ArrayList&lt;Game&gt;();</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            Connection connection = dcm.getConnection();</b>
+<b class="nc">&nbsp;            GameDAO gameDAO = new GameDAO(connection);</b>
+<b class="nc">&nbsp;            allGames = gameDAO.findAllGames();</b>
+<b class="nc">&nbsp;            for (Game g : allGames) {</b>
+<b class="nc">&nbsp;                System.out.println(g);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            connection.close();</b>
+<b class="fc">&nbsp;        } catch (SQLException e) {</b>
+<b class="fc">&nbsp;            e.printStackTrace();</b>
+<b class="nc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return allGames;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // UPDATE Operation - Update a player
+&nbsp;    @PutMapping(&quot;/updatePlayer/{p_id}&quot;)
+&nbsp;    public Player updateByPID(@PathVariable long p_id, @RequestBody String json) throws JsonProcessingException {
+<b class="nc">&nbsp;        System.out.println(json);</b>
+<b class="nc">&nbsp;        ObjectMapper objectMapper = new ObjectMapper();</b>
+<b class="nc">&nbsp;        Map&lt;String, String&gt; inputMap = objectMapper.readValue(json, Map.class);</b>
+<b class="nc">&nbsp;        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,</b>
+&nbsp;                &quot;picturepoker&quot;, &quot;postgres&quot;, &quot;password&quot;);
+<b class="nc">&nbsp;        Player updatedPlayer = new Player();</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            Connection connection = dcm.getConnection();</b>
+<b class="nc">&nbsp;            PlayerDAO playerdao = new PlayerDAO(connection);</b>
+<b class="nc">&nbsp;            updatedPlayer = playerdao.findById(p_id);</b>
+&nbsp;
+<b class="nc">&nbsp;            updatedPlayer.setID(p_id);</b>
+<b class="nc">&nbsp;            updatedPlayer.setPlayerName(inputMap.get(&quot;name&quot;));</b>
+<b class="nc">&nbsp;            updatedPlayer.setPasscode(inputMap.get(&quot;password&quot;));</b>
+<b class="nc">&nbsp;            updatedPlayer.setDollars(Integer.parseInt(inputMap.get(&quot;dollars&quot;)));</b>
+&nbsp;
+&nbsp;            // Per player game statistics
+<b class="nc">&nbsp;            updatedPlayer.setFirstPlaces(Integer.parseInt(inputMap.get(&quot;firsts&quot;)));</b>
+<b class="nc">&nbsp;            updatedPlayer.setSecondPlaces(Integer.parseInt(inputMap.get(&quot;seconds&quot;)));</b>
+<b class="nc">&nbsp;            updatedPlayer.setThirdPlaces(Integer.parseInt(inputMap.get(&quot;thirds&quot;)));</b>
+<b class="nc">&nbsp;            updatedPlayer.setFourthPlaces(Integer.parseInt(inputMap.get(&quot;fourths&quot;)));</b>
+<b class="nc">&nbsp;            updatedPlayer.setLifetimeTokens(Integer.parseInt(inputMap.get(&quot;lifetime_tokens&quot;)));</b>
+<b class="nc">&nbsp;            updatedPlayer.setFlushes(Integer.parseInt(inputMap.get(&quot;flushes&quot;)));</b>
+<b class="nc">&nbsp;            updatedPlayer.setQuads(Integer.parseInt(inputMap.get(&quot;quads&quot;)));</b>
+<b class="nc">&nbsp;            updatedPlayer.setFullHouses(Integer.parseInt(inputMap.get(&quot;full_houses&quot;)));</b>
+<b class="nc">&nbsp;            updatedPlayer.setTriples(Integer.parseInt(inputMap.get(&quot;triples&quot;)));</b>
+<b class="nc">&nbsp;            updatedPlayer.setTwoPairs(Integer.parseInt(inputMap.get(&quot;two_pairs&quot;)));</b>
+<b class="nc">&nbsp;            updatedPlayer.setOnePairs(Integer.parseInt(inputMap.get(&quot;one_pairs&quot;)));</b>
+<b class="nc">&nbsp;            updatedPlayer.setHighCards(Integer.parseInt(inputMap.get(&quot;high_card&quot;)));</b>
+<b class="nc">&nbsp;            updatedPlayer.setCardsChanged(Integer.parseInt(inputMap.get(&quot;cards_changed&quot;)));</b>
+<b class="nc">&nbsp;            updatedPlayer.setLifetimeRoundsWon(Integer.parseInt(inputMap.get(&quot;lifetime_rounds_won&quot;)));</b>
+<b class="nc">&nbsp;            updatedPlayer.setLifetimeTotalBet(Integer.parseInt(inputMap.get(&quot;lifetime_total_bet&quot;)));</b>
+&nbsp;
+&nbsp;            //update everything
+<b class="nc">&nbsp;            playerdao.updateAttributes(updatedPlayer);</b>
+<b class="nc">&nbsp;            System.out.println(updatedPlayer);</b>
+<b class="nc">&nbsp;            connection.close();</b>
+<b class="nc">&nbsp;            return updatedPlayer;</b>
+<b class="nc">&nbsp;        } catch (SQLException e) {</b>
+<b class="nc">&nbsp;            e.printStackTrace();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return updatedPlayer;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // UPDATE Operation - Update current game details. We&#39;re never really going to
+&nbsp;    // need this, but
+&nbsp;    @PutMapping(&quot;/updateGame/{g_id}&quot;)
+&nbsp;    public Game updateByGID(@PathVariable Long g_id, @RequestBody String json) throws JsonProcessingException {
+<b class="fc">&nbsp;        System.out.println(json);</b>
+<b class="fc">&nbsp;        ObjectMapper objectMapper = new ObjectMapper();</b>
+<b class="fc">&nbsp;        Map&lt;String, String&gt; inputMap = objectMapper.readValue(json, Map.class);</b>
+<b class="fc">&nbsp;        System.out.println(g_id);</b>
+<b class="fc">&nbsp;        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,</b>
+&nbsp;                &quot;picturepoker&quot;, &quot;postgres&quot;, &quot;password&quot;);
+<b class="fc">&nbsp;        Game updatedGame = new Game();</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            Connection connection = dcm.getConnection();</b>
+<b class="nc">&nbsp;            GameDAO gamedao = new GameDAO(connection);</b>
+<b class="nc">&nbsp;            updatedGame = gamedao.findById(g_id);</b>
+&nbsp;
+&nbsp;            // update all the things that we may want to update (no changing ID or any
+&nbsp;            // temporary stuff
+<b class="nc">&nbsp;            updatedGame.setCurRound(Integer.parseInt(inputMap.get(&quot;cur_round&quot;)));</b>
+<b class="nc">&nbsp;            updatedGame.setNumRounds(Integer.parseInt(inputMap.get(&quot;num_rounds&quot;)));</b>
+<b class="nc">&nbsp;            updatedGame.setActivePlayers(Integer.parseInt(inputMap.get(&quot;active_players&quot;)));</b>
+<b class="nc">&nbsp;            updatedGame.setBuyIn(Integer.parseInt(inputMap.get(&quot;buy_in&quot;)));</b>
+<b class="nc">&nbsp;            updatedGame.setPotQuantity(Integer.parseInt(inputMap.get(&quot;pot_quant&quot;)));</b>
+<b class="nc">&nbsp;            updatedGame.setDifficulty(Integer.parseInt(inputMap.get(&quot;difficulty&quot;)));</b>
+<b class="nc">&nbsp;            updatedGame.setPlayersFinished(Integer.parseInt(inputMap.get(&quot;players_finished&quot;)));</b>
+<b class="nc">&nbsp;            updatedGame.setLuigiFinished(Integer.parseInt(inputMap.get(&quot;luigi_finished&quot;)));</b>
+&nbsp;
+&nbsp;            // and update it in the database.
+<b class="nc">&nbsp;            updatedGame = gamedao.update_all(updatedGame);</b>
+<b class="nc">&nbsp;            System.out.println(updatedGame);</b>
+<b class="nc">&nbsp;            connection.close();</b>
+<b class="nc">&nbsp;            return updatedGame;</b>
+<b class="fc">&nbsp;        } catch (SQLException e) {</b>
+<b class="fc">&nbsp;            e.printStackTrace();</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return updatedGame;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //UPDATE Operation - Raise player bet
+&nbsp;    @PutMapping(&quot;/raise/{p_id}&quot;)
+&nbsp;    public Player raiseBet(@PathVariable long p_id){
+<b class="fc">&nbsp;        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,</b>
+&nbsp;                &quot;picturepoker&quot;, &quot;postgres&quot;, &quot;password&quot;);
+<b class="fc">&nbsp;        Player player = new Player();</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            Connection connection = dcm.getConnection();</b>
+<b class="nc">&nbsp;            PlayerDAO playerDAO = new PlayerDAO(connection);</b>
+&nbsp;
+<b class="nc">&nbsp;            player = playerDAO.findById(p_id);</b>
+<b class="nc">&nbsp;            if(player.getFinishedRound() &gt; 0){</b>
+<b class="nc">&nbsp;                System.out.println(&quot;Could not raise: Finished round.&quot;);</b>
+<b class="nc">&nbsp;                return player;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if(player.raise() &lt; 0){</b>
+<b class="nc">&nbsp;                System.out.println(&quot;Could not raise: Not enough tokens.&quot;);</b>
+<b class="nc">&nbsp;                return player;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            System.out.println(&quot;Player bet is now :&quot; + player.getBet());</b>
+<b class="nc">&nbsp;            playerDAO.update_int(&quot;bet&quot;, player.getBet(), player);</b>
+<b class="nc">&nbsp;            System.out.println(&quot;Player tokens remaining :&quot; + player.getTokens());</b>
+<b class="nc">&nbsp;            playerDAO.update_int(&quot;tokens&quot;, player.getTokens(), player);</b>
+<b class="nc">&nbsp;            System.out.println(player);</b>
+<b class="nc">&nbsp;            connection.close();</b>
+<b class="fc">&nbsp;        } catch (SQLException e) {</b>
+<b class="fc">&nbsp;            e.printStackTrace();</b>
+<b class="nc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return player;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //UPDATE Operation - Toggle whether to change out card
+&nbsp;    @PutMapping(&quot;/changeCard/{p_id}/{pos}&quot;)
+&nbsp;    public Player toggleToChange(@PathVariable long p_id, @PathVariable int pos){
+<b class="fc">&nbsp;        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,</b>
+&nbsp;                &quot;picturepoker&quot;, &quot;postgres&quot;, &quot;password&quot;);
+<b class="fc">&nbsp;        Player player = new Player();</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            Connection connection = dcm.getConnection();</b>
+<b class="nc">&nbsp;            PlayerDAO playerDAO = new PlayerDAO(connection);</b>
+&nbsp;
+<b class="nc">&nbsp;            player = playerDAO.findById(p_id);</b>
+<b class="nc">&nbsp;            if(player.getFinishedRound() &gt; 0){</b>
+<b class="nc">&nbsp;                System.out.println(&quot;Could not toggle Card: Finished round.&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if(pos &lt; 0 || pos &gt; 4){</b>
+<b class="nc">&nbsp;                System.out.println(&quot;Could not toggle Card: Hand position out of bounds.&quot;);</b>
+<b class="nc">&nbsp;                return player;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            Card[] hand = player.getHand();</b>
+<b class="nc">&nbsp;            hand[pos].setToChange(!hand[pos].getToChange());</b>
+<b class="nc">&nbsp;            playerDAO.updateHand(player);</b>
+<b class="nc">&nbsp;            System.out.println(player);</b>
+<b class="nc">&nbsp;            connection.close();</b>
+<b class="fc">&nbsp;        } catch (SQLException e) {</b>
+<b class="fc">&nbsp;            e.printStackTrace();</b>
+<b class="nc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return player;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PutMapping(&quot;/finishRound/{p_id}&quot;)
+&nbsp;    public Player finishRound(@PathVariable long p_id){
+<b class="fc">&nbsp;        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,</b>
+&nbsp;                &quot;picturepoker&quot;, &quot;postgres&quot;, &quot;password&quot;);
+<b class="fc">&nbsp;        Player player = new Player();</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            Connection connection = dcm.getConnection();</b>
+<b class="nc">&nbsp;            PlayerDAO playerDAO = new PlayerDAO(connection);</b>
+<b class="nc">&nbsp;            GameDAO gameDAO = new GameDAO(connection);</b>
+&nbsp;
+<b class="nc">&nbsp;            player = playerDAO.findById(p_id);</b>
+<b class="nc">&nbsp;            if(player.getFinishedRound() &gt; 0){</b>
+<b class="nc">&nbsp;                System.out.println(&quot;Could not finish round: You have already finished the current round.&quot;);</b>
+<b class="nc">&nbsp;                return player;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            player.setFinishedRound(1);</b>
+<b class="nc">&nbsp;            playerDAO.update_int(&quot;finished_round&quot;, 1, player);</b>
+&nbsp;
+<b class="nc">&nbsp;            long curGameID = playerDAO.getCurrentGame(player);</b>
+<b class="nc">&nbsp;            Game curGame = gameDAO.findById(curGameID);</b>
+<b class="nc">&nbsp;            if(curGame.getCurRound() &gt; curGame.getNumRounds()) {</b>
+<b class="nc">&nbsp;                System.out.println(&quot;Could not finish round: Game is already over.&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;                player.setFinishedRound(1);</b>
+<b class="nc">&nbsp;            playerDAO.update_int(&quot;finished_round&quot;, 1, player);</b>
+<b class="nc">&nbsp;            curGame.setPlayersFinished(curGame.getPlayersFinished() + 1);</b>
+<b class="nc">&nbsp;            gameDAO.update_int(&quot;players_finished&quot;, curGame.getPlayersFinished(), curGame);</b>
+&nbsp;            /*
+&nbsp;            if(curGame.getPlayersFinished() &gt;= 4){
+&nbsp;                // Do round stuff
+&nbsp;                Player[] playerList = new Player[4];
+&nbsp;                long[] playerIDList = curGame.getPlayers();
+&nbsp;
+&nbsp;                //we get the list of all the players, so it is iterable.
+&nbsp;                for (int i = 0; i &lt; 4; i++) {
+&nbsp;                    playerList[i] = playerDAO.findById(playerIDList[i]);
+&nbsp;                    playerList[i].redrawHand();
+&nbsp;                    playerDAO.updateHand(playerList[i]);
+&nbsp;                }
+&nbsp;                GamePlay gp = new GamePlay(curGame, playerList);
+&nbsp;
+&nbsp;                gp.showdownResolution(gameDAO, playerDAO, true);
+&nbsp;                if(curGame.getCurRound() &gt; curGame.getNumRounds()){
+&nbsp;                    // Do end of game stuff
+&nbsp;                    gp.gameEndResolution(gameDAO, playerDAO);
+&nbsp;                }
+&nbsp;            }
+&nbsp;            connection.close();
+&nbsp;            */
+<b class="fc">&nbsp;        } catch (SQLException e) {</b>
+<b class="fc">&nbsp;            e.printStackTrace();</b>
+<b class="nc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return player;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/getEndOfRoundInformation/{g_id}/{commit_results}&quot;)
+&nbsp;    public ArrayList&lt;PlayerShowdownInfo&gt; getEndOfRoundInformation(@PathVariable long g_id, @PathVariable boolean commit_results){
+<b class="fc">&nbsp;        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,</b>
+&nbsp;                &quot;picturepoker&quot;, &quot;postgres&quot;, &quot;password&quot;);
+<b class="fc">&nbsp;        ArrayList&lt;PlayerShowdownInfo&gt; pSDInfo = new ArrayList&lt;PlayerShowdownInfo&gt;();</b>
+<b class="fc">&nbsp;        Game game = new Game();</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            Connection connection = dcm.getConnection();</b>
+<b class="nc">&nbsp;            PlayerDAO playerDAO = new PlayerDAO(connection);</b>
+<b class="nc">&nbsp;            GameDAO gameDAO = new GameDAO(connection);</b>
+<b class="nc">&nbsp;            game = gameDAO.findById(g_id);</b>
+<b class="nc">&nbsp;            if(game.getCurRound() &lt;= game.getNumRounds() &amp;&amp; game.getPlayersFinished() &gt;= 4){</b>
+&nbsp;                // Do round stuff
+<b class="nc">&nbsp;                Player[] playerList = new Player[4];</b>
+<b class="nc">&nbsp;                long[] playerIDList = game.getPlayers();</b>
+&nbsp;
+&nbsp;                //we get the list of all the players, so it is iterable.
+<b class="nc">&nbsp;                for (int i = 0; i &lt; 4; i++) {</b>
+<b class="nc">&nbsp;                    playerList[i] = playerDAO.findById(playerIDList[i]);</b>
+<b class="nc">&nbsp;                    playerList[i].redrawHand();</b>
+<b class="nc">&nbsp;                    playerDAO.updateHand(playerList[i]);</b>
+<b class="nc">&nbsp;                    playerDAO.updateAttributes(playerList[i]);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                GamePlay gp = new GamePlay(game, playerList);</b>
+<b class="nc">&nbsp;                if(game.getLuigiFinished() &lt; 1) {</b>
+<b class="nc">&nbsp;                    gp.executeLuigi();</b>
+<b class="nc">&nbsp;                    gameDAO.updateHand(game);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                pSDInfo = gp.showdownResolution(gameDAO, playerDAO, commit_results);</b>
+<b class="nc">&nbsp;                if(game.getCurRound() &gt; game.getNumRounds()){</b>
+&nbsp;                    // Do end of game stuff
+<b class="nc">&nbsp;                    gp.gameEndResolution(gameDAO, playerDAO);</b>
+&nbsp;                }
+&nbsp;            }
+<b class="fc">&nbsp;        } catch (SQLException e) {</b>
+<b class="fc">&nbsp;            e.printStackTrace();</b>
+<b class="nc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return pSDInfo;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //DELETE Operation - Delete a player
+&nbsp;    @DeleteMapping(&quot;/deletePlayer/{p_id}&quot;)
+&nbsp;    public Player deleteByPID(@PathVariable long p_id) {
+<b class="fc">&nbsp;        System.out.println(p_id);</b>
+<b class="fc">&nbsp;        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,</b>
+&nbsp;                &quot;picturepoker&quot;, &quot;postgres&quot;, &quot;password&quot;);
+<b class="fc">&nbsp;        Player player = new Player();</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            Connection connection = dcm.getConnection();</b>
+<b class="nc">&nbsp;            PlayerDAO playerDAO = new PlayerDAO(connection);</b>
+<b class="nc">&nbsp;            player = playerDAO.deletePlayer(p_id);</b>
+&nbsp;
+<b class="nc">&nbsp;            System.out.println(player);</b>
+<b class="nc">&nbsp;            connection.close();</b>
+<b class="fc">&nbsp;        } catch (SQLException e) {</b>
+<b class="fc">&nbsp;            e.printStackTrace();</b>
+<b class="nc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return player;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // DELETE OPERATION - Delete a game
+&nbsp;    @DeleteMapping(&quot;/deleteGame/{g_id}&quot;)
+&nbsp;    public Game deleteByGID(@PathVariable long g_id) {
+<b class="fc">&nbsp;        System.out.println(g_id);</b>
+<b class="fc">&nbsp;        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,</b>
+&nbsp;                &quot;picturepoker&quot;, &quot;postgres&quot;, &quot;password&quot;);
+<b class="fc">&nbsp;        Game game = new Game();</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            Connection connection = dcm.getConnection();</b>
+<b class="nc">&nbsp;            GameDAO gamedao = new GameDAO(connection);</b>
+<b class="nc">&nbsp;            game = gamedao.deleteGame(g_id);</b>
+&nbsp;
+<b class="nc">&nbsp;            System.out.println(game);</b>
+<b class="nc">&nbsp;            connection.close();</b>
+<b class="fc">&nbsp;        } catch (SQLException e) {</b>
+<b class="fc">&nbsp;            e.printStackTrace();</b>
+<b class="nc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return game;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //DELETE OPERATION - Remove a player from a game
+&nbsp;    @DeleteMapping(&quot;/leaveCurrentGame/{p_id}&quot;)
+&nbsp;    public Game leaveGame(@PathVariable long p_id) {
+<b class="fc">&nbsp;        System.out.println(p_id);</b>
+<b class="fc">&nbsp;        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,</b>
+&nbsp;                &quot;picturepoker&quot;, &quot;postgres&quot;, &quot;password&quot;);
+<b class="fc">&nbsp;        Game game = new Game();</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            Connection connection = dcm.getConnection();</b>
+<b class="nc">&nbsp;            GameDAO gameDAO = new GameDAO(connection);</b>
+<b class="nc">&nbsp;            PlayerDAO playerDAO = new PlayerDAO(connection);</b>
+<b class="nc">&nbsp;            Player p = playerDAO.findById(p_id);</b>
+<b class="nc">&nbsp;            long gid = playerDAO.getCurrentGame(p);</b>
+<b class="nc">&nbsp;            game = gameDAO.findById(gid);</b>
+<b class="nc">&nbsp;            game = gameDAO.removePlayerFromGame(game, p_id);</b>
+<b class="nc">&nbsp;            p.resetPerGameInfo();</b>
+<b class="nc">&nbsp;            playerDAO.update_int(&quot;tokens&quot;, 9, p);</b>
+<b class="nc">&nbsp;            playerDAO.update_int(&quot;bet&quot;, 1, p);</b>
+<b class="nc">&nbsp;            playerDAO.update_int(&quot;rounds_won&quot;, 0, p);</b>
+<b class="nc">&nbsp;            playerDAO.update_int(&quot;finished_round&quot;, 0, p);</b>
+<b class="nc">&nbsp;            playerDAO.updateAttributes(p);</b>
+<b class="nc">&nbsp;            playerDAO.updateHand(p);</b>
+&nbsp;            // Clean up once all players leave.
+<b class="nc">&nbsp;            if(game.getActivePlayers() == 0){</b>
+<b class="nc">&nbsp;                game = gameDAO.deleteGame(game.getID());</b>
+&nbsp;            }
+<b class="nc">&nbsp;            System.out.println(game);</b>
+<b class="nc">&nbsp;            connection.close();</b>
+<b class="fc">&nbsp;        } catch (SQLException e) {</b>
+<b class="fc">&nbsp;            e.printStackTrace();</b>
+<b class="nc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return game;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //Actually play the game
+&nbsp;    @GetMapping(&quot;/playGame/{g_id}&quot;)
+&nbsp;    public Game playGame(@PathVariable long g_id) {
+<b class="fc">&nbsp;        System.out.println(g_id);</b>
+<b class="fc">&nbsp;        Game game = new Game();</b>
+<b class="fc">&nbsp;        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,</b>
+&nbsp;                &quot;picturepoker&quot;, &quot;postgres&quot;, &quot;password&quot;);
+&nbsp;
+&nbsp;        try {
+<b class="fc">&nbsp;            Connection connection = dcm.getConnection();</b>
+<b class="nc">&nbsp;            GameDAO gameDAO = new GameDAO(connection);</b>
+<b class="nc">&nbsp;            PlayerDAO playerDAO = new PlayerDAO(connection);</b>
+&nbsp;
+&nbsp;            // pseudo lobby system - just reject starting when the game is not full.
+<b class="nc">&nbsp;            game = gameDAO.findById(g_id);</b>
+<b class="nc">&nbsp;            int curPlayers = game.getActivePlayers();</b>
+<b class="nc">&nbsp;            if (curPlayers &lt; 4) {</b>
+<b class="nc">&nbsp;                System.out.println(&quot;The game is not full yet! We need &quot; + (4 - curPlayers) + &quot; more players. &quot;);</b>
+<b class="nc">&nbsp;                return game;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            Player[] playerList = new Player[4];</b>
+<b class="nc">&nbsp;            long[] playerIDList = game.getPlayers();</b>
+&nbsp;            //we get the list of all the players, so it is iterable.
+<b class="nc">&nbsp;            for (int i = 0; i &lt; 4; i++) {</b>
+<b class="nc">&nbsp;                playerList[i] = playerDAO.findById(playerIDList[i]);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            GamePlay gamePlay = new GamePlay(game, playerList);</b>
+<b class="nc">&nbsp;            game = gamePlay.gameSeq(gameDAO, playerDAO);</b>
+<b class="nc">&nbsp;            connection.close();</b>
+<b class="fc">&nbsp;        } catch (SQLException e) {</b>
+<b class="fc">&nbsp;            e.printStackTrace();</b>
+<b class="nc">&nbsp;        }</b>
+<b class="fc">&nbsp;        System.out.println(game);</b>
+<b class="fc">&nbsp;        return game;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PutMapping(&quot;/joinGame/{g_id}/{p_id}&quot;)
+&nbsp;    public Game joinGame(@PathVariable long g_id, @PathVariable long p_id) {
+<b class="fc">&nbsp;        System.out.println(&quot;GameID: &quot; + g_id + &quot;PlayerID: &quot; + p_id);</b>
+<b class="fc">&nbsp;        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,</b>
+&nbsp;                &quot;picturepoker&quot;, &quot;postgres&quot;, &quot;password&quot;);
+<b class="fc">&nbsp;        Game game = new Game();</b>
+&nbsp;        try {
+&nbsp;            //Makes a connection, gets a player and the game ID, and tries adding the player to the game.
+<b class="fc">&nbsp;            Connection connection = dcm.getConnection();</b>
+<b class="nc">&nbsp;            GameDAO gamedao = new GameDAO(connection);</b>
+<b class="nc">&nbsp;            PlayerDAO playerDAO = new PlayerDAO(connection);</b>
+<b class="nc">&nbsp;            Player player = playerDAO.findById(p_id);</b>
+<b class="nc">&nbsp;            game = gamedao.findById(g_id);</b>
+&nbsp;
+<b class="nc">&nbsp;            int players_before = game.getActivePlayers();</b>
+&nbsp;            //stick the player into the game (or at least, it tries)
+<b class="nc">&nbsp;            game = gamedao.joinGame(game, player);</b>
+&nbsp;            // Once everyone joins, start the game and take away money from players&#39; balances
+<b class="nc">&nbsp;            if(game.getActivePlayers() &gt;= 4 &amp;&amp; players_before == 3){</b>
+<b class="nc">&nbsp;                Player[] playerList = new Player[4];</b>
+<b class="nc">&nbsp;                long[] playerIDList = game.getPlayers();</b>
+&nbsp;
+&nbsp;                //we get the list of all the players, so it is iterable.
+<b class="nc">&nbsp;                for (int i = 0; i &lt; 4; i++) {</b>
+<b class="nc">&nbsp;                    playerList[i] = playerDAO.findById(playerIDList[i]);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                for (Player p : playerList) {</b>
+<b class="nc">&nbsp;                    p.resetPerGameInfo();</b>
+<b class="nc">&nbsp;                    playerDAO.update_int(&quot;tokens&quot;, 9, p);</b>
+<b class="nc">&nbsp;                    playerDAO.update_int(&quot;bet&quot;, 1, p);</b>
+<b class="nc">&nbsp;                    playerDAO.update_int(&quot;rounds_won&quot;, 0, p);</b>
+<b class="nc">&nbsp;                    playerDAO.update_int(&quot;finished_round&quot;, 0, p);</b>
+<b class="nc">&nbsp;                    playerDAO.updateHand(p);</b>
+&nbsp;
+&nbsp;                    //drain people&#39;s bank accounts and add to pot
+<b class="nc">&nbsp;                    p.setDollars(p.getDollars() - game.getBuyIn());</b>
+<b class="nc">&nbsp;                    playerDAO.updateAttributes(p);</b>
+<b class="nc">&nbsp;                    game.setPotQuantity(game.getPotQuantity() + game.getBuyIn());</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            gamedao.update_all(game);</b>
+<b class="nc">&nbsp;            connection.close();</b>
+<b class="fc">&nbsp;        }catch (SQLException e) {</b>
+<b class="fc">&nbsp;            e.printStackTrace();</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="fc">&nbsp;        return game;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void main(String[] args) {
+<b class="nc">&nbsp;        SpringApplication.run(PicturePokerGame.class, args);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-16 21:55</div>
+</div>
+</body>
+</html>

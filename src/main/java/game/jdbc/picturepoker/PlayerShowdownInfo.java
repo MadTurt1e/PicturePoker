@@ -11,7 +11,6 @@ public class PlayerShowdownInfo{
 
     public PlayerShowdownInfo(Player p){
         this.pID = p.getID();
-        this.hand = p.getHand();
     }
 
     public long getpID() {

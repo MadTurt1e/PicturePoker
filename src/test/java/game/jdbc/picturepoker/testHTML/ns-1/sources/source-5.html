@@ -1,0 +1,761 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GamePlay</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">game.jdbc.picturepoker</a>
+</div>
+
+<h1>Coverage Summary for Class: GamePlay (game.jdbc.picturepoker)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GamePlay</td>
+<td class="coverageStat">
+  <span class="percent">
+    72.7%
+  </span>
+  <span class="absValue">
+    (8/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50.7%
+  </span>
+  <span class="absValue">
+    (153/302)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">GamePlay$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">GamePlay$PokerHand</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (11/11)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    81.2%
+  </span>
+  <span class="absValue">
+    (13/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    52.5%
+  </span>
+  <span class="absValue">
+    (165/314)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package game.jdbc.picturepoker;
+&nbsp;
+&nbsp;import java.util.*;
+&nbsp;
+&nbsp;public class GamePlay {
+&nbsp;
+&nbsp;    //Relevant variables - current game, and the list of players
+&nbsp;    private Game curGame;
+&nbsp;    private Player[] playerList;
+&nbsp;
+<b class="fc">&nbsp;    public enum PokerHand {</b>
+<b class="fc">&nbsp;        HIGH_CARD(&quot;High Card&quot;),</b>
+<b class="fc">&nbsp;        ONE_PAIR(&quot;One Pair&quot;),</b>
+<b class="fc">&nbsp;        TWO_PAIR(&quot;Two Pair&quot;),</b>
+<b class="fc">&nbsp;        THREE_OF_A_KIND(&quot;Three of a Kind&quot;),</b>
+<b class="fc">&nbsp;        FULL_HOUSE(&quot;Full House&quot;),</b>
+<b class="fc">&nbsp;        FOUR_OF_A_KIND(&quot;Four of a Kind&quot;),</b>
+<b class="fc">&nbsp;        FLUSH(&quot;Flush&quot;);</b>
+&nbsp;        private String handName;
+<b class="fc">&nbsp;        PokerHand(String handName){</b>
+<b class="fc">&nbsp;            this.handName = handName;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        public String getHandName(){return handName;}</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Constructor since we are using this multiple times within the API calls
+<b class="fc">&nbsp;    public GamePlay(Game game, Player[] playerList){</b>
+<b class="fc">&nbsp;        this.curGame = game;</b>
+<b class="fc">&nbsp;        this.playerList = playerList;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Player executeRoundFromTerminal(Player player, GameDAO gameDAO, PlayerDAO playerDAO) {
+<b class="nc">&nbsp;        System.out.println(&quot;\n&quot; + player.getPlayerName() + &quot;&#39;s Turn! &quot;);</b>
+<b class="nc">&nbsp;        System.out.println(player.getPlayerName() + &quot; has &quot; + player.getTokens() + &quot; tokens!&quot;);</b>
+&nbsp;
+&nbsp;        // Step 1: Deal cards at random
+<b class="nc">&nbsp;        Card[] hand = new Card[5];</b>
+&nbsp;        //initialize values
+<b class="nc">&nbsp;        for (int i = 0; i &lt; hand.length; ++i) {</b>
+<b class="nc">&nbsp;            hand[i] = new Card();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        //update the hand of the player
+<b class="nc">&nbsp;        player.setHand(hand);</b>
+&nbsp;
+&nbsp;        // Prints out the card outputs
+<b class="nc">&nbsp;        System.out.println(player.getPlayerName() + &quot;&#39;s cards: &quot;);</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; hand.length; ++i) {</b>
+<b class="nc">&nbsp;            System.out.println(&quot;Card &quot; + i + &quot;: &quot; + hand[i]);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        //Case: Broke- Do this before we even give them input
+<b class="nc">&nbsp;        if (player.getTokens() == 0) {</b>
+<b class="nc">&nbsp;            System.out.println(&quot;You have no tokens to bet. How did you get here? &quot;);</b>
+<b class="nc">&nbsp;            player.setBet(0);</b>
+<b class="nc">&nbsp;            return player;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Step 2: Take bets
+&nbsp;        // I noticed there is a raise function just now. This will be useful for a GUI feature where you can spam a button.
+&nbsp;        // Terminal inputs make it so that spamming a button is a bit hard, though.
+&nbsp;        // TODO: when we have GUI set up and everything.
+<b class="nc">&nbsp;        System.out.println(&quot;How much do you want to bet? &quot;);</b>
+<b class="nc">&nbsp;        Scanner scan = new Scanner(System.in);</b>
+<b class="nc">&nbsp;        int betCount = 0;</b>
+<b class="nc">&nbsp;        while (betCount &lt; 1 || betCount &gt; 5) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                betCount = scan.nextInt();</b>
+&nbsp;                //case: too much / little money.
+<b class="nc">&nbsp;                if (betCount &lt; 1 || betCount &gt; 5) {</b>
+<b class="nc">&nbsp;                    System.out.println(&quot;Bet must be between 1 and 5. &quot;);</b>
+<b class="nc">&nbsp;                    continue;</b>
+&nbsp;                }
+&nbsp;                // Case: broke part 2
+<b class="nc">&nbsp;                if (betCount &gt; player.getTokens()) {</b>
+<b class="nc">&nbsp;                    System.out.println(&quot;You don&#39;t have enough tokens! Right now, you have &quot; + player.getTokens() + &quot; tokens. &quot;);</b>
+<b class="nc">&nbsp;                    betCount = 0;</b>
+<b class="nc">&nbsp;                    continue;</b>
+&nbsp;                }
+&nbsp;                //case: we are in the clear
+<b class="nc">&nbsp;                break;</b>
+<b class="nc">&nbsp;            } catch (InputMismatchException e) {</b>
+&nbsp;                //case: what even was typed?
+<b class="nc">&nbsp;                System.out.println(&quot;Bet must be between 1 and 5. &quot;);</b>
+<b class="nc">&nbsp;                scan.nextLine();</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+<b class="nc">&nbsp;        player.setBet(betCount);</b>
+<b class="nc">&nbsp;        player.setTokens(player.getTokens() - betCount);</b>
+<b class="nc">&nbsp;        playerDAO.update_int(&quot;tokens&quot;, player.getTokens(), player);</b>
+<b class="nc">&nbsp;        playerDAO.update_int(&quot;bet&quot;, player.getBet(), player);</b>
+&nbsp;
+&nbsp;        // Step 3: Change out the cards which were selected for changing
+<b class="nc">&nbsp;        System.out.println(&quot;Which cards would you like to change out? &quot;);</b>
+&nbsp;        boolean changeCard;
+<b class="nc">&nbsp;        for (int i = 0; i &lt; hand.length; ++i) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                System.out.println(&quot;Change card &quot; + i + &quot;?&quot;);</b>
+<b class="nc">&nbsp;                changeCard = scan.nextBoolean();</b>
+<b class="nc">&nbsp;                if (changeCard)</b>
+<b class="nc">&nbsp;                    hand[i].setToChange(true);</b>
+<b class="nc">&nbsp;            } catch (InputMismatchException e) {</b>
+<b class="nc">&nbsp;                System.out.println(&quot;Player must input true or false!&quot;);</b>
+<b class="nc">&nbsp;                --i;</b>
+<b class="nc">&nbsp;                scan.nextLine();</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // We change out desired cards.
+<b class="nc">&nbsp;        player.redrawHand();</b>
+<b class="nc">&nbsp;        playerDAO.updateHand(player);</b>
+&nbsp;
+&nbsp;        // Step 4: Let the player cry at their new cards.
+<b class="nc">&nbsp;        System.out.println(&quot;Here are your new cards!&quot;);</b>
+&nbsp;
+&nbsp;
+&nbsp;        // return the player with the newfangled hand.
+<b class="nc">&nbsp;        for (int i = 0; i &lt; hand.length; ++i) {</b>
+<b class="nc">&nbsp;            System.out.println(&quot;Card &quot; + i + &quot;: &quot; + player.getHand()[i]);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return player;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void executeLuigi() {
+&nbsp;        // Luigi is an external game force.
+<b class="fc">&nbsp;        Card[] luigiHand = new Card[5];</b>
+&nbsp;        //initialize values
+<b class="fc">&nbsp;        for (int i = 0; i &lt; luigiHand.length; ++i) {</b>
+<b class="fc">&nbsp;            luigiHand[i] = new Card();</b>
+&nbsp;        }
+&nbsp;        //updates the game with luigi&#39;s hand
+<b class="fc">&nbsp;        curGame.setHand(luigiHand);</b>
+&nbsp;
+&nbsp;
+&nbsp;        // step 1: Get cards at random
+&nbsp;        // This is already done by the card class.
+<b class="fc">&nbsp;        System.out.println(&quot;Luigi Turn! &quot;);</b>
+<b class="fc">&nbsp;        for (int i = 0; i &lt; luigiHand.length; ++i) {</b>
+<b class="fc">&nbsp;            System.out.println(&quot;Card &quot; + i + &quot;: &quot; + luigiHand[i]);</b>
+&nbsp;        }
+&nbsp;        // Step 2: Calculate current score and change out cards if needed
+<b class="fc">&nbsp;        int luigiScore = playerScore(luigiHand);</b>
+<b class="fc">&nbsp;        if (luigiScore &gt; 1000000) {</b>
+<b class="nc">&nbsp;            System.out.println(&quot;Luigi is happy with his hand! &quot;);</b>
+&nbsp;            return;
+&nbsp;        } else {
+<b class="fc">&nbsp;            List&lt;Integer&gt; cardToSwapIndex = findCardsToChange(luigiHand);</b>
+<b class="fc">&nbsp;            for (Integer toSwapIndex : cardToSwapIndex) {</b>
+<b class="fc">&nbsp;                luigiHand[toSwapIndex].setToChange(true);</b>
+<b class="fc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Step 3: that&#39;s it.
+<b class="fc">&nbsp;        for (int i = 0; i &lt; luigiHand.length; ++i) {</b>
+<b class="fc">&nbsp;            if (luigiHand[i].getToChange()) {</b>
+<b class="fc">&nbsp;                System.out.println(&quot;Luigi is changing out card &quot; + i + &quot;!&quot;);</b>
+<b class="fc">&nbsp;                luigiHand[i].setSuit(Card.Suit.values()[(int) (Math.random() * 6)]);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        curGame.setHand(luigiHand);</b>
+&nbsp;
+<b class="fc">&nbsp;        for (int i = 0; i &lt; luigiHand.length; ++i) {</b>
+<b class="fc">&nbsp;            System.out.println(&quot;Card &quot; + i + &quot;: &quot; + luigiHand[i]);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        //no return needed.
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    // Returns the index of the card with the least potential to form a good hand,
+&nbsp;    // if no card should be changed returns -1
+&nbsp;    private int findCardWithLeastPotential(Card[] hand, boolean[] alreadyChosen) {
+&nbsp;        // Count number of cards of each suit
+<b class="fc">&nbsp;        int[] suitCount = new int[Card.Suit.values().length];</b>
+<b class="fc">&nbsp;        for (int i = 0; i &lt; hand.length; ++i) {</b>
+<b class="fc">&nbsp;            if (!alreadyChosen[i]) {</b>
+<b class="fc">&nbsp;                suitCount[hand[i].getSuit().ordinal()]++;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // First Check for 4-of-a-kind
+<b class="fc">&nbsp;        for (int i = 0; i &lt; suitCount.length; ++i) {</b>
+<b class="fc">&nbsp;            if (suitCount[i] == 4) {</b>
+<b class="nc">&nbsp;                for (int j = 0; j &lt; hand.length; ++j) {</b>
+<b class="nc">&nbsp;                    if (!alreadyChosen[j] &amp;&amp; hand[j].getSuit().ordinal() != i) {</b>
+<b class="nc">&nbsp;                        return j; // return the index of the card to change</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Next, Check for possible full house (3-of-a-kind and pair)
+<b class="fc">&nbsp;        boolean threeOfAKind = false;</b>
+<b class="fc">&nbsp;        int suitOfThree = -1;</b>
+&nbsp;
+<b class="fc">&nbsp;        for (int i = 0; i &lt; suitCount.length; ++i) {</b>
+<b class="fc">&nbsp;            if (suitCount[i] == 3) {</b>
+<b class="fc">&nbsp;                threeOfAKind = true;</b>
+<b class="fc">&nbsp;                suitOfThree = i;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        if (threeOfAKind) {</b>
+<b class="fc">&nbsp;            for (int i = 0; i &lt; hand.length; ++i) {</b>
+&nbsp;                // Finds both cards that are not part of three of a kind, if they are a pair
+&nbsp;                // then dont change, else change the one with the lowest value according to
+&nbsp;                // ordinal
+<b class="fc">&nbsp;                if (!alreadyChosen[i] &amp;&amp; hand[i].getSuit().ordinal() != suitOfThree) {</b>
+<b class="fc">&nbsp;                    for (int j = i + 1; j &lt; hand.length; ++j) {</b>
+<b class="fc">&nbsp;                        if (!alreadyChosen[j] &amp;&amp; hand[j].getSuit().ordinal() != suitOfThree) {</b>
+<b class="fc">&nbsp;                            if (hand[i].getSuit().ordinal() != hand[j].getSuit().ordinal()) {</b>
+&nbsp;                                // returns the index of whichever card has a lower suit
+<b class="fc">&nbsp;                                return (hand[i].getSuit().ordinal() &lt; hand[j].getSuit().ordinal()) ? i : j;</b>
+&nbsp;                            } else {
+<b class="fc">&nbsp;                                return -1; // no change needed</b>
+&nbsp;                            }
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Next, we mark pairs to ensure they are not changed
+&nbsp;
+<b class="fc">&nbsp;        boolean[] isPair = new boolean[hand.length];</b>
+<b class="fc">&nbsp;        for (int i = 0; i &lt; hand.length; i++) {</b>
+<b class="fc">&nbsp;            if (!alreadyChosen[i]) {</b>
+<b class="fc">&nbsp;                for (int j = i + 1; j &lt; hand.length; j++) {</b>
+<b class="fc">&nbsp;                    if (!alreadyChosen[j] &amp;&amp; hand[i].getSuit().ordinal() == hand[j].getSuit().ordinal()) {</b>
+<b class="fc">&nbsp;                        isPair[i] = true;</b>
+<b class="fc">&nbsp;                        isPair[j] = true;</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Finally, we change the card with the lowest value
+&nbsp;
+<b class="fc">&nbsp;        int cardToDiscard = -1;</b>
+<b class="fc">&nbsp;        int lowestOrdinal = Integer.MAX_VALUE;</b>
+&nbsp;
+<b class="fc">&nbsp;        for (int i = 0; i &lt; hand.length; ++i) {</b>
+<b class="fc">&nbsp;            if (!alreadyChosen[i] &amp;&amp; !isPair[i]) {</b>
+<b class="fc">&nbsp;                if (hand[i].getSuit().ordinal() &lt; lowestOrdinal) {</b>
+<b class="fc">&nbsp;                    lowestOrdinal = hand[i].getSuit().ordinal();</b>
+<b class="fc">&nbsp;                    cardToDiscard = i;</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return cardToDiscard;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Returns a list of cards to be changed
+&nbsp;    private List&lt;Integer&gt; findCardsToChange(Card[] hand) {
+<b class="fc">&nbsp;        List&lt;Integer&gt; cardsToChange = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        boolean[] alreadyChosen = new boolean[hand.length];</b>
+&nbsp;
+&nbsp;        // Tries to change up to 5 cards
+<b class="fc">&nbsp;        for (int changes = 0; changes &lt; 5; changes++) {</b>
+<b class="fc">&nbsp;            int cardIndex = findCardWithLeastPotential(hand, alreadyChosen);</b>
+&nbsp;            // if a card will be beneficial to change, add it to the list and try again
+&nbsp;            // if no card is beneficial, break out of the loop
+<b class="fc">&nbsp;            if (cardIndex == -1) {</b>
+<b class="fc">&nbsp;                break;</b>
+&nbsp;            }
+<b class="fc">&nbsp;            cardsToChange.add(cardIndex);</b>
+<b class="fc">&nbsp;            alreadyChosen[cardIndex] = true;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return cardsToChange;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // This function does a score calculation on a player.
+&nbsp;    private int playerScore(Card[] hand) {
+<b class="fc">&nbsp;        int score = 0;</b>
+<b class="fc">&nbsp;        int[] suitCount = new int[6];</b>
+<b class="fc">&nbsp;        boolean pairFound = false; // For evaluating two pairs</b>
+<b class="fc">&nbsp;        int singleton_mult = 120;</b>
+<b class="fc">&nbsp;        int singletons_found = 0;</b>
+&nbsp;
+&nbsp;        Card.Suit curSuit;
+&nbsp;        //count the number of each suit - start from 1 to prevent any weird errors
+<b class="fc">&nbsp;        for (Card card : hand) {</b>
+<b class="fc">&nbsp;            curSuit = card.getSuit();</b>
+<b class="fc">&nbsp;            switch (curSuit) {</b>
+&nbsp;                case STAR:
+<b class="fc">&nbsp;                    ++suitCount[5];</b>
+<b class="fc">&nbsp;                    break;</b>
+&nbsp;                case MARIO:
+<b class="fc">&nbsp;                    ++suitCount[4];</b>
+<b class="fc">&nbsp;                    break;</b>
+&nbsp;                case LUIGI:
+<b class="fc">&nbsp;                    ++suitCount[3];</b>
+<b class="fc">&nbsp;                    break;</b>
+&nbsp;                case FIRE_FLOWER:
+<b class="fc">&nbsp;                    ++suitCount[2];</b>
+<b class="fc">&nbsp;                    break;</b>
+&nbsp;                case MUSHROOM:
+<b class="fc">&nbsp;                    ++suitCount[1];</b>
+<b class="fc">&nbsp;                    break;</b>
+&nbsp;                case CLOUD:
+<b class="fc">&nbsp;                    ++suitCount[0];</b>
+&nbsp;                    break;
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        //convert suits to int
+&nbsp;        // We should evaluate from high to low so that a higher pair breaks ties first
+<b class="fc">&nbsp;        for (int i = suitCount.length - 1; i &gt;= 0; --i) {</b>
+&nbsp;            // Each digit represents whether a certain set of cards exists and of what type
+&nbsp;            // Ex: a 30000000 = 3*10000000 represents a 5 of a kind of Flowers
+<b class="fc">&nbsp;            if (suitCount[i] == 5) {</b>
+<b class="nc">&nbsp;                score += (i + 1) * 10000000; // easy way to tell differences between hand strengths - just use huge numbers</b>
+<b class="nc">&nbsp;                break;</b>
+&nbsp;            }
+<b class="fc">&nbsp;            if (suitCount[i] == 4) {</b>
+<b class="nc">&nbsp;                score += (i + 1) * 1000000;</b>
+&nbsp;            }
+<b class="fc">&nbsp;            if (suitCount[i] == 3) {</b>
+<b class="fc">&nbsp;                score += (i + 1) * 100000; // pairs start mattering from here</b>
+&nbsp;            }
+<b class="fc">&nbsp;            if (suitCount[i] == 2) {</b>
+<b class="fc">&nbsp;                if (!pairFound) {</b>
+<b class="fc">&nbsp;                    score += (i + 1) * 10000; //Double pair is 11000, single triple becomes 100000, and full house is 110000.</b>
+<b class="fc">&nbsp;                    pairFound = true;</b>
+&nbsp;                } else {
+<b class="fc">&nbsp;                    score += (i + 1) * 1000; // There should only ever be up to two pairs at once.</b>
+&nbsp;                }
+&nbsp;
+&nbsp;            }
+&nbsp;            // We note that every singleton is unique, so we can only see one Star, then one Mario, and so on
+&nbsp;            // We can represent every combination of singletons uniquely using integers
+&nbsp;            // Using the mapping 120*[0,5] + 24[0,4] + 6[0,3] + 2[0,2] + 1[0,1],
+&nbsp;            // where each term corresponds to the ith highest singleton.
+&nbsp;            // This is necessary to completely correctly evaluate one pair hands
+&nbsp;            // This does not interfere with any higher sets because the singleton max
+&nbsp;            // is 6! - 1 = 719 &lt; 1000.
+<b class="fc">&nbsp;            if (suitCount[i] == 1) {</b>
+<b class="fc">&nbsp;                score += singleton_mult * i;</b>
+<b class="fc">&nbsp;                singleton_mult /= (5 - singletons_found);</b>
+<b class="fc">&nbsp;                singletons_found++;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        //that&#39;s the entire score calculation done.
+<b class="fc">&nbsp;        return score;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // This function converts a calculated score to a hand name.
+&nbsp;    private PokerHand scoreToHand(int playerScore){
+<b class="nc">&nbsp;        if (playerScore &gt;= 10000000) {</b>
+<b class="nc">&nbsp;            return PokerHand.FLUSH;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (playerScore &gt;= 1000000) {</b>
+<b class="nc">&nbsp;            return PokerHand.FOUR_OF_A_KIND;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (playerScore &gt;= 100000) {</b>
+&nbsp;            // If 10^4 digit is nonzero the two remaining cards are a pair, otherwise kickers
+<b class="nc">&nbsp;            if((playerScore % 100000) / 10000 &gt; 0){</b>
+<b class="nc">&nbsp;                return PokerHand.FULL_HOUSE;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return PokerHand.THREE_OF_A_KIND;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (playerScore &gt;= 10000) {</b>
+&nbsp;            // If 10^3 digit is nonzero there is a second pair, otherwise three kickers
+<b class="nc">&nbsp;            if((playerScore % 10000) / 1000 &gt; 0){</b>
+<b class="nc">&nbsp;                return PokerHand.TWO_PAIR;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return PokerHand.ONE_PAIR;</b>
+&nbsp;        }
+&nbsp;        else {
+<b class="nc">&nbsp;            return PokerHand.HIGH_CARD;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    //score calculate, compare, and multiply the pots
+&nbsp;    private int determinePayout(Player player) {
+<b class="nc">&nbsp;        int playerScore = playerScore(player.getHand());</b>
+<b class="nc">&nbsp;        PokerHand playerHand = scoreToHand(playerScore);</b>
+&nbsp;        // A player is considered to have won a round if they beat Luigi- they do not have to beat anyone else
+<b class="nc">&nbsp;        int winner = 1;</b>
+<b class="nc">&nbsp;        int luigiScore = playerScore(curGame.getHand());</b>
+<b class="nc">&nbsp;        PokerHand luigiHand = scoreToHand(luigiScore);</b>
+<b class="nc">&nbsp;        System.out.println(&quot;Luigi got a &quot;+ luigiHand.getHandName() +&quot;!&quot;);</b>
+<b class="nc">&nbsp;        System.out.println(player.getPlayerName()  + &quot; got a &quot; + playerHand.getHandName() + &quot;!&quot;);</b>
+&nbsp;        // NOTE: The scoring calculator is somewhat bugged- it does not properly compare
+&nbsp;        // triples and full houses, or one and two pairs.
+&nbsp;        // As a workaround we compare hands first, then use scores as a tiebreaker
+<b class="nc">&nbsp;        if(playerHand.ordinal() &lt; luigiHand.ordinal()){</b>
+<b class="nc">&nbsp;            System.out.println(player.getPlayerName() + &quot; did not beat Luigi. &quot;);</b>
+<b class="nc">&nbsp;            winner = 0;</b>
+&nbsp;        }
+&nbsp;        else{
+<b class="nc">&nbsp;            if(playerHand.ordinal() == luigiHand.ordinal() &amp;&amp; playerScore &lt; luigiScore){</b>
+<b class="nc">&nbsp;                System.out.println(player.getPlayerName() + &quot; did not beat Luigi. &quot;);</b>
+<b class="nc">&nbsp;                winner = 0;</b>
+&nbsp;            }
+&nbsp;            else{
+<b class="nc">&nbsp;                System.out.println(player.getPlayerName() + &quot; defeated Luigi! &quot;);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        player.setRoundsWon(player.getRoundsWon() + winner);</b>
+<b class="nc">&nbsp;        player.setLifetimeRoundsWon(player.getLifetimeRoundsWon() + winner);</b>
+&nbsp;
+<b class="nc">&nbsp;        switch(playerHand){</b>
+&nbsp;            case FLUSH:
+<b class="nc">&nbsp;                player.setFlushes(player.getFlushes() + 1);</b>
+<b class="nc">&nbsp;                return player.getBet() * 12 * winner;</b>
+&nbsp;            case FOUR_OF_A_KIND:
+<b class="nc">&nbsp;                player.setQuads(player.getQuads() + 1);</b>
+<b class="nc">&nbsp;                return player.getBet() * 8 * winner;</b>
+&nbsp;            case FULL_HOUSE:
+<b class="nc">&nbsp;                player.setFullHouses(player.getFullHouses() + 1);</b>
+<b class="nc">&nbsp;                return player.getBet() * 6 * winner;</b>
+&nbsp;            case THREE_OF_A_KIND:
+<b class="nc">&nbsp;                player.setTriples(player.getTriples() + 1);</b>
+<b class="nc">&nbsp;                return player.getBet() * 4 * winner;</b>
+&nbsp;            case TWO_PAIR:
+<b class="nc">&nbsp;                player.setTwoPairs(player.getTwoPairs() + 1);</b>
+<b class="nc">&nbsp;                return player.getBet() * 3 * winner;</b>
+&nbsp;            case ONE_PAIR:
+<b class="nc">&nbsp;                player.setOnePairs(player.getOnePairs() + 1);</b>
+<b class="nc">&nbsp;                return player.getBet() * 2 * winner;</b>
+&nbsp;            case HIGH_CARD:
+<b class="nc">&nbsp;                player.setHighCards(player.getHighCards() + 1);</b>
+<b class="nc">&nbsp;                return player.getBet() * winner;</b>
+&nbsp;            default:
+<b class="nc">&nbsp;                System.out.println(&quot;Invalid hand found!&quot;);</b>
+<b class="nc">&nbsp;                return 0;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    // If commitResults is false, the results of the showdown will not be recorded in the database
+&nbsp;    public ArrayList&lt;PlayerShowdownInfo&gt; showdownResolution(GameDAO gameDAO, PlayerDAO playerDAO, boolean commitResults){
+<b class="fc">&nbsp;        System.out.println(&quot;Showdown time!&quot;);</b>
+&nbsp;
+&nbsp;        // We want to track the players that ran out of tokens so we can just skip their turns
+<b class="fc">&nbsp;        int playersBankrupted = 0;</b>
+&nbsp;
+&nbsp;        // Begin tracking players&#39; end of round information
+&nbsp;
+<b class="fc">&nbsp;        ArrayList&lt;PlayerShowdownInfo&gt; pSDList = new ArrayList&lt;PlayerShowdownInfo&gt;();</b>
+&nbsp;
+&nbsp;        //Now we run a function which pays out tokens compared to Luigi
+<b class="fc">&nbsp;        for (Player player : playerList) {</b>
+<b class="nc">&nbsp;            PlayerShowdownInfo pSD = new PlayerShowdownInfo(player);</b>
+<b class="nc">&nbsp;            int coinsWon = determinePayout(player);</b>
+<b class="nc">&nbsp;            if(coinsWon &gt; 0){</b>
+<b class="nc">&nbsp;                System.out.println(player.getPlayerName() + &quot; won &quot; + coinsWon + &quot; tokens!&quot;);</b>
+<b class="nc">&nbsp;                pSD.setWinLossAmount(coinsWon);</b>
+&nbsp;            }
+&nbsp;            else{
+<b class="nc">&nbsp;                if(player.getTokens() == 0) {</b>
+<b class="nc">&nbsp;                    System.out.println(player.getPlayerName() + &quot; is bankrupt...&quot;);</b>
+&nbsp;                }
+&nbsp;                else{
+<b class="nc">&nbsp;                    System.out.println(player.getPlayerName() + &quot; lost &quot; + player.getBet() + &quot; tokens.&quot;);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                pSD.setWinLossAmount(-player.getBet());</b>
+&nbsp;            }
+<b class="nc">&nbsp;            pSD.setHandType(scoreToHand(playerScore(player.getHand())).getHandName());</b>
+<b class="nc">&nbsp;            player.setTokens(player.getTokens() + coinsWon);</b>
+&nbsp;
+<b class="nc">&nbsp;            System.out.println(player.getPlayerName() + &quot; now has &quot; + player.getTokens() + &quot; tokens. &quot;);</b>
+<b class="nc">&nbsp;            pSD.setNewTokens(player.getTokens());</b>
+<b class="nc">&nbsp;            if(commitResults) {</b>
+<b class="nc">&nbsp;                playerDAO.update_long(&quot;tokens&quot;, player.getTokens(), player);</b>
+<b class="nc">&nbsp;                playerDAO.update_int(&quot;rounds_won&quot;, player.getRoundsWon(), player);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            //a new bit to reset the player&#39;s hand at the end of each round
+<b class="nc">&nbsp;            player.resetHand();</b>
+<b class="nc">&nbsp;            if(commitResults)</b>
+<b class="nc">&nbsp;                playerDAO.updateHand(player);</b>
+&nbsp;
+&nbsp;            // Handle bankruptcy logic here
+<b class="nc">&nbsp;            playersBankrupted += (player.getTokens() &gt; 0 ? 0 : 1);</b>
+<b class="nc">&nbsp;            player.setFinishedRound(player.getTokens() &gt; 0 ? 0 : 1);</b>
+<b class="nc">&nbsp;            player.setBet(player.getTokens() &gt; 0 ? 1 : 0);</b>
+<b class="nc">&nbsp;            player.setTokens(player.getTokens() &gt; 0 ? player.getTokens() - 1: 0);</b>
+<b class="nc">&nbsp;            if (commitResults) {</b>
+<b class="nc">&nbsp;                playerDAO.update_int(&quot;finished_round&quot;, player.getFinishedRound(), player);</b>
+<b class="nc">&nbsp;                playerDAO.update_int(&quot;bet&quot;, player.getBet(), player);</b>
+<b class="nc">&nbsp;                playerDAO.update_int(&quot;tokens&quot;, player.getTokens(), player);</b>
+<b class="nc">&nbsp;                playerDAO.updateAttributes(player);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            pSDList.add(pSD);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        //we should increment the current round and keep on going.
+<b class="fc">&nbsp;        curGame.setCurRound(curGame.getCurRound() + 1);</b>
+<b class="fc">&nbsp;        curGame.setPlayersFinished(playersBankrupted);</b>
+&nbsp;        //update the game at this point to the database, and reenable Luigi to act.
+<b class="fc">&nbsp;        if(commitResults) {</b>
+<b class="fc">&nbsp;            curGame.setLuigiFinished(0);</b>
+<b class="fc">&nbsp;            gameDAO.update_int(&quot;luigi_finished&quot;, 0, curGame);</b>
+<b class="fc">&nbsp;            gameDAO.update_all(curGame);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return pSDList;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void gameEndResolution(GameDAO gameDAO, PlayerDAO playerDAO){
+<b class="fc">&nbsp;        System.out.println(&quot;\nGame over. Placements: &quot;);</b>
+&nbsp;
+&nbsp;        //update this one last time just in case anything has changed
+<b class="fc">&nbsp;        ArrayList&lt;Player&gt; playerArrayList = new ArrayList&lt;&gt;(Arrays.asList(playerList));</b>
+<b class="fc">&nbsp;        Collections.sort(playerArrayList);</b>
+&nbsp;
+<b class="fc">&nbsp;        int curPlayerNum = 0;</b>
+<b class="fc">&nbsp;        for (Player player : playerArrayList) {</b>
+<b class="fc">&nbsp;            System.out.println((curPlayerNum + 1) + &quot; place: &quot; + player.getPlayerName());</b>
+&nbsp;
+&nbsp;            //we also want to update the lifetime tokens while we&#39;re here. Also the dollar counts.
+<b class="fc">&nbsp;            player.setLifetimeTokens(player.getTokens() + player.getLifetimeTokens());</b>
+<b class="fc">&nbsp;            playerDAO.update_long(&quot;lifetime_tokens&quot;, player.getLifetimeTokens(), player);</b>
+&nbsp;
+<b class="fc">&nbsp;            switch (curPlayerNum++) {</b>
+&nbsp;                case 0:
+<b class="fc">&nbsp;                    player.setFirstPlaces(player.getFirstPlaces() + 1);</b>
+<b class="fc">&nbsp;                    playerDAO.update_int(&quot;first_places&quot;, player.getFirstPlaces(), player);</b>
+&nbsp;                    //We also want to update the dollars accordingly
+<b class="fc">&nbsp;                    playerDAO.update_int(&quot;dollars&quot;, player.getDollars() + (int) (curGame.getPotQuantity() * 0.55), player);</b>
+&nbsp;
+<b class="fc">&nbsp;                    curGame.setWinner(player.getPlayerName());</b>
+<b class="fc">&nbsp;                    continue;</b>
+&nbsp;                case 1:
+<b class="fc">&nbsp;                    player.setSecondPlaces(player.getSecondPlaces() + 1);</b>
+<b class="fc">&nbsp;                    playerDAO.update_int(&quot;second_places&quot;, player.getSecondPlaces(), player);</b>
+<b class="fc">&nbsp;                    playerDAO.update_int(&quot;dollars&quot;, player.getDollars() + (int) (curGame.getPotQuantity() * 0.30), player);</b>
+<b class="fc">&nbsp;                    continue;</b>
+&nbsp;                case 2:
+<b class="fc">&nbsp;                    player.setThirdPlaces(player.getThirdPlaces() + 1);</b>
+<b class="fc">&nbsp;                    playerDAO.update_int(&quot;third_places&quot;, player.getThirdPlaces(), player);</b>
+<b class="fc">&nbsp;                    playerDAO.update_int(&quot;dollars&quot;, player.getDollars() + (int) (curGame.getPotQuantity() * 0.15), player);</b>
+<b class="fc">&nbsp;                    continue;</b>
+&nbsp;                case 3:
+<b class="nc">&nbsp;                    player.setFourthPlaces(player.getFourthPlaces() + 1);</b>
+<b class="nc">&nbsp;                    playerDAO.update_int(&quot;fourth_places&quot;, player.getFourthPlaces(), player);</b>
+<b class="nc">&nbsp;                    playerDAO.update_int(&quot;dollars&quot;, player.getDollars(), player);</b>
+<b class="nc">&nbsp;                    continue;</b>
+&nbsp;                default:
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        //Game updates
+<b class="fc">&nbsp;        gameDAO.update_all(curGame);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Game gameSeq(GameDAO gamedao, PlayerDAO playerdao) {
+&nbsp;        //in the game, the first thing we want to do is get DAO objects to everything
+&nbsp;
+&nbsp;        //Next, we get the current game state using the game ID.
+<b class="fc">&nbsp;        curGame = gamedao.findById(curGame.getID());</b>
+&nbsp;        //of course, we also have to get the players because gameDAO is weird like that.
+<b class="fc">&nbsp;        curGame.setPlayers(gamedao.getPIDsByGame(curGame));</b>
+&nbsp;
+<b class="fc">&nbsp;        long[] playerIDList = curGame.getPlayers();</b>
+&nbsp;
+&nbsp;        //we get the list of all the players, so it is iterable.
+<b class="fc">&nbsp;        for (int i = 0; i &lt; playerList.length; ++i) {</b>
+<b class="nc">&nbsp;            playerList[i] = playerdao.findById(playerIDList[i]);</b>
+<b class="nc">&nbsp;            playerList[i] = playerdao.getHand(playerList[i]);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        //reset everything we&#39;d need to reset before the game. Do not reset if in the middle of a game
+<b class="fc">&nbsp;        if(curGame.getCurRound() == 1) {</b>
+<b class="fc">&nbsp;            for (Player value : playerList) {</b>
+<b class="nc">&nbsp;                value.resetPerGameInfo();</b>
+&nbsp;                //drain people&#39;s bank accounts and add to pot
+<b class="nc">&nbsp;                value.setDollars(value.getDollars() - curGame.getBuyIn());</b>
+<b class="nc">&nbsp;                curGame.setPotQuantity(curGame.getPotQuantity() + curGame.getBuyIn());</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        int curPlayerNum;
+<b class="fc">&nbsp;        ArrayList&lt;Player&gt; playerArrayList = new ArrayList&lt;&gt;(Arrays.asList(playerList));</b>
+&nbsp;        // we can do a check on the number of rounds at this point to see if the game is ongoing.
+<b class="fc">&nbsp;        while (curGame.getCurRound() &lt;= curGame.getNumRounds()) {</b>
+&nbsp;            //Print out the rounds
+<b class="fc">&nbsp;            System.out.println(&quot;Round &quot; + curGame.getCurRound());</b>
+&nbsp;            //I do agree that array lists are easier to sort - but not much else.
+&nbsp;            //This probably causes a bunch of memory leaks or something: isn&#39;t that a shame.
+<b class="fc">&nbsp;            playerArrayList = new ArrayList&lt;&gt;(Arrays.asList(playerList));</b>
+<b class="fc">&nbsp;            Collections.sort(playerArrayList);</b>
+&nbsp;
+&nbsp;            //we execute everyone&#39;s turns now
+<b class="fc">&nbsp;            curPlayerNum = 0;</b>
+<b class="fc">&nbsp;            for (Player i : playerArrayList) {</b>
+<b class="nc">&nbsp;                playerList[curPlayerNum++] = executeRoundFromTerminal(i, gamedao, playerdao);</b>
+<b class="nc">&nbsp;                i.setFinishedRound(1);</b>
+<b class="nc">&nbsp;                playerdao.update_int(&quot;finished_round&quot;, 1, i);</b>
+<b class="nc">&nbsp;                curGame.setPlayersFinished(curGame.getPlayersFinished() + 1);</b>
+<b class="nc">&nbsp;                gamedao.update_int(&quot;players_finished&quot;, curGame.getPlayersFinished(), curGame);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;            // this is where we&#39;d execute Luigi&#39;s turn.
+<b class="fc">&nbsp;            executeLuigi();</b>
+<b class="fc">&nbsp;            gamedao.updateHand(curGame);</b>
+&nbsp;
+&nbsp;            // Runs Luigi logic then pays out to players
+<b class="fc">&nbsp;            showdownResolution(gamedao, playerdao, true);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        //once we break out of the loop, all rounds are over and we can determine the winner.
+<b class="fc">&nbsp;        gameEndResolution(gamedao, playerdao);</b>
+&nbsp;
+&nbsp;        //return the game state
+<b class="fc">&nbsp;        return curGame;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-16 21:55</div>
+</div>
+</body>
+</html>

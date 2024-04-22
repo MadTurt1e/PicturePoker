@@ -286,7 +286,9 @@ public class Player implements DataTransferObject, Comparable<Player> {
             if(hand[i].getToChange()){
                 cardsChanged++;
             }
+            //redraw, and than indicate that we probably don't want to redraw anymore.
             hand[i].redrawSuit();
+            hand[i].setToChange(false);
         }
     }
 

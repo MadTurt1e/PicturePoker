@@ -13,7 +13,24 @@ import ColorfulText from "../index";
 import {useEffect, useState} from "react";
 
 function joinGame(gid, navigate) {
+    //we need to check if the game has started
     if (gid !== 0) {
+        async function isInGame() {
+            const response = await axios.get(`http://localhost:8080/getByGameID/` + gid)
+                .catch(function () {
+                    console.log("GetbyGameID didn't work. ");
+                });
+            if (response.data.players){
+                let newPNames = [];
+                const filteredPlayers = response.data.players.filter(player => player === 0);
+                if (filteredPlayers.length > 0){
+                    navigate(`/WaitingRoom`, {state: {gameId: gid}});
+                }
+            }
+        }
+        isInGame();
+
+        // this is the case where we're not waiting on players so we just start
         navigate('/game', {state: {gameId: gid}});
     }
 }
@@ -25,9 +42,8 @@ const ImageComponent = () => {
         const inGame = async () => {
             const response = await axios.get(`http://localhost:8080/getPlayerActiveGame/${sessionStorage.getItem('userID')}`)
                 .catch(function(error){
-                    console.log("getByPlayerID API call did not work");
+                    console.log("getByPlayerID API call did not work" + sessionStorage.getItem('userID'));
                 });
-            console.log(response);
             if(response.status === 200 && response.data !== null && (response.data.curRound <= response.data.numRounds)) {
                 setGid(response.data.id);
             }

@@ -52,9 +52,6 @@ root.render(
             <Route path="/gameEnd" element={<GameEnd />} />
         </Routes>
     </BrowserRouter>,
-  <React.StrictMode>
-    <Menu />
-  </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function

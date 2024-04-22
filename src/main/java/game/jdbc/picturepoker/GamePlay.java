@@ -29,6 +29,10 @@ public class GamePlay {
         this.playerList = playerList;
     }
 
+    public Game getCurGame() {
+        return curGame;
+    }
+
     private Player executeRoundFromTerminal(Player player, GameDAO gameDAO, PlayerDAO playerDAO) {
         System.out.println("\n" + player.getPlayerName() + "'s Turn! ");
         System.out.println(player.getPlayerName() + " has " + player.getTokens() + " tokens!");
@@ -155,7 +159,7 @@ public class GamePlay {
         for (int i = 0; i < luigiHand.length; ++i) {
             if (luigiHand[i].getToChange()) {
                 System.out.println("Luigi is changing out card " + i + "!");
-                luigiHand[i].setSuit(Card.Suit.values()[(int) (Math.random() * 6)]);
+                luigiHand[i].redrawSuit();
             }
         }
 
@@ -165,6 +169,7 @@ public class GamePlay {
             System.out.println("Card " + i + ": " + luigiHand[i]);
         }
 
+        curGame.setLuigiFinished(1);
         //no return needed.
     }
 
@@ -434,7 +439,7 @@ public class GamePlay {
     }
 
     // If commitResults is false, the results of the showdown will not be recorded in the database
-    public ArrayList<PlayerShowdownInfo> showdownResolution(GameDAO gameDAO, PlayerDAO playerDAO, boolean commitResults){
+    public ShowdownInfo showdownResolution(GameDAO gameDAO, PlayerDAO playerDAO, boolean commitResults){
         System.out.println("Showdown time!");
 
         // We want to track the players that ran out of tokens so we can just skip their turns
@@ -442,11 +447,19 @@ public class GamePlay {
 
         // Begin tracking players' end of round information
 
+        ShowdownInfo sdInfo = new ShowdownInfo();
+        sdInfo.setLuigiHand(curGame.getHand());
         ArrayList<PlayerShowdownInfo> pSDList = new ArrayList<PlayerShowdownInfo>();
 
         //Now we run a function which pays out tokens compared to Luigi
         for (Player player : playerList) {
             PlayerShowdownInfo pSD = new PlayerShowdownInfo(player);
+            // Need to create a deep copy of hand so that resetting cards does not affect returned info
+            Card[] dupHand = new Card[5];
+            for(int i = 0; i < 5; i++){
+                dupHand[i] = new Card(player.getHand()[i].getSuit());
+            }
+            pSD.setHand(dupHand);
             int coinsWon = determinePayout(player);
             if(coinsWon > 0){
                 System.out.println(player.getPlayerName() + " won " + coinsWon + " tokens!");
@@ -472,9 +485,10 @@ public class GamePlay {
             }
 
             //a new bit to reset the player's hand at the end of each round
-            player.resetHand();
-            if(commitResults)
+            if(commitResults) {
+                player.resetHand();
                 playerDAO.updateHand(player);
+            }
 
             // Handle bankruptcy logic here
             playersBankrupted += (player.getTokens() > 0 ? 0 : 1);
@@ -499,7 +513,8 @@ public class GamePlay {
             gameDAO.update_int("luigi_finished", 0, curGame);
             gameDAO.update_all(curGame);
         }
-        return pSDList;
+        sdInfo.setPlayerShowdownInfos(pSDList);
+        return sdInfo;
     }
 
     public void gameEndResolution(GameDAO gameDAO, PlayerDAO playerDAO){
@@ -598,6 +613,7 @@ public class GamePlay {
             // this is where we'd execute Luigi's turn.
             executeLuigi();
             gamedao.updateHand(curGame);
+            gamedao.update_int("luigi_finished", 1, curGame);
 
             // Runs Luigi logic then pays out to players
             showdownResolution(gamedao, playerdao, true);

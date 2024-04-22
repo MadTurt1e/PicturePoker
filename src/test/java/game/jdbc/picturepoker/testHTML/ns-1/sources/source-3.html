@@ -1,0 +1,243 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Game</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">game.jdbc.picturepoker</a>
+</div>
+
+<h1>Coverage Summary for Class: Game (game.jdbc.picturepoker)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Game</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (26/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (28/28)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package game.jdbc.picturepoker;
+&nbsp;
+&nbsp;import game.jdbc.picturepoker.util.DataTransferObject;
+&nbsp;import java.util.Arrays;
+&nbsp;
+<b class="fc">&nbsp;public class Game implements DataTransferObject</b>
+&nbsp;{
+&nbsp;    private long g_id;
+&nbsp;
+&nbsp;    // sorry, but nonpreallocated memory is for the weak.
+&nbsp;    private long [] players;
+&nbsp;    //This actually accepts players 1 through n
+&nbsp;    private int cur_round;
+&nbsp;    private int num_rounds;
+&nbsp;    private int active_players;
+&nbsp;    private int buy_in;
+&nbsp;    private int pot_quantity;
+&nbsp;    private int difficulty;
+&nbsp;    private int playersFinished;
+&nbsp;    private int luigiFinished;
+&nbsp;    private String winner;
+&nbsp;    private Card[] hand;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public long getID() {
+<b class="fc">&nbsp;        return g_id;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setID(long g_id) {
+<b class="fc">&nbsp;        this.g_id = g_id;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public long[] getPlayers() {
+<b class="fc">&nbsp;        return players;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setPlayers(long[] players) {
+<b class="fc">&nbsp;        this.players = players;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getCurRound() {
+<b class="fc">&nbsp;        return cur_round;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setCurRound(int cur_round) {
+<b class="fc">&nbsp;        this.cur_round = cur_round;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getNumRounds() {
+<b class="fc">&nbsp;        return num_rounds;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setNumRounds(int num_rounds) {
+<b class="fc">&nbsp;        this.num_rounds = num_rounds;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getActivePlayers() {
+<b class="fc">&nbsp;        return active_players;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setActivePlayers(int active_players) {
+<b class="fc">&nbsp;        this.active_players = active_players;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getBuyIn() {
+<b class="fc">&nbsp;        return buy_in;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setBuyIn(int buy_in) {
+<b class="fc">&nbsp;        this.buy_in = buy_in;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getPotQuantity() {
+<b class="fc">&nbsp;        return pot_quantity;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setPotQuantity(int pot_quantity) {
+<b class="fc">&nbsp;        this.pot_quantity = pot_quantity;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getDifficulty() {
+<b class="fc">&nbsp;        return difficulty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setDifficulty(int difficulty) {
+<b class="fc">&nbsp;        this.difficulty = difficulty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getPlayersFinished() {
+<b class="fc">&nbsp;        return playersFinished;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setPlayersFinished(int playersFinished) {
+<b class="fc">&nbsp;        this.playersFinished = playersFinished;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getLuigiFinished() {
+<b class="fc">&nbsp;        return luigiFinished;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setLuigiFinished(int luigiFinished) {
+<b class="fc">&nbsp;        this.luigiFinished = luigiFinished;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getWinner(){
+<b class="fc">&nbsp;        return winner;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //honestly, database wise it might be better to store the winner as a string, but whatever.
+&nbsp;    public void setWinner(String winner){
+<b class="fc">&nbsp;        this.winner = winner;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Card[] getHand() {
+<b class="fc">&nbsp;        return hand;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setHand(Card[] hand) {
+<b class="fc">&nbsp;        this.hand = hand;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="fc">&nbsp;        return &quot;Game{&quot; +</b>
+&nbsp;                &quot;g_id=&quot; + g_id +
+<b class="fc">&nbsp;                &quot;, players=&quot; + Arrays.toString(players) +</b>
+&nbsp;                &quot;, cur_round=&quot; + cur_round +
+&nbsp;                &quot;, num_rounds=&quot; + num_rounds +
+&nbsp;                &quot;, active_players=&quot; + active_players +
+&nbsp;                &quot;, buy_in=&quot; + buy_in +
+&nbsp;                &quot;, pot_quantity=&quot; + pot_quantity +
+&nbsp;                &quot;, difficulty=&quot; + difficulty +
+&nbsp;                &quot;, players_finished=&quot; + playersFinished +
+&nbsp;                &quot;, luigi_finished=&quot; + luigiFinished +
+&nbsp;                &quot;, winner=&#39;&quot; + winner + &#39;\&#39;&#39; +
+<b class="fc">&nbsp;                &quot;, hand=&quot; + Arrays.toString(hand) +</b>
+&nbsp;                &#39;}&#39;;
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-16 21:55</div>
+</div>
+</body>
+</html>

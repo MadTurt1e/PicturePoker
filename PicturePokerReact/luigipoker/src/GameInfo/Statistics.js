@@ -45,10 +45,10 @@ function Stats(){
                 <ColorfulText text={"Games Played: " + data.gamesPlayed}/>
                 <ColorfulText text={"Hands Played: " + data.handsPlayed}/>
                 <br/>
-                <ColorfulText text={"Average Bet: " + data.avgBet}/>
+                <ColorfulText text={"Average Bet: " + Math.round(data.avgBet*100)/100}/>
                 <ColorfulText text={"Cards Changed: " + data.cardsChanged}/>
-                <ColorfulText text={"Average Cards Changed: " + data.avgCardsChanged}/>
-                <ColorfulText text={"Average Lifetime Tokens: " + data.avgLifetimeTokens}/>
+                <ColorfulText text={"Average Cards Changed: " + Math.round(data.avgCardsChanged*100)/100}/>
+                <ColorfulText text={"Average Lifetime Tokens: " + Math.round(data.avgLifetimeTokens*10)/10}/>
                 <br/>
                 <ColorfulText text={"Lifetime Rounds Won: " + data.lifetimeRoundsWon}/>
                 <ColorfulText text={"Lifetime Tokens: " + data.lifetimeTokens}/>
@@ -63,7 +63,7 @@ function Stats(){
                 <ColorfulText text={"Flushes: " + data.flushes}/>
                 <br/>
                 <ColorfulText text={"Rounds Won: " + data.roundsWon}/>
-                <ColorfulText text={"Round Winrate: " + data.roundWinrate}/>
+                <ColorfulText text={"Round Winrate: " + Math.round(data.roundWinrate) + "%"}/>
             </div>
         );
     }

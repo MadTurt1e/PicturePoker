@@ -508,18 +508,17 @@ public class PicturePokerGame {
                 //we get the list of all the players, so it is iterable.
                 for (int i = 0; i < 4; i++) {
                     playerList[i] = playerDAO.findById(playerIDList[i]);
-                    //we only redraw for players who have finished the round
-                    // Well actually we assume that all players have already finished the round before entering but whatever
-                    if (playerList[i].getFinishedRound() == 1) {
-                        playerList[i].redrawHand();
-                        playerDAO.updateHand(playerList[i]);
-                        playerDAO.updateAttributes(playerList[i]);
-                    }
+                    // Well actually we assume that all players have already finished the round before entering so no need to check
+                    playerList[i].redrawHand();
+                    playerDAO.updateHand(playerList[i]);
+                    playerDAO.updateAttributes(playerList[i]);
+                    System.out.println(playerList[i]);
                 }
                 GamePlay gp = new GamePlay(game, playerList);
                 if(game.getLuigiFinished() < 1) {
                     gp.executeLuigi();
                     gameDAO.updateHand(gp.getCurGame());
+                    gameDAO.update_int("luigi_finished", 1, gp.getCurGame());
                 }
                 sdInfo = gp.showdownResolution(gameDAO, playerDAO, commit_results);
                 //Only end the game in the case that everybody is done with the game.

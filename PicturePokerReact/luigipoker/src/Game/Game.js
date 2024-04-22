@@ -33,7 +33,6 @@ function PlayerList({gid}) {
     const [pBet, setPBet] = useState([]);
     const [pWaiting, setPWaiting] = useState([]);
     useLocation();
-    const navigate = useNavigate();
 
     useEffect(() => {
         const loadGame = async () => {
@@ -42,21 +41,17 @@ function PlayerList({gid}) {
                     console.log("GetbyGameID didn't work. " + gid);
                 });
             setPlayers(response.data.players);
-            
-            if (response.data.curRound > response.data.numRounds) {
-                navigate("/gameEnd", { state: { gameId: gid } })
-            }
         }
 
         //if we are in the round end, jump to the end screen
 
         // Call loadGame immediately and then every X milliseconds
         loadGame();
-        // const intervalId = setInterval(loadGame, 10000); // 5000 ms = 5 seconds
+        const intervalId = setInterval(loadGame, 5000); // 5000 ms = 5 seconds
         //TODO: This is how we update the players, which really isn't that great a strategy.
 
         // Clear interval on unmount
-        // return () => clearInterval(intervalId);
+        return () => clearInterval(intervalId);
     }, [gid]);
 
 
@@ -118,7 +113,7 @@ function PlayerList({gid}) {
 }
 
 
-function RoundCount({gid}) {
+function RoundCount({gid, gameUpdate}) {
     const [rounds, setRounds] = useState(null);
     const [curRound, setCurRounds] = useState(null);
     useEffect(() => {
@@ -131,7 +126,14 @@ function RoundCount({gid}) {
             setCurRounds(response.data.curRound)
         }
         loadGame();
-    }, [gid]); // Remove players from the dependency array
+    }, [gid, gameUpdate]); // Remove players from the dependency array
+
+    //navigate away in the event we're done with the game
+    const navigate = useNavigate();
+    if (curRound > rounds) {
+        navigate("/gameEnd", { state: { gameId: gid } })
+    }
+
     return(
         <div style = {{fontSize: "2vh"}} className={"bordering"}>
             <ColorfulText text={"Round " + curRound + " of " + rounds} />
@@ -143,7 +145,7 @@ function WaitingOnTurn(turnEnd) {
     const [finished, setFinished] = useState(0); // Use state to track 'finished'
 
     useEffect(() => {
-        if (turnEnd === 1)
+        if (turnEnd.turn === true)
             setFinished(1);
         else
             setFinished(0);
@@ -219,21 +221,22 @@ function EndOfRoundList({info}) {
 function nextRound(gid){
     const endRound = async () => {
         // api call once and done
-        const response = await axios.get(`http://localhost:8080/getEndOfRoundInformation/${gid}/${false}`)
+        await axios.get(`http://localhost:8080/getEndOfRoundInformation/${gid}/${true}`)
             .catch(function () {
                 console.log("GetEndOfRoundInformation didn't work. " + gid);
             });
     }
     endRound();
 }
-function EndOfRound({gid, turnEnd, showCards}){
+function EndOfRound({gid, turnEnd, showCards, gameUpdate}){
     const [data, setData] = useState(null);
     const [dispResults, setDispResults] = useState(false);
+
     useEffect(() => {
         const endRound = async () => {
             //we only start API calling when our turn ends.
             if (turnEnd) {
-                const response = await axios.get(`http://localhost:8080/getEndOfRoundInformation/${gid}/${true}`)
+                const response = await axios.get(`http://localhost:8080/getEndOfRoundInformation/${gid}/${false}`)
                     .catch(function () {
                         console.log("GetEndOfRoundInformation didn't work. " + gid);
                     });
@@ -243,15 +246,14 @@ function EndOfRound({gid, turnEnd, showCards}){
         endRound();
 
         const intervalId = setInterval(endRound, 5000); // 5000 ms = 5 seconds
-        //TODO: Intervals are bad, but we use them a lot. Ideally we don't use them a lot.
+        //TODO: Intervals are bad, and we have a lot of them. At this state, we live with it.
 
         // Clear interval on unmount
         return () => clearInterval(intervalId);
     }, [gid, turnEnd]);
 
-    const placement = ["Quite well", "Okay", "kind of badly", "terribly"]
     //this is the case where our game is now over
-    if (turnEnd && data !== null && data.playerShowdownInfos.length !== 0){
+    if (turnEnd && data !== null && data.playerShowdownInfos !== null && data.playerShowdownInfos.length !== 0){
         //scan through for our player ID
         for (let i = 0; i < data.playerShowdownInfos.length; ++i){
             if (data.playerShowdownInfos[i].pID === parseInt(sessionStorage.getItem("userID"))){
@@ -269,6 +271,7 @@ function EndOfRound({gid, turnEnd, showCards}){
                 setTimeout(() => {
                     nextRound(gid);
                     setDispResults(false);
+                    gameUpdate(true);
                 }, 30000); // let the user bask in the results for like 30 seconds
 
                 //Next, we return a splash screen of the results
@@ -318,6 +321,7 @@ function Game() {
     //startup stuff - we first get the game id and stuff
     useEffect(() => {
         setGID(location.state.gameId);
+        setGameUpdate(true);
 
         // set turn end to false for when we update it later
         setTurnEnd(false);
@@ -350,6 +354,9 @@ function Game() {
             if (response.data.finishedRound === 1){
                 setTurnEnd(true);
             }
+            else
+                setTurnEnd(false);
+
             setHand(response.data.hand);
             setTokens(response.data.tokens);
             setBet(response.data.bet);
@@ -367,7 +374,10 @@ function Game() {
 
     //update the player's hand whenever we activate game update
     useEffect(() => {
-        getPlayerData();
+        if (gameUpdate) {
+            getPlayerData();
+            setGameUpdate(false);
+        }
     }, [gameUpdate]);
 
     //update the player's cards whenever necessary.
@@ -398,13 +408,14 @@ function Game() {
     }
 
     const handleCardClick = (index) => {
-        setToChange(index);
-
-        // Add or remove the index from the selectedCards array
-        if (selectedCards.includes(index)) {
-            setSelectedCards(selectedCards.filter(i => i !== index));
-        } else {
-            setSelectedCards([...selectedCards, index]);
+        if (!turnEnd) {
+            setToChange(index);
+            // Add or remove the index from the selectedCards array
+            if (selectedCards.includes(index)) {
+                setSelectedCards(selectedCards.filter(i => i !== index));
+            } else {
+                setSelectedCards([...selectedCards, index]);
+            }
         }
     };
 
@@ -424,19 +435,21 @@ function Game() {
     const endTurnProcedure = async() => {
         if (bet !== 0)
         {
-            finishRound(pid);
-            getPlayerData(pid);
-
             //only animate if we haven't finished our turn.
-            if (turnEnd)
+            if (turnEnd === false)
                 setLuigiState(1);
+
+            await finishRound(pid);
+
+            //note: turnEnd only gets updated in this section
+            getPlayerData(pid);
 
             //pseudo animations - we don't have the budget to go further.
             setTimeout(() => {
                 setLuigiState(0);
             }, 5310);
 
-            //show luigi's hand
+            //show luigi's hand (as of the turn end)
             const response = await axios.get("http://localhost:8080/getByGameID/" + gid)
                 .catch(function () {
                     console.log("getByGameID API call didn't work. ")
@@ -447,18 +460,18 @@ function Game() {
                 setDealerHand("luigi")
             }
         }
-
-        setTurnEnd(true);
     }
 
-    //run the end of turn stuff if we're done already (even at the beginning)
+    //run the end of turn stuff whenever turnEnd is true (or set to true)
     useEffect(() => {
         if (turnEnd === true){
             endTurnProcedure();
         }
+        else
+            setDealerHand("luigi"); //if we're not at the turn end, hide the dealer's hand.
     }, [turnEnd]);
 
-    //function that goes through a sequence for the card data
+    //function that goes through a sequence to display card data to the user
     const showCards = (eorData, idx) => {
         //update hand
         setHand(eorData.playerShowdownInfos[idx].hand);
@@ -491,9 +504,9 @@ function Game() {
                 <ColorfulText text={("Current Game ID: " + gid).toString()}/>
             </div>
             <PlayerList gid = {gid}/>
-            <RoundCount gid = {gid}/>
+            <RoundCount gid = {gid} gameUpdate = {gameUpdate}/>
             <WaitingOnTurn turn={turnEnd} />
-            <EndOfRound gid = {gid} turnEnd={turnEnd} showCards={showCards}/>
+            <EndOfRound gid = {gid} turnEnd={turnEnd} showCards={showCards} gameUpdate = {setGameUpdate}/>
             <div className="cards" style={{
                 top: '5%'
             }}>

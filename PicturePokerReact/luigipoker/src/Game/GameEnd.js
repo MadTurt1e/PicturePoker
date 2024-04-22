@@ -14,8 +14,7 @@ function PlayerList({ gid }) {
     const [pNames, setPNames] = useState([]);
     const [pTokens, setPTokens] = useState([]);
     const [buyIn, setBuyIn] = useState([]);
-    const [pWaiting, setPWaiting] = useState([]);
-    const location = useLocation();
+    useLocation();
 
     useEffect(() => {
         const loadGame = async () => {
@@ -40,12 +39,10 @@ function PlayerList({ gid }) {
             async function getPlayerNames() {
                 const names = [];
                 const tokens = [];
-                const bet = [];
-                const waiting = [];
 
                 for (let i = 0; i < filteredPlayers.length; i++) {
                     let response = await axios.get(`http://localhost:8080/getByPlayerID/${filteredPlayers[i]}`)
-                        .catch(function (error) {
+                        .catch(function () {
                             console.log('getByPlayerID didn\'t work ' + filteredPlayers[i]);
                         });
                     names.push(response.data.playerName);

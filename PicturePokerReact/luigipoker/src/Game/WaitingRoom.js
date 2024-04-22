@@ -6,7 +6,7 @@ import ColorfulText from "../index"
 import backdrop from "../resources/menuIcons/luigisCasino.jpg";
 
 function PlayerList() {
-    const [players, setPlayers] = useState(null);
+    const [players, setPlayers] = useState([]);
     const [pNames, setPNames] = useState([]);
     const location = useLocation();
     const gid = location.state.gameId;
@@ -19,14 +19,16 @@ function PlayerList() {
                 .catch(function () {
                     console.log("GetbyGameID didn't work. ");
                 });
-            setPlayers(response.data.players);
+
+            const players = response.data.players;
+            setPlayers(players);
 
             if (players) {
                 const filteredPlayers = players.filter(player => player !== 0);
                 let newPNames = [];
                 for (let i = 0; i < filteredPlayers.length; i++) {
                     let response = await axios.get(`http://localhost:8080/getByPlayerID/${filteredPlayers[i]}`)
-                        .catch(function (error) {
+                        .catch(function () {
                             console.log('getByPlayerID didn\'t work');
                         });
                     newPNames.push(response.data.playerName);
@@ -34,10 +36,12 @@ function PlayerList() {
                 setPNames(newPNames);
             }
         }
+
         doStuff();
+
         const interval = setInterval(async () => {
             doStuff();
-        }, 10000);
+        }, 1000);
         //TIME: for debugging purposes. Set to 10 seconds in real life.
 
         // Leave the waiting room immediately after we hit 4 players.
@@ -72,13 +76,13 @@ function WaitingRoom(){
     const exitGame = async() => {
         //leave game
         let response = await axios.delete(`http://localhost:8080/leaveCurrentGame/${sessionStorage.getItem('userID')}`)
-            .catch(function(error){
+            .catch(function(){
                 console.log("leaveCurrentGame didn\'t work. ");
             });
         if (response.status === 200){
             //if we actually leave, go to the menu
             let response2 = await axios.get(`http://localhost:8080/getPlayerActiveGame/${sessionStorage.getItem('userID')}`)
-                .catch(function(error){
+                .catch(function(){
                     console.log("GetPlayerActiveGame didn\'t work. ");
                 });
             if (response2.data === "" || response2.data.players.includes(parseInt(sessionStorage.getItem("userID"))))
@@ -101,7 +105,7 @@ function WaitingRoom(){
             <PlayerList/>
             <br/>
 
-            <button className="escapeGame bordering glow" style={{fontSize:"3vh"}}onClick={() => exitGame()}>
+            <button className="escapeGame bordering glow" style={{fontSize:"3vh"}} onClick={() => exitGame()}>
                 <ColorfulText text={"Leave Game?  "}/>
             </button>
 

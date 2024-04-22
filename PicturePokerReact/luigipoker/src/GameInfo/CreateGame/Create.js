@@ -120,7 +120,7 @@ function CreateGame(){
                 <div className="config-section">
                     <img src={buyin} style={{height: '150px'}} alt={"buyin"}/>
                     <button
-                        onClick={() => buyIn > 5 && setBuyIn(buyIn - 5)}
+                        onClick={() => buyIn > 0 && setBuyIn(buyIn - 5)}
                         className="glow">
                         <img src={arrow} alt="arrow pointing upwards" className="rotate90"/>
                     </button>

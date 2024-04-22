@@ -52,7 +52,7 @@ function PlayerList({gid}) {
         // Call loadGame immediately and then every X milliseconds
         loadGame();
         // const intervalId = setInterval(loadGame, 10000); // 5000 ms = 5 seconds
-        //TODO: Intervals are bad, but we use them a lot. Ideally we don't use them a lot.
+        //TODO: This is how we update the players, which really isn't that great a strategy.
 
         // Clear interval on unmount
         // return () => clearInterval(intervalId);
@@ -199,7 +199,7 @@ function EndOfRound({gid, turnEnd, showCards}){
             if (turnEnd) {
                 const response = await axios.get(`http://localhost:8080/getEndOfRoundInformation/${gid}/${false}`)
                     .catch(function () {
-                        console.log("GetbyGameID didn't work. " + gid);
+                        console.log("GetEndOfRoundInformation didn't work. " + gid);
                     });
                 setData(response.data);
             }
@@ -213,19 +213,20 @@ function EndOfRound({gid, turnEnd, showCards}){
         return () => clearInterval(intervalId);
     }, [gid, turnEnd]);
 
+    console.log(data);
     //this is the case where our game is now over
-    if (turnEnd && data !== null && data.length !== 0){
+    if (turnEnd && data !== null && data.playerShowdownInfos.length !== 0){
         //scan through for our player ID
-        for (let i = 0; i < data.length; ++i){
-            if (data[i].pID === parseInt(sessionStorage.getItem("userID"))){
+        for (let i = 0; i < data.playerShowdownInfos.length; ++i){
+            if (data.playerShowdownInfos[i].pID === parseInt(sessionStorage.getItem("userID"))){
                 // With this information, we can do stuff.
 
                 //First, we can kind of showcase the results via something from the parent function
-                showCards(data[i]);
+                showCards(data.playerShowdownInfos[i]);
 
                 return(
                     <div style={{display: "flex", fontSize: "2vh"}}>
-                        <ColorfulText text = {JSON.stringify(data[i])}/>
+                        <ColorfulText text = {JSON.stringify(data.playerShowdownInfos[i])}/>
                     </div>
                 );
             }

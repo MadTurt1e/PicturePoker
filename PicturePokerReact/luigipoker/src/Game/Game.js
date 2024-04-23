@@ -272,7 +272,7 @@ function EndOfRound({gid, turnEnd, showCards, gameUpdate}){
                     nextRound(gid);
                     setDispResults(false);
                     gameUpdate(true);
-                }, 10000); // let the user bask in the results for like 30 seconds
+                }, 20000); // let the user bask in the results for like 20 seconds
 
                 //Next, we return a splash screen of the results
                 return(
@@ -280,6 +280,7 @@ function EndOfRound({gid, turnEnd, showCards, gameUpdate}){
                         {dispResults &&
                             <div className="splashScreen bordering">
                                 <ColorfulText text = {"You drew: " + (data.playerShowdownInfos[i].handType)}/>
+                                <ColorfulText text = {"Luigi drew: " + data.luigiHandType}></ColorfulText>
                                 <ColorfulText text = {"You are " + (data.playerShowdownInfos[i].winLossAmount > 0 ? "up " : "down ") + Math.abs(data.playerShowdownInfos[i].winLossAmount) + " tokens"} />
                                 <ColorfulText text={"Current standings: "}/>
                                 <EndOfRoundList info = {data.playerShowdownInfos} />

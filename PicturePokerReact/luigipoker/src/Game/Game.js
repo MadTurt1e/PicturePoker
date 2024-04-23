@@ -272,7 +272,7 @@ function EndOfRound({gid, turnEnd, showCards, gameUpdate}){
                     nextRound(gid);
                     setDispResults(false);
                     gameUpdate(true);
-                }, 30000); // let the user bask in the results for like 30 seconds
+                }, 10000); // let the user bask in the results for like 30 seconds
 
                 //Next, we return a splash screen of the results
                 return(

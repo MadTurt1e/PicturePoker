@@ -449,6 +449,7 @@ public class GamePlay {
 
         ShowdownInfo sdInfo = new ShowdownInfo();
         sdInfo.setLuigiHand(curGame.getHand());
+        sdInfo.setLuigiHandType(scoreToHand(playerScore(curGame.getHand())).getHandName());
         ArrayList<PlayerShowdownInfo> pSDList = new ArrayList<PlayerShowdownInfo>();
 
         //Now we run a function which pays out tokens compared to Luigi

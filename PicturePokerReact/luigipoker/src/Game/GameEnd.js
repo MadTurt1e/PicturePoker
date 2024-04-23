@@ -45,6 +45,10 @@ function PlayerList({ gid }) {
                         .catch(function () {
                             console.log('getByPlayerID didn\'t work ' + filteredPlayers[i]);
                         });
+                    //update this thing while we're here
+                    if (filteredPlayers[i] === sessionStorage.getItem("userID")){
+                        sessionStorage.setItem('dollars', response.data.dollars);
+                    }
                     names.push(response.data.playerName);
                     tokens.push(response.data.tokens);
                 }

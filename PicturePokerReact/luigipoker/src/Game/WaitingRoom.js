@@ -34,6 +34,10 @@ function PlayerList() {
                     newPNames.push(response.data.playerName);
                 }
                 setPNames(newPNames);
+                // Leave the waiting room immediately after we hit 4 players.
+                if (filteredPlayers.length === 4) {
+                    navigate(`/Game`, { state: { gameId: gid } });
+                }
             }
         }
 
@@ -41,13 +45,8 @@ function PlayerList() {
 
         const interval = setInterval(async () => {
             doStuff();
-        }, 1000);
-        //TIME: for debugging purposes. Set to 10 seconds in real life.
-
-        // Leave the waiting room immediately after we hit 4 players.
-        if (pNames.length === 4) {
-            navigate(`/Game`, { state: { gameId: gid } });
-        }
+        }, 3000);
+        //TIME: Set to 3 second delay because we're not really expecting people to stay here for long.
 
         // Cleanup interval on unmount
         return () => clearInterval(interval);

@@ -279,7 +279,8 @@ function EndOfRound({gid, turnEnd, showCards, gameUpdate}){
                     <div>
                         {dispResults &&
                             <div className="splashScreen bordering">
-                                <ColorfulText text = {"You drew: " + (data.playerShowdownInfos[i].handType) + "!"}/>
+                                <ColorfulText text = {"You drew: " + (data.playerShowdownInfos[i].handType)}/>
+                                <ColorfulText text = {"You are " + (data.playerShowdownInfos[i].winLossAmount > 0 ? "up " : "down ") + Math.abs(data.playerShowdownInfos[i].winLossAmount) + " tokens"} />
                                 <ColorfulText text={"Current standings: "}/>
                                 <EndOfRoundList info = {data.playerShowdownInfos} />
                             </div>
@@ -387,7 +388,10 @@ function Game() {
 
     //update the dealer's cards whenever necessary
     useEffect(() => {
-        setDealerCards(cards2Int(dealerHand));
+        if (turnEnd)
+            setDealerCards(cards2Int(dealerHand));
+        else
+            setDealerCards(cards2Int("luigi"));
     }, [dealerHand]);
 
 

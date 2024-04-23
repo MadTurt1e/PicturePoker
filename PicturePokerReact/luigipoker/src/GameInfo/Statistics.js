@@ -17,21 +17,17 @@ function Stats(){
         const loadGame = async () => {
             // Replace this with the updated API call
             const response = await axios.get(`http://localhost:8080/getByPlayerID/` + sessionStorage.getItem('userID'))
-                .catch(function(error){
-                    console.log("GetbyGameID didn't work. ");
+                .catch(function(){
+                    console.log("getByPlayerID didn't work. ");
                 });
-            setData(response.data)
+            setData(response.data);
         }
         loadGame();
-    }, [reload]);
+    }, []);
 
-    //for use if we want to reload the data
-    const handleReload = () => {
-        setReload(!reload);
-    }
 
     if (data) {
-        console.log(data);
+        sessionStorage.setItem('dollars', data.dollars);
         return (
             <div style={{fontSize: "3vh", height: '80%', overflow: 'scroll'}} className={"bordering"}>
                 <ColorfulText text={"Username: " + data.playerName}/>

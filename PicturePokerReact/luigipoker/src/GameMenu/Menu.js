@@ -85,6 +85,7 @@ const ImageComponent = () => {
 
             <div style={{position: "absolute", left: "5%", bottom: "5%", fontSize: "5vh"}} className={"bordering"}>
                 <ColorfulText text={"Player: " + sessionStorage.getItem('username')}/>
+                <ColorfulText text={"Wealth: $" + sessionStorage.getItem('dollars')}/>
             </div>
         </div>
     );

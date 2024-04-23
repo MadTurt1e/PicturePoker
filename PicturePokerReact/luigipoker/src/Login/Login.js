@@ -32,6 +32,7 @@ const Login = () => {
                     // User login info is saved as loggedInUser for future use
                     sessionStorage.setItem('userID', data.id);
                     sessionStorage.setItem('username', data.playerName);
+                    sessionStorage.setItem('dollars', data.dollars);
                     navigate("/menu");
                 } else if (data.id === 0){
                     setError("Username not found")

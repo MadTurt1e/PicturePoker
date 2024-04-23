@@ -481,8 +481,8 @@ public class PicturePokerGame {
                     gp.gameEndResolution(gameDAO, playerDAO);
                 }
             }
+             */
             connection.close();
-            */
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -527,6 +527,7 @@ public class PicturePokerGame {
                     gp.gameEndResolution(gameDAO, playerDAO);
                 }
             }
+            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }

@@ -149,6 +149,7 @@ function CreateGame(){
             </div>
             <div style={{position: "absolute", right: "5%", bottom: "5%", fontSize: "5vh"}} className={"bordering"}>
                 <ColorfulText text={"Player: " + sessionStorage.getItem('username')}/>
+                <ColorfulText text={"Wealth: $" + sessionStorage.getItem('dollars')}/>
             </div>
         </div>
     );

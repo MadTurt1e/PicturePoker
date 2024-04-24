@@ -10,7 +10,6 @@ import axios from "axios";
 
 function Stats(){
     const [data, setData] = useState(null);
-    const [reload, setReload] = useState(false);
 
     //the call to get the game info
     useEffect(() => {

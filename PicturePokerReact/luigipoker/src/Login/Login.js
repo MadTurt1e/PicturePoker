@@ -15,7 +15,7 @@ const Login = () => {
     const [loginPassword, setLoginPassword] = useState("");
     const [registerUsername, setRegisterUsername] = useState("");
     const [registerPassword, setRegisterPassword] = useState("");
-    const [error, setError] = useState("");
+    const [errorMsg, setError] = useState("");
 
     const handleSubmission = async (e) => {
         e.preventDefault();
@@ -27,7 +27,6 @@ const Login = () => {
 
             if (response.status === 200) {
                 const data = response.data;
-                //TODO: Implement a more rigourous check for the password info
                 if(data.id !== 0 && data.passcode === loginPassword){
                     // User login info is saved as loggedInUser for future use
                     sessionStorage.setItem('userID', data.id);
@@ -109,7 +108,7 @@ const Login = () => {
                                 src={loginP} 
                                 alt="Login" 
                                 className ="glow"
-                                style={{ width: '100px', margin: '10px 0' }} 
+                                style={{width: 'auto', height:'50px', margin: '10px 0'}}
                             />
                         </form>
                     </div>
@@ -137,7 +136,7 @@ const Login = () => {
                                 src={registerP} 
                                 alt="Create Account" 
                                 className ="glow"
-                                style={{ width: '100px', margin: '10px 0' }} 
+                                style={{width: 'auto', height:'50px', margin: '10px 0'}}
                             />
                         </form>
                     </div>

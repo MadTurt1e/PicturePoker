@@ -38,7 +38,7 @@
 .create-title {
     font-size: 5vh;
     margin-top: 10vh;
-    margin-bottom: 100px;
+    margin-bottom: 4vh;
     width: 700px;
 }
 
@@ -50,7 +50,7 @@
 }
 
 .back-button {
-    width: 150px;
+    width: 12vw;
 }
 
 .configuration-container {
@@ -61,6 +61,11 @@
 
 .config-section {
     display: flex;
+    align-content: flex-end;
     justify-content: center;
-    margin: 20px;
+    margin: 2vh;
+}
+
+.arrow{
+    height: 14vh;
 }

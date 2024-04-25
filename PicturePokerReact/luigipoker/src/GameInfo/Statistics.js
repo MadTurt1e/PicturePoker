@@ -1,7 +1,7 @@
 import "./CreateGame/Create.css";
 
 import stats from "../resources/menuIcons/statistics.png";
-import backdrop from "../resources/menuIcons/luigisCasino.jpg";
+import backdrop from "../resources/menuIcons/luigisCasinoBright.jpg";
 
 import {Link} from "react-router-dom";
 import React, {useEffect, useState} from "react";
@@ -10,7 +10,6 @@ import axios from "axios";
 
 function Stats(){
     const [data, setData] = useState(null);
-    const [reload, setReload] = useState(false);
 
     //the call to get the game info
     useEffect(() => {

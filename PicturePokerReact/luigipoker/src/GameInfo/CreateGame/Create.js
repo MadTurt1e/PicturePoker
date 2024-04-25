@@ -1,7 +1,6 @@
 import "./Create.css"
 import React, {useState } from 'react';
 import create from "../../resources/menuIcons/creategame.png";
-import backdrop from "../../resources/menuIcons/luigisCasino.jpg";
 import back from "../../resources/misIcons/back.png";
 
 import buyin from "../../resources/menuIcons/buy-in-4-3-2024.png"
@@ -60,7 +59,6 @@ function CreateGame(){
                 console.log("Error with getByPlayerID");
             });
 
-        let state = "Server problems. ";
         // two checks - if the player can actually join a game, and if a player has enough cash to join
         if (response.status === 200) {
             const response2 = await axios.get(`http://localhost:8080/getPlayerActiveGame/${sessionStorage.getItem('userID')}`)
@@ -100,37 +98,37 @@ function CreateGame(){
                 </Link>
             </div>
             <div className="config-container">
-                <div className="config-section">
-                    <img src={rounds} style={{height: '175px'}} alt={"Round Count"}/>
+                <div className="config-section" >
+                    <img src={rounds} style={{height: '22vh'}} alt={"Round Count"}/>
                     <button
                         onClick={() => roundCount > 1 && setRoundCount(roundCount - 1)}
                         className="glow">
-                        <img src={arrow} alt="arrow pointing upwards" className="rotate90"/>
+                        <img src={arrow} alt="arrow pointing upwards" className="rotate90 arrow"/>
                     </button>
-                    <div style={{fontSize: '14vh'}} className="bordering">
+                    <div style={{fontSize: '17vh'}} className="bordering">
                         <ColorfulText text={roundCount}/>
                     </div>
                     <button
                         onClick={() => roundCount < 11 && setRoundCount(roundCount + 1)}
                         className="glow">
-                        <img src={arrow} alt="arrow pointing downwards" className="rotateneg90"/>
+                        <img src={arrow} alt="arrow pointing downwards" className="rotateneg90 arrow"/>
                     </button>
                 </div>
                 <br/>
                 <div className="config-section">
-                    <img src={buyin} style={{height: '150px'}} alt={"buyin"}/>
+                    <img src={buyin} style={{height: '22vh'}} alt={"buyin"}/>
                     <button
                         onClick={() => buyIn > 0 && setBuyIn(buyIn - 5)}
                         className="glow">
-                        <img src={arrow} alt="arrow pointing upwards" className="rotate90"/>
+                        <img src={arrow} alt="arrow pointing upwards" className="rotate90 arrow"/>
                     </button>
-                    <span style={{fontSize: '15vh', fontFamily: "MarioFont", color: "green"}} className="bordering">
+                    <span style={{fontSize: '17vh'}} className="bordering">
                         <ColorfulText text={buyIn}/>
                     </span>
                     <button
                         onClick={() => setBuyIn(buyIn + 5)}
                         className="glow">
-                        <img src={arrow} alt="arrow pointing downwards" className="rotateneg90"/>
+                        <img src={arrow} alt="arrow pointing downwards" className="rotateneg90 arrow"/>
                     </button>
                 </div>
             </div>

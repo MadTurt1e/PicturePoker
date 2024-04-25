@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import './Game.css';
 
 
-import backdrop from "../resources/menuIcons/luigisCasino.jpg"
+import backdrop from "../resources/menuIcons/luigisCasinoBright.jpg"
 import leave from "../resources/incdec/Arrow_Sign_SMB3.webp";
 
 import axios from "axios";

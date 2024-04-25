@@ -78,7 +78,7 @@ const ImageComponent = () => {
             </Link>
             ))
             {gid !== 0 && //conditional statement to only let player join game if they're already in a game
-                <div style={{position: "absolute", left: "5%", bottom: "10%", fontSize: "5vh"}} className={"bordering glow"} onClick={() => { joinGame(gid, navigate) }}>
+                <div style={{position: "absolute", left: "5%", bottom: "20%", fontSize: "5vh"}} className={"bordering glow"} onClick={() => { joinGame(gid, navigate) }}>
                     <ColorfulText text={"Rejoin Current Game! "}/>
                 </div>
             }

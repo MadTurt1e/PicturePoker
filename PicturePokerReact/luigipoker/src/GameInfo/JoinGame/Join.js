@@ -15,6 +15,9 @@ function GameList({joinFxn}) {
     const [data, setData] = useState(null);
 
     useEffect(() => {
+        if (sessionStorage.getItem('userID') === null)
+            navigate('/');
+
         const loadGame = async () => {
             const response = await axios.get(`http://localhost:8080/getAllGames`)
                 .catch(function(error){
@@ -25,13 +28,13 @@ function GameList({joinFxn}) {
         loadGame();
     }, []);
     if (data) {
-        const filteredData = data.filter(game => game.players.includes(0) && game.curRound === 1);
-        const gameIDs = filteredData.map(game => game.id);
+        const games = data.filter(game => game.players.includes(0) && game.curRound === 1);
         return (
             <div style={{height: '30vh', overflow: 'scroll'}}>
-                {gameIDs.map((value) =>
-                    <div onClick={() => joinFxn(value)}>
-                        <ColorfulText text={JSON.stringify(value, null, 2)}/>
+                {games.map((value) =>
+                    <div onClick={() => joinFxn(value.id)}>
+                        {/*TODO: Make the value.buyin thing look a little nicer. */}
+                        <ColorfulText text={JSON.stringify(value.id, null, 2) + ", $" + value.buyIn}/>
                     </div>
                 )}
             </div>
@@ -78,7 +81,7 @@ function JoinGame() {
             handleJoinGameResponse(response, gameId);
         } catch (error) {
             console.log("JoinGame didn't work. " + gameId);
-            setMessage("An error occurred while trying to join the game. Please try again.");
+            setMessage("An error occurred while trying to join the game. Refresh the page? ");
         }
     }
 
@@ -128,6 +131,7 @@ function JoinGame() {
             </div>
             <div style={{position: "absolute", right: "5%", bottom: "5%", fontSize: "5vh"}} className={"bordering"}>
                 <ColorfulText text={"Player: " + sessionStorage.getItem('username')}/>
+                <ColorfulText text={"Wealth: $" + sessionStorage.getItem('dollars')}/>
             </div>
         </div>
     );

@@ -6,44 +6,58 @@ import ColorfulText from "../index"
 import backdrop from "../resources/menuIcons/luigisCasino.jpg";
 
 function PlayerList() {
-    const [players, setPlayers] = useState(null);
+    const [players, setPlayers] = useState([]);
     const [pNames, setPNames] = useState([]);
     const location = useLocation();
-    const gid = location.state.gameId;
+    let gid = 0;
     const navigate = useNavigate();
+
+    if (location.state !== null)
+        gid = location.state.gameId;
 
     useEffect(() => {
         //this should be on an interval - it runs once, then it runs every 10 seconds.
         async function doStuff () {
+            //boot bad players out
+            if (gid === 0) {
+                if (sessionStorage.getItem('userID') === null)
+                    navigate('/');
+                else
+                    navigate('/menu')
+            }
+
             const response = await axios.get(`http://localhost:8080/getByGameID/` + gid)
                 .catch(function () {
                     console.log("GetbyGameID didn't work. ");
                 });
-            setPlayers(response.data.players);
+
+            const players = response.data.players;
+            setPlayers(players);
 
             if (players) {
                 const filteredPlayers = players.filter(player => player !== 0);
                 let newPNames = [];
                 for (let i = 0; i < filteredPlayers.length; i++) {
                     let response = await axios.get(`http://localhost:8080/getByPlayerID/${filteredPlayers[i]}`)
-                        .catch(function (error) {
+                        .catch(function () {
                             console.log('getByPlayerID didn\'t work');
                         });
                     newPNames.push(response.data.playerName);
                 }
                 setPNames(newPNames);
+                // Leave the waiting room immediately after we hit 4 players.
+                if (filteredPlayers.length === 4) {
+                    navigate(`/Game`, { state: { gameId: gid } });
+                }
             }
         }
+
         doStuff();
+
         const interval = setInterval(async () => {
             doStuff();
-        }, 10000);
-        //TIME: for debugging purposes. Set to 10 seconds in real life.
-
-        // Leave the waiting room immediately after we hit 4 players.
-        if (pNames.length === 4) {
-            navigate(`/Game`, { state: { gameId: gid } });
-        }
+        }, 3000);
+        //TIME: Set to 3 second delay because we're not really expecting people to stay here for long.
 
         // Cleanup interval on unmount
         return () => clearInterval(interval);
@@ -72,13 +86,13 @@ function WaitingRoom(){
     const exitGame = async() => {
         //leave game
         let response = await axios.delete(`http://localhost:8080/leaveCurrentGame/${sessionStorage.getItem('userID')}`)
-            .catch(function(error){
+            .catch(function(){
                 console.log("leaveCurrentGame didn\'t work. ");
             });
         if (response.status === 200){
             //if we actually leave, go to the menu
             let response2 = await axios.get(`http://localhost:8080/getPlayerActiveGame/${sessionStorage.getItem('userID')}`)
-                .catch(function(error){
+                .catch(function(){
                     console.log("GetPlayerActiveGame didn\'t work. ");
                 });
             if (response2.data === "" || response2.data.players.includes(parseInt(sessionStorage.getItem("userID"))))
@@ -101,7 +115,7 @@ function WaitingRoom(){
             <PlayerList/>
             <br/>
 
-            <button className="escapeGame bordering glow" style={{fontSize:"3vh"}}onClick={() => exitGame()}>
+            <button className="escapeGame bordering glow" style={{fontSize:"3vh"}} onClick={() => exitGame()}>
                 <ColorfulText text={"Leave Game?  "}/>
             </button>
 

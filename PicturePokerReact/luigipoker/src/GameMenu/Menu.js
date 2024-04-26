@@ -35,23 +35,28 @@ function joinGame(gid, navigate) {
     }
 }
 const ImageComponent = () => {
+    const navigate = useNavigate();
 
     const [gid, setGid] = useState(0);
     //quick check to see if the player is in an active game right now
     useEffect(() => {
+        //boot players out if they haven't logged in.
+        console.log(sessionStorage.getItem('userID'));
+        if (sessionStorage.getItem('userID') === null)
+            navigate('/');
+
         const inGame = async () => {
             const response = await axios.get(`http://localhost:8080/getPlayerActiveGame/${sessionStorage.getItem('userID')}`)
-                .catch(function(error){
+                .catch(function(){
                     console.log("getByPlayerID API call did not work" + sessionStorage.getItem('userID'));
                 });
-            if(response.status === 200 && response.data !== null && (response.data.curRound <= response.data.numRounds)) {
+            if(response !== undefined && response.status === 200 && response.data !== null && (response.data.curRound <= response.data.numRounds)) {
                 setGid(response.data.id);
             }
         }
         inGame();
     }, []);
 
-    const navigate = useNavigate();
 
 
     return (
@@ -78,13 +83,14 @@ const ImageComponent = () => {
             </Link>
             ))
             {gid !== 0 && //conditional statement to only let player join game if they're already in a game
-                <div style={{position: "absolute", left: "5%", bottom: "10%", fontSize: "5vh"}} className={"bordering glow"} onClick={() => { joinGame(gid, navigate) }}>
+                <div style={{position: "absolute", left: "5%", bottom: "20%", fontSize: "5vh"}} className={"bordering glow"} onClick={() => { joinGame(gid, navigate) }}>
                     <ColorfulText text={"Rejoin Current Game! "}/>
                 </div>
             }
 
             <div style={{position: "absolute", left: "5%", bottom: "5%", fontSize: "5vh"}} className={"bordering"}>
                 <ColorfulText text={"Player: " + sessionStorage.getItem('username')}/>
+                <ColorfulText text={"Wealth: $" + sessionStorage.getItem('dollars')}/>
             </div>
         </div>
     );

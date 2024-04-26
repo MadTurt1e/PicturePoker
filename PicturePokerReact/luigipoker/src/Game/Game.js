@@ -25,14 +25,15 @@ import backdrop from "../resources/pokerSprites/table.png";
 import axios from "axios";
 import ColorfulText from "../index";
 
+
 function PlayerList({gid}) {
     const [players, setPlayers] = useState(null);
     const [pNames, setPNames] = useState([]);
     const [pTokens, setPTokens] = useState([]);
     const [pBet, setPBet] = useState([]);
     const [pWaiting, setPWaiting] = useState([]);
+    const [pRoundsWon, setPRoundsWon] = useState([]);
     useLocation();
-    const navigate = useNavigate();
 
     useEffect(() => {
         const loadGame = async () => {
@@ -41,21 +42,17 @@ function PlayerList({gid}) {
                     console.log("GetbyGameID didn't work. " + gid);
                 });
             setPlayers(response.data.players);
-            
-            if (response.data.curRound > response.data.numRounds) {
-                navigate("/gameEnd", { state: { gameId: gid } })
-            }
         }
 
         //if we are in the round end, jump to the end screen
 
         // Call loadGame immediately and then every X milliseconds
         loadGame();
-        // const intervalId = setInterval(loadGame, 10000); // 5000 ms = 5 seconds
-        //TODO: Intervals are bad, but we use them a lot. Ideally we don't use them a lot.
+        const intervalId = setInterval(loadGame, 5000); // 5000 ms = 5 seconds
+        //TODO: This is how we update the players, which really isn't that great a strategy.
 
         // Clear interval on unmount
-        // return () => clearInterval(intervalId);
+        return () => clearInterval(intervalId);
     }, [gid]);
 
 
@@ -68,6 +65,7 @@ function PlayerList({gid}) {
                 const tokens = [];
                 const bet = [];
                 const waiting = [];
+                const roundsWon = [];
 
                 for(let i=0; i < filteredPlayers.length; i++) {
                     let response = await axios.get(`http://localhost:8080/getByPlayerID/${filteredPlayers[i]}`)
@@ -78,27 +76,28 @@ function PlayerList({gid}) {
                     tokens.push(response.data.tokens);
                     bet.push(response.data.bet);
                     waiting.push(response.data.finishedRound);
-
+                    roundsWon.push(response.data.roundsWon);
                 }
                 setPNames(names);
                 setPTokens(tokens);
                 setPBet(bet);
                 setPWaiting(waiting);
+                setPRoundsWon(roundsWon);
             }
             getPlayerNames();
         }
     }, [players]); // Use a separate useEffect hook to update pNames when players changes
 
     return (
-        <div style={{fontSize: "3vh"}} className={"bordering"}>
+        <div style={{fontSize: "2.3vh"}} className={"bordering"}>
             {pNames.map((value, i) => (
                 <React.Fragment key={i}>
-                    <ColorfulText text={pNames[i]}/>
+                    <ColorfulText text={pNames[i] + (pNames[i] === sessionStorage.getItem("username") ? " (You!)" : "") }/>
                     <div style={{display: 'flex', alignItems: 'center'}}>
                         <ColorfulText text={"Tokens: " + pTokens[i]}/>
                     </div>
                     <div style={{display: 'flex', alignItems: 'center'}}>
-                    <ColorfulText text={"Bet: "}/>
+                        <ColorfulText text={"Bet: "}/>
                         <div>
                             <img src={pBet[i] > 0 ? token : null} alt="" className="miniToken crispImages"/>
                             <img src={pBet[i] > 1 ? token : null} alt="" className="miniToken crispImages"/>
@@ -107,6 +106,9 @@ function PlayerList({gid}) {
                             <img src={pBet[i] > 4 ? token : null} alt="" className="miniToken crispImages"/>
                             <img src={pBet[i] > 5 ? token : null} alt="" className="miniToken crispImages"/>
                         </div>
+                    </div>
+                    <div style={{display: 'flex', alignItems: 'center'}}>
+                        <ColorfulText text={"Wins against Luigi: " + pRoundsWon[i]} />
                     </div>
                     {pWaiting[i] === 0 && <ColorfulText text={"Tell this person to hurry up! "}/>}
                     <br/>
@@ -117,7 +119,7 @@ function PlayerList({gid}) {
 }
 
 
-function RoundCount({gid}) {
+function RoundCount({gid, gameUpdate}) {
     const [rounds, setRounds] = useState(null);
     const [curRound, setCurRounds] = useState(null);
     useEffect(() => {
@@ -130,7 +132,14 @@ function RoundCount({gid}) {
             setCurRounds(response.data.curRound)
         }
         loadGame();
-    }, [gid]); // Remove players from the dependency array
+    }, [gid, gameUpdate]); // Remove players from the dependency array
+
+    //navigate away in the event we're done with the game
+    const navigate = useNavigate();
+    if (curRound > rounds) {
+        navigate("/gameEnd", { state: { gameId: gid } })
+    }
+
     return(
         <div style = {{fontSize: "2vh"}} className={"bordering"}>
             <ColorfulText text={"Round " + curRound + " of " + rounds} />
@@ -142,16 +151,10 @@ function WaitingOnTurn(turnEnd) {
     const [finished, setFinished] = useState(0); // Use state to track 'finished'
 
     useEffect(() => {
-        async function getPlayerNames() {
-            let response = await axios.get(`http://localhost:8080/getByPlayerID/${sessionStorage.getItem("userID")}`)
-                .catch(function () {
-                    console.log('getByPlayerID didn\'t work. ');
-                });
-            if (response.status === 200 && response.data.finishedRound === 1) {
-                setFinished(1); // Update 'finished' state here
-            }
-        }
-        getPlayerNames();
+        if (turnEnd.turn === true)
+            setFinished(1);
+        else
+            setFinished(0);
     }, [turnEnd]);
 
     // Conditionally render based on 'finished'
@@ -191,46 +194,117 @@ function cards2Int(hand){
 
 }
 
-function EndOfRound({gid, turnEnd, showCards}){
+function EndOfRoundList({info}) {
+    const [players, setPlayers] = useState([]);
+
+    useEffect(() => {
+        async function getPlayerNames() {
+            const names = [];
+
+            for(let i=0; i < info.length; i++) {
+                let response = await axios.get(`http://localhost:8080/getByPlayerID/${info[i].pID}`)
+                    .catch(function(){
+                        console.log('getByPlayerID didn\'t work ' + info[i].pID);
+                    });
+                names.push(response.data.playerName);
+            }
+            setPlayers(names);
+        }
+        getPlayerNames();
+    }, [info]);
+
+    return (
+        <div>
+            {players.map((value, i) => (
+                <React.Fragment key={i}>
+                    <ColorfulText text={players[i] + ": " + info[i].newTokens + " token" + (info[i].newTokens > 1 ? "s" : "") +" ("+ (info[i].winLossAmount > 0 ? "+" : "")+info[i].winLossAmount +")"}/>
+                </React.Fragment>
+            ))}
+        </div>
+    )
+}
+
+function nextRound(gid){
+    const endRound = async () => {
+        // api call once and done
+        await axios.get(`http://localhost:8080/getEndOfRoundInformation/${gid}/${true}`)
+            .catch(function () {
+                console.log("GetEndOfRoundInformation didn't work. " + gid);
+            });
+    }
+    endRound();
+}
+function EndOfRound({gid, turnEnd, showCards, gameUpdate}){
     const [data, setData] = useState(null);
+    const [dispResults, setDispResults] = useState(false);
+
     useEffect(() => {
         const endRound = async () => {
             //we only start API calling when our turn ends.
             if (turnEnd) {
                 const response = await axios.get(`http://localhost:8080/getEndOfRoundInformation/${gid}/${false}`)
                     .catch(function () {
-                        console.log("GetbyGameID didn't work. " + gid);
+                        console.log("GetEndOfRoundInformation didn't work. " + gid);
                     });
                 setData(response.data);
             }
         }
         endRound();
 
-        const intervalId = setInterval(endRound, 1000); // 5000 ms = 5 seconds
-        //TODO: Intervals are bad, but we use them a lot. Ideally we don't use them a lot.
+        const intervalId = setInterval(endRound, 5000); // 5000 ms = 5 seconds
+        //TODO: Intervals are bad, and we have a lot of them. At this state, we live with it.
 
         // Clear interval on unmount
         return () => clearInterval(intervalId);
     }, [gid, turnEnd]);
 
     //this is the case where our game is now over
-    if (turnEnd && data !== null && data.length !== 0){
+    if (turnEnd && data !== null && data.playerShowdownInfos !== null && data.playerShowdownInfos.length !== 0){
         //scan through for our player ID
-        for (let i = 0; i < data.length; ++i){
-            if (data[i].pID === parseInt(sessionStorage.getItem("userID"))){
+        for (let i = 0; i < data.playerShowdownInfos.length; ++i){
+            if (data.playerShowdownInfos[i].pID === parseInt(sessionStorage.getItem("userID"))){
                 // With this information, we can do stuff.
 
-                //First, we can kind of showcase the results via something from the parent function
-                showCards(data[i]);
+                //First, we showcase the results of the drawing
+                showCards(data, i);
 
+                //Set a timer to wait for a bit before we display results
+                setTimeout(() => {
+                    setDispResults(true);
+                }, 7000); // give it like 7 seconds
+
+                //Set a timer to go on to the next round after a while
+                setTimeout(() => {
+                    nextRound(gid);
+                    setData(null); //this is so that we don't call this thing again
+                    setDispResults(false);
+                    gameUpdate(true);
+                }, 20000); // let the user bask in the results for like 20 seconds
+
+                //Next, we return a splash screen of the results
                 return(
-                    <div style={{display: "flex", fontSize: "2vh"}}>
-                        <ColorfulText text = {JSON.stringify(data[i])}/>
+                    <div>
+                        {dispResults &&
+                            <div className="splashScreen bordering">
+                                <ColorfulText text = {"You drew: " + (data.playerShowdownInfos[i].handType)}/>
+                                <ColorfulText text = {"Luigi drew: " + data.luigiHandType}></ColorfulText>
+                                <ColorfulText text = {"You are " + (data.playerShowdownInfos[i].winLossAmount > 0 ? "up " : "down ") + Math.abs(data.playerShowdownInfos[i].winLossAmount) + " tokens"} />
+                                <ColorfulText text={"Current standings: "}/>
+                                <EndOfRoundList info = {data.playerShowdownInfos} />
+                            </div>
+                        }
                     </div>
                 );
             }
         }
     }
+
+    //return nothing if we don't have anything
+    return (
+        <div>
+
+        </div>
+    )
 }
 
 function Game() {
@@ -254,9 +328,17 @@ function Game() {
 
     const pid = sessionStorage.getItem('userID');
 
+    const navigate = useNavigate();
+
     //startup stuff - we first get the game id and stuff
     useEffect(() => {
-        setGID(location.state.gameId);
+        //boot players out if they haven't logged in.
+        if (sessionStorage.getItem('userID') === null)
+            navigate('/');
+        if (location.state !== null)
+            setGID(location.state.gameId);
+
+        setGameUpdate(true);
 
         // set turn end to false for when we update it later
         setTurnEnd(false);
@@ -266,7 +348,7 @@ function Game() {
                     .catch(function () {
                         console.log("getByPlayerID API call did not work");
                     });
-                if (response.status === 200) {
+                if (response !== undefined && response.status === 200) {
                     setGID(response.data.id);
                 }
             }
@@ -289,6 +371,9 @@ function Game() {
             if (response.data.finishedRound === 1){
                 setTurnEnd(true);
             }
+            else
+                setTurnEnd(false);
+
             setHand(response.data.hand);
             setTokens(response.data.tokens);
             setBet(response.data.bet);
@@ -306,7 +391,10 @@ function Game() {
 
     //update the player's hand whenever we activate game update
     useEffect(() => {
-        getPlayerData();
+        if (gameUpdate) {
+            getPlayerData();
+            setGameUpdate(false);
+        }
     }, [gameUpdate]);
 
     //update the player's cards whenever necessary.
@@ -316,7 +404,10 @@ function Game() {
 
     //update the dealer's cards whenever necessary
     useEffect(() => {
-        setDealerCards(cards2Int(dealerHand));
+        if (turnEnd)
+            setDealerCards(cards2Int(dealerHand));
+        else
+            setDealerCards(cards2Int("luigi"));
     }, [dealerHand]);
 
 
@@ -337,15 +428,15 @@ function Game() {
     }
 
     const handleCardClick = (index) => {
-        setToChange(index);
-
-        // Add or remove the index from the selectedCards array
-        if (selectedCards.includes(index)) {
-            setSelectedCards(selectedCards.filter(i => i !== index));
-        } else {
-            setSelectedCards([...selectedCards, index]);
+        if (!turnEnd) {
+            setToChange(index);
+            // Add or remove the index from the selectedCards array
+            if (selectedCards.includes(index)) {
+                setSelectedCards(selectedCards.filter(i => i !== index));
+            } else {
+                setSelectedCards([...selectedCards, index]);
+            }
         }
-        console.log(selectedCards);
     };
 
 
@@ -364,19 +455,21 @@ function Game() {
     const endTurnProcedure = async() => {
         if (bet !== 0)
         {
-            finishRound(pid);
-            getPlayerData(pid);
-
             //only animate if we haven't finished our turn.
-            if (turnEnd)
+            if (turnEnd === false)
                 setLuigiState(1);
+
+            await finishRound(pid);
+
+            //note: turnEnd only gets updated in this section
+            getPlayerData(pid);
 
             //pseudo animations - we don't have the budget to go further.
             setTimeout(() => {
                 setLuigiState(0);
             }, 5310);
 
-            //show luigi's hand
+            //show luigi's hand (as of the turn end)
             const response = await axios.get("http://localhost:8080/getByGameID/" + gid)
                 .catch(function () {
                     console.log("getByGameID API call didn't work. ")
@@ -387,28 +480,32 @@ function Game() {
                 setDealerHand("luigi")
             }
         }
-
-        setTurnEnd(true);
     }
 
-    //run the end of turn stuff if we're done already (even at the beginning)
+    //run the end of turn stuff whenever turnEnd is true (or set to true)
     useEffect(() => {
         if (turnEnd === true){
             endTurnProcedure();
         }
+        else
+            setDealerHand("luigi"); //if we're not at the turn end, hide the dealer's hand.
     }, [turnEnd]);
 
-    //function that goes through a sequence for the card data
-    const showCards = (eorData) => {
+    //function that goes through a sequence to display card data to the user
+    const showCards = (eorData, idx) => {
         //update hand
-        setHand(eorData.hand);
+        setHand(eorData.playerShowdownInfos[idx].hand);
 
-        //reset selected cards
-        setSelectedCards([]);
+        //reset the cards selected to nothing
+        setTimeout(() => {
+            if (selectedCards.length !== 0)
+                setSelectedCards([]);
+        }, 3000);
 
-        //TODO: Show Luigi's cards
-
-        //show the hand "power"
+        //let the player stare at their cards for a bit before updating Luigi's hand
+        setTimeout(() => {
+            setDealerHand(eorData.luigiHand);
+        }, 4000);
     }
 
     return (
@@ -427,9 +524,9 @@ function Game() {
                 <ColorfulText text={("Current Game ID: " + gid).toString()}/>
             </div>
             <PlayerList gid = {gid}/>
-            <RoundCount gid = {gid}/>
+            <RoundCount gid = {gid} gameUpdate = {gameUpdate}/>
             <WaitingOnTurn turn={turnEnd} />
-            <EndOfRound gid = {gid} turnEnd={turnEnd} showCards={showCards}/>
+            <EndOfRound gid = {gid} turnEnd={turnEnd} showCards={showCards} gameUpdate = {setGameUpdate}/>
             <div className="cards" style={{
                 top: '5%'
             }}>

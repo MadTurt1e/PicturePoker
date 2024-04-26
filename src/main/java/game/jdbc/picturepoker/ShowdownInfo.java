@@ -7,6 +7,7 @@ import java.util.ArrayList;
 public class ShowdownInfo {
     private ArrayList<PlayerShowdownInfo> playerShowdownInfos;
     private Card[] luigiHand;
+    private String luigiHandType;
     // TODO: Implement array to track swapped cards
 
     public ArrayList<PlayerShowdownInfo> getPlayerShowdownInfos() {
@@ -23,5 +24,13 @@ public class ShowdownInfo {
 
     public void setLuigiHand(Card[] luigiHand) {
         this.luigiHand = luigiHand;
+    }
+
+    public String getLuigiHandType() {
+        return luigiHandType;
+    }
+
+    public void setLuigiHandType(String luigiHandType) {
+        this.luigiHandType = luigiHandType;
     }
 }

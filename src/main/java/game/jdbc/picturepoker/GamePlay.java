@@ -449,6 +449,7 @@ public class GamePlay {
 
         ShowdownInfo sdInfo = new ShowdownInfo();
         sdInfo.setLuigiHand(curGame.getHand());
+        sdInfo.setLuigiHandType(scoreToHand(playerScore(curGame.getHand())).getHandName());
         ArrayList<PlayerShowdownInfo> pSDList = new ArrayList<PlayerShowdownInfo>();
 
         //Now we run a function which pays out tokens compared to Luigi
@@ -479,6 +480,7 @@ public class GamePlay {
 
             System.out.println(player.getPlayerName() + " now has " + player.getTokens() + " tokens. ");
             pSD.setNewTokens(player.getTokens());
+            pSD.setRoundsWon(player.getRoundsWon());
             if(commitResults) {
                 playerDAO.update_long("tokens", player.getTokens(), player);
                 playerDAO.update_int("rounds_won", player.getRoundsWon(), player);
@@ -494,7 +496,7 @@ public class GamePlay {
             playersBankrupted += (player.getTokens() > 0 ? 0 : 1);
             player.setFinishedRound(player.getTokens() > 0 ? 0 : 1);
             player.setBet(player.getTokens() > 0 ? 1 : 0);
-            player.setTokens(player.getTokens() > 0 ? player.getTokens() - 1: 0);
+            player.setTokens(player.getTokens() > 0 ? player.getTokens() - 1 : 0);
             if (commitResults) {
                 playerDAO.update_int("finished_round", player.getFinishedRound(), player);
                 playerDAO.update_int("bet", player.getBet(), player);
@@ -512,7 +514,10 @@ public class GamePlay {
             curGame.setLuigiFinished(0);
             gameDAO.update_int("luigi_finished", 0, curGame);
             gameDAO.update_all(curGame);
+            curGame.resetHand();
+            gameDAO.updateHand(curGame);
         }
+        Collections.sort(pSDList);
         sdInfo.setPlayerShowdownInfos(pSDList);
         return sdInfo;
     }

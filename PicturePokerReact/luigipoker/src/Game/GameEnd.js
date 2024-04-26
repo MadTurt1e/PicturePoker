@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import {Link, useLocation, useNavigate} from 'react-router-dom';
 import './Game.css';
 
 
-import backdrop from "../resources/menuIcons/luigisCasino.jpg"
+import backdrop from "../resources/menuIcons/luigisCasinoBright.jpg"
 import leave from "../resources/incdec/Arrow_Sign_SMB3.webp";
 
 import axios from "axios";
@@ -13,17 +13,21 @@ function PlayerList({ gid }) {
     const [players, setPlayers] = useState(null);
     const [pNames, setPNames] = useState([]);
     const [pTokens, setPTokens] = useState([]);
+    const [pRoundsWon, setPRoundsWon] = useState([]);
     const [buyIn, setBuyIn] = useState([]);
-    const [pWaiting, setPWaiting] = useState([]);
-    const location = useLocation();
+    useLocation();
+    const navigate = useNavigate();
 
     useEffect(() => {
+        //check to ensure the user isn't doing weird link hopping
+        if (gid === 0)
+            navigate('/');
+
         const loadGame = async () => {
             const response = await axios.get(`http://localhost:8080/getGameEndDetails/${gid}`)
                 .catch(function () {
                     console.log("getGameEndDetails didn't work. " + gid);
                 });
-            console.log(gid);
             setPlayers(response.data.players);
             setBuyIn(response.data.buyIn);
         }
@@ -40,19 +44,24 @@ function PlayerList({ gid }) {
             async function getPlayerNames() {
                 const names = [];
                 const tokens = [];
-                const bet = [];
-                const waiting = [];
+                const rounds_won = [];
 
                 for (let i = 0; i < filteredPlayers.length; i++) {
                     let response = await axios.get(`http://localhost:8080/getByPlayerID/${filteredPlayers[i]}`)
-                        .catch(function (error) {
+                        .catch(function () {
                             console.log('getByPlayerID didn\'t work ' + filteredPlayers[i]);
                         });
+                    //update this thing while we're here
+                    if (filteredPlayers[i] === sessionStorage.getItem("userID")){
+                        sessionStorage.setItem('dollars', response.data.dollars);
+                    }
                     names.push(response.data.playerName);
                     tokens.push(response.data.tokens);
+                    rounds_won.push(response.data.roundsWon);
                 }
                 setPNames(names);
                 setPTokens(tokens);
+                setPRoundsWon(rounds_won);
             }
             getPlayerNames();
         }
@@ -67,6 +76,7 @@ function PlayerList({ gid }) {
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                         <ColorfulText text={"Tokens: \t" + pTokens[i]} />
                     </div>
+                    <ColorfulText text={"Rounds Won: \t" + pRoundsWon[i]} />
                     <ColorfulText text={"Winnings: $" + (winnings[i] * (buyIn*4))} />
                     <br/>
                 </React.Fragment>
@@ -76,8 +86,12 @@ function PlayerList({ gid }) {
 }
 
 function GameEnd() {
+    const navigate = useNavigate();
+    let gid = 0;
     const location = useLocation();
-    const gid = (location.state.gameId);
+
+    if (location.state !== null)
+        gid = (location.state.gameId);
     return (
         <div style={{
             backgroundImage: `url(${backdrop})`,

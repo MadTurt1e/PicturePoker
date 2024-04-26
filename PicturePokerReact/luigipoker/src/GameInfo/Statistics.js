@@ -1,37 +1,37 @@
 import "./CreateGame/Create.css";
 
 import stats from "../resources/menuIcons/statistics.png";
-import backdrop from "../resources/menuIcons/luigisCasino.jpg";
+import backdrop from "../resources/menuIcons/luigisCasinoBright.jpg";
 
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import React, {useEffect, useState} from "react";
 import ColorfulText from "../index";
 import axios from "axios";
 
 function Stats(){
     const [data, setData] = useState(null);
-    const [reload, setReload] = useState(false);
+    const navigate = useNavigate();
 
     //the call to get the game info
     useEffect(() => {
+        if (sessionStorage.getItem('userID') === null)
+            navigate('/');
+
         const loadGame = async () => {
             // Replace this with the updated API call
             const response = await axios.get(`http://localhost:8080/getByPlayerID/` + sessionStorage.getItem('userID'))
-                .catch(function(error){
-                    console.log("GetbyGameID didn't work. ");
+                .catch(function(){
+                    console.log("getByPlayerID didn't work. ");
                 });
-            setData(response.data)
+            if (response !== undefined)
+                setData(response.data);
         }
         loadGame();
-    }, [reload]);
+    }, []);
 
-    //for use if we want to reload the data
-    const handleReload = () => {
-        setReload(!reload);
-    }
 
     if (data) {
-        console.log(data);
+        sessionStorage.setItem('dollars', data.dollars);
         return (
             <div style={{fontSize: "3vh", height: '80%', overflow: 'scroll'}} className={"bordering"}>
                 <ColorfulText text={"Username: " + data.playerName}/>
@@ -51,6 +51,7 @@ function Stats(){
                 <ColorfulText text={"Average Lifetime Tokens: " + Math.round(data.avgLifetimeTokens*10)/10}/>
                 <br/>
                 <ColorfulText text={"Lifetime Rounds Won: " + data.lifetimeRoundsWon}/>
+                <ColorfulText text={"Round Winrate: " + Math.round(data.roundWinrate) + "%"}/>
                 <ColorfulText text={"Lifetime Tokens: " + data.lifetimeTokens}/>
                 <ColorfulText text={"Lifetime Total Bet: " + data.lifetimeTotalBet}/>
                 <br/>
@@ -62,8 +63,6 @@ function Stats(){
                 <ColorfulText text={"Quads: " + data.quads}/>
                 <ColorfulText text={"Flushes: " + data.flushes}/>
                 <br/>
-                <ColorfulText text={"Rounds Won: " + data.roundsWon}/>
-                <ColorfulText text={"Round Winrate: " + Math.round(data.roundWinrate) + "%"}/>
             </div>
         );
     }

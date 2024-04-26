@@ -119,6 +119,14 @@ public class Game implements DataTransferObject
         this.hand = hand;
     }
 
+    //redraw the entire hand
+    public void resetHand(){
+        for(int i = 0; i < 5; i++){
+            hand[i].setToChange(true);
+            hand[i].redrawSuit();
+        }
+    }
+
     @Override
     public String toString() {
         return "Game{" +

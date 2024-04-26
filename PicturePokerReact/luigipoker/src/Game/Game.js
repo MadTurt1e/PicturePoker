@@ -218,7 +218,7 @@ function EndOfRoundList({info}) {
         <div>
             {players.map((value, i) => (
                 <React.Fragment key={i}>
-                    <ColorfulText text={players[i] + ": " + (info[i].winLossAmount > 0 ? "+" : "")+info[i].winLossAmount + " token" + (Math.abs(info[i].winLossAmount) > 1 ? "s" : "")}/>
+                    <ColorfulText text={players[i] + ": " + info[i].newTokens + " token" + (info[i].newTokens > 1 ? "s" : "") +" ("+ (info[i].winLossAmount > 0 ? "+" : "")+info[i].winLossAmount +")"}/>
                 </React.Fragment>
             ))}
         </div>
@@ -272,14 +272,14 @@ function EndOfRound({gid, turnEnd, showCards, gameUpdate}){
                 //Set a timer to wait for a bit before we display results
                 setTimeout(() => {
                     setDispResults(true);
-                }, 10000); // give it like 10 seconds
+                }, 7000); // give it like 7 seconds
 
                 //Set a timer to go on to the next round after a while
                 setTimeout(() => {
                     nextRound(gid);
                     setDispResults(false);
                     gameUpdate(true);
-                }, 30000); // let the user bask in the results for like 30 seconds
+                }, 20000); // let the user bask in the results for like 20 seconds
 
                 //Next, we return a splash screen of the results
                 return(
@@ -287,6 +287,7 @@ function EndOfRound({gid, turnEnd, showCards, gameUpdate}){
                         {dispResults &&
                             <div className="splashScreen bordering">
                                 <ColorfulText text = {"You drew: " + (data.playerShowdownInfos[i].handType)}/>
+                                <ColorfulText text = {"Luigi drew: " + data.luigiHandType}></ColorfulText>
                                 <ColorfulText text = {"You are " + (data.playerShowdownInfos[i].winLossAmount > 0 ? "up " : "down ") + Math.abs(data.playerShowdownInfos[i].winLossAmount) + " tokens"} />
                                 <ColorfulText text={"Current standings: "}/>
                                 <EndOfRoundList info = {data.playerShowdownInfos} />

@@ -46,6 +46,7 @@ function Stats(){
                 <ColorfulText text={"Average Lifetime Tokens: " + Math.round(data.avgLifetimeTokens*10)/10}/>
                 <br/>
                 <ColorfulText text={"Lifetime Rounds Won: " + data.lifetimeRoundsWon}/>
+                <ColorfulText text={"Round Winrate: " + Math.round(data.roundWinrate) + "%"}/>
                 <ColorfulText text={"Lifetime Tokens: " + data.lifetimeTokens}/>
                 <ColorfulText text={"Lifetime Total Bet: " + data.lifetimeTotalBet}/>
                 <br/>
@@ -57,8 +58,6 @@ function Stats(){
                 <ColorfulText text={"Quads: " + data.quads}/>
                 <ColorfulText text={"Flushes: " + data.flushes}/>
                 <br/>
-                <ColorfulText text={"Rounds Won: " + data.roundsWon}/>
-                <ColorfulText text={"Round Winrate: " + Math.round(data.roundWinrate) + "%"}/>
             </div>
         );
     }

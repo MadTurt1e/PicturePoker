@@ -480,6 +480,7 @@ public class GamePlay {
 
             System.out.println(player.getPlayerName() + " now has " + player.getTokens() + " tokens. ");
             pSD.setNewTokens(player.getTokens());
+            pSD.setRoundsWon(player.getRoundsWon());
             if(commitResults) {
                 playerDAO.update_long("tokens", player.getTokens(), player);
                 playerDAO.update_int("rounds_won", player.getRoundsWon(), player);
@@ -514,6 +515,7 @@ public class GamePlay {
             gameDAO.update_int("luigi_finished", 0, curGame);
             gameDAO.update_all(curGame);
         }
+        Collections.sort(pSDList);
         sdInfo.setPlayerShowdownInfos(pSDList);
         return sdInfo;
     }

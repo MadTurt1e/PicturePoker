@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import {Link, useLocation, useNavigate} from 'react-router-dom';
 import './Game.css';
 
 
@@ -16,14 +16,18 @@ function PlayerList({ gid }) {
     const [pRoundsWon, setPRoundsWon] = useState([]);
     const [buyIn, setBuyIn] = useState([]);
     useLocation();
+    const navigate = useNavigate();
 
     useEffect(() => {
+        //check to ensure the user isn't doing weird link hopping
+        if (gid === 0)
+            navigate('/');
+
         const loadGame = async () => {
             const response = await axios.get(`http://localhost:8080/getGameEndDetails/${gid}`)
                 .catch(function () {
                     console.log("getGameEndDetails didn't work. " + gid);
                 });
-            console.log(gid);
             setPlayers(response.data.players);
             setBuyIn(response.data.buyIn);
         }
@@ -82,8 +86,12 @@ function PlayerList({ gid }) {
 }
 
 function GameEnd() {
+    const navigate = useNavigate();
+    let gid = 0;
     const location = useLocation();
-    const gid = (location.state.gameId);
+
+    if (location.state !== null)
+        gid = (location.state.gameId);
     return (
         <div style={{
             backgroundImage: `url(${backdrop})`,

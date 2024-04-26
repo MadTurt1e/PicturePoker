@@ -15,6 +15,9 @@ function GameList({joinFxn}) {
     const [data, setData] = useState(null);
 
     useEffect(() => {
+        if (sessionStorage.getItem('userID') === null)
+            navigate('/');
+
         const loadGame = async () => {
             const response = await axios.get(`http://localhost:8080/getAllGames`)
                 .catch(function(error){

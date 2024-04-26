@@ -3,23 +3,28 @@ import "./CreateGame/Create.css";
 import stats from "../resources/menuIcons/statistics.png";
 import backdrop from "../resources/menuIcons/luigisCasinoBright.jpg";
 
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import React, {useEffect, useState} from "react";
 import ColorfulText from "../index";
 import axios from "axios";
 
 function Stats(){
     const [data, setData] = useState(null);
+    const navigate = useNavigate();
 
     //the call to get the game info
     useEffect(() => {
+        if (sessionStorage.getItem('userID') === null)
+            navigate('/');
+
         const loadGame = async () => {
             // Replace this with the updated API call
             const response = await axios.get(`http://localhost:8080/getByPlayerID/` + sessionStorage.getItem('userID'))
                 .catch(function(){
                     console.log("getByPlayerID didn't work. ");
                 });
-            setData(response.data);
+            if (response !== undefined)
+                setData(response.data);
         }
         loadGame();
     }, []);

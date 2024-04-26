@@ -330,13 +330,14 @@ function Game() {
 
     const navigate = useNavigate();
 
-    //boot players out if they haven't logged in.
-    if (sessionStorage.getItem('userID') === null)
-        navigate('/');
-
     //startup stuff - we first get the game id and stuff
     useEffect(() => {
-        setGID(location.state.gameId);
+        //boot players out if they haven't logged in.
+        if (sessionStorage.getItem('userID') === null)
+            navigate('/');
+        if (location.state !== null)
+            setGID(location.state.gameId);
+
         setGameUpdate(true);
 
         // set turn end to false for when we update it later
@@ -347,7 +348,7 @@ function Game() {
                     .catch(function () {
                         console.log("getByPlayerID API call did not work");
                     });
-                if (response.status === 200) {
+                if (response !== undefined && response.status === 200) {
                     setGID(response.data.id);
                 }
             }

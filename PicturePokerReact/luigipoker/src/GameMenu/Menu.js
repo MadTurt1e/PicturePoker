@@ -37,19 +37,20 @@ function joinGame(gid, navigate) {
 const ImageComponent = () => {
     const navigate = useNavigate();
 
-    //boot players out if they haven't logged in.
-    if (sessionStorage.getItem('userID') === null)
-        navigate('/');
-
     const [gid, setGid] = useState(0);
     //quick check to see if the player is in an active game right now
     useEffect(() => {
+        //boot players out if they haven't logged in.
+        console.log(sessionStorage.getItem('userID'));
+        if (sessionStorage.getItem('userID') === null)
+            navigate('/');
+
         const inGame = async () => {
             const response = await axios.get(`http://localhost:8080/getPlayerActiveGame/${sessionStorage.getItem('userID')}`)
-                .catch(function(error){
+                .catch(function(){
                     console.log("getByPlayerID API call did not work" + sessionStorage.getItem('userID'));
                 });
-            if(response.status === 200 && response.data !== null && (response.data.curRound <= response.data.numRounds)) {
+            if(response !== undefined && response.status === 200 && response.data !== null && (response.data.curRound <= response.data.numRounds)) {
                 setGid(response.data.id);
             }
         }

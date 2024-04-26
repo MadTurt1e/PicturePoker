@@ -9,12 +9,23 @@ function PlayerList() {
     const [players, setPlayers] = useState([]);
     const [pNames, setPNames] = useState([]);
     const location = useLocation();
-    const gid = location.state.gameId;
+    let gid = 0;
     const navigate = useNavigate();
+
+    if (location.state !== null)
+        gid = location.state.gameId;
 
     useEffect(() => {
         //this should be on an interval - it runs once, then it runs every 10 seconds.
         async function doStuff () {
+            //boot bad players out
+            if (gid === 0) {
+                if (sessionStorage.getItem('userID') === null)
+                    navigate('/');
+                else
+                    navigate('/menu')
+            }
+
             const response = await axios.get(`http://localhost:8080/getByGameID/` + gid)
                 .catch(function () {
                     console.log("GetbyGameID didn't work. ");

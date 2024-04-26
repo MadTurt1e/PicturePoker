@@ -1,5 +1,5 @@
 import "./Create.css"
-import React, {useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import create from "../../resources/menuIcons/creategame.png";
 import back from "../../resources/misIcons/back.png";
 
@@ -52,11 +52,12 @@ function CreateGame(){
     const [message, setMessage] = useState("");
     const navigate = useNavigate();
 
-    //boot players out if they haven't logged in.
-    if (sessionStorage.getItem('userID') === null)
-        navigate('/');
-
     const [reason, setReason] = useState("");
+
+    useEffect(() => {
+        if (sessionStorage.getItem('userID') === null)
+            navigate('/')
+    }, []);
     const checkIfGood = async () => {
         const response = await axios.get(`http://localhost:8080/getByPlayerID/${sessionStorage.getItem('userID')}`)
             .catch(function(){

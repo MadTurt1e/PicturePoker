@@ -32,6 +32,7 @@ function PlayerList({gid}) {
     const [pTokens, setPTokens] = useState([]);
     const [pBet, setPBet] = useState([]);
     const [pWaiting, setPWaiting] = useState([]);
+    const [pRoundsWon, setPRoundsWon] = useState([]);
     useLocation();
 
     useEffect(() => {
@@ -64,37 +65,40 @@ function PlayerList({gid}) {
                 const tokens = [];
                 const bet = [];
                 const waiting = [];
+                const roundsWon = [];
 
                 for(let i=0; i < filteredPlayers.length; i++) {
                     let response = await axios.get(`http://localhost:8080/getByPlayerID/${filteredPlayers[i]}`)
                         .catch(function(){
                             console.log('getByPlayerID didn\'t work ' + filteredPlayers[i]);
                         });
+                    console.log(response.data);
                     names.push(response.data.playerName);
                     tokens.push(response.data.tokens);
                     bet.push(response.data.bet);
                     waiting.push(response.data.finishedRound);
-
+                    roundsWon.push(response.data.roundsWon);
                 }
                 setPNames(names);
                 setPTokens(tokens);
                 setPBet(bet);
                 setPWaiting(waiting);
+                setPRoundsWon(roundsWon);
             }
             getPlayerNames();
         }
     }, [players]); // Use a separate useEffect hook to update pNames when players changes
 
     return (
-        <div style={{fontSize: "3vh"}} className={"bordering"}>
+        <div style={{fontSize: "2.7vh"}} className={"bordering"}>
             {pNames.map((value, i) => (
                 <React.Fragment key={i}>
-                    <ColorfulText text={pNames[i]}/>
+                    <ColorfulText text={pNames[i] + (pNames[i] === sessionStorage.getItem("username") ? " (You!)" : "") }/>
                     <div style={{display: 'flex', alignItems: 'center'}}>
                         <ColorfulText text={"Tokens: " + pTokens[i]}/>
                     </div>
                     <div style={{display: 'flex', alignItems: 'center'}}>
-                    <ColorfulText text={"Bet: "}/>
+                        <ColorfulText text={"Bet: "}/>
                         <div>
                             <img src={pBet[i] > 0 ? token : null} alt="" className="miniToken crispImages"/>
                             <img src={pBet[i] > 1 ? token : null} alt="" className="miniToken crispImages"/>
@@ -103,6 +107,9 @@ function PlayerList({gid}) {
                             <img src={pBet[i] > 4 ? token : null} alt="" className="miniToken crispImages"/>
                             <img src={pBet[i] > 5 ? token : null} alt="" className="miniToken crispImages"/>
                         </div>
+                    </div>
+                    <div style={{display: 'flex', alignItems: 'center'}}>
+                        <ColorfulText text={"Rounds Won: " + pRoundsWon[i]} />
                     </div>
                     {pWaiting[i] === 0 && <ColorfulText text={"Tell this person to hurry up! "}/>}
                     <br/>

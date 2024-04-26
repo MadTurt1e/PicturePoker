@@ -13,6 +13,7 @@ function PlayerList({ gid }) {
     const [players, setPlayers] = useState(null);
     const [pNames, setPNames] = useState([]);
     const [pTokens, setPTokens] = useState([]);
+    const [pRoundsWon, setPRoundsWon] = useState([]);
     const [buyIn, setBuyIn] = useState([]);
     useLocation();
 
@@ -39,6 +40,7 @@ function PlayerList({ gid }) {
             async function getPlayerNames() {
                 const names = [];
                 const tokens = [];
+                const rounds_won = [];
 
                 for (let i = 0; i < filteredPlayers.length; i++) {
                     let response = await axios.get(`http://localhost:8080/getByPlayerID/${filteredPlayers[i]}`)
@@ -51,9 +53,11 @@ function PlayerList({ gid }) {
                     }
                     names.push(response.data.playerName);
                     tokens.push(response.data.tokens);
+                    rounds_won.push(response.data.roundsWon);
                 }
                 setPNames(names);
                 setPTokens(tokens);
+                setPRoundsWon(rounds_won);
             }
             getPlayerNames();
         }
@@ -68,6 +72,7 @@ function PlayerList({ gid }) {
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                         <ColorfulText text={"Tokens: \t" + pTokens[i]} />
                     </div>
+                    <ColorfulText text={"Rounds Won: \t" + pRoundsWon[i]} />
                     <ColorfulText text={"Winnings: $" + (winnings[i] * (buyIn*4))} />
                     <br/>
                 </React.Fragment>

@@ -65,6 +65,7 @@ const Login = () => {
 
                 sessionStorage.setItem('userID', response.data.id);
                 sessionStorage.setItem('username', response.data.playerName);
+                sessionStorage.setItem('dollars', 50);
 
                 // User login info is saved as newUser for future use
                 navigate("/menu");

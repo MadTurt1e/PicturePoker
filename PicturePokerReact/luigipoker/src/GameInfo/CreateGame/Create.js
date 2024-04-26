@@ -123,7 +123,7 @@ function CreateGame(){
                         <img src={arrow} alt="arrow pointing upwards" className="rotate90 arrow"/>
                     </button>
                     <span style={{fontSize: '17vh'}} className="bordering">
-                        <ColorfulText text={buyIn}/>
+                        <ColorfulText text={"$" + buyIn}/>
                     </span>
                     <button
                         onClick={() => setBuyIn(buyIn + 5)}

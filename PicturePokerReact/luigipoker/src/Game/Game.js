@@ -90,7 +90,7 @@ function PlayerList({gid}) {
     }, [players]); // Use a separate useEffect hook to update pNames when players changes
 
     return (
-        <div style={{fontSize: "2.7vh"}} className={"bordering"}>
+        <div style={{fontSize: "2.3vh"}} className={"bordering"}>
             {pNames.map((value, i) => (
                 <React.Fragment key={i}>
                     <ColorfulText text={pNames[i] + (pNames[i] === sessionStorage.getItem("username") ? " (You!)" : "") }/>

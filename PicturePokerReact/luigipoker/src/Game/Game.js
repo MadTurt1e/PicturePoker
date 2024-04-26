@@ -72,7 +72,6 @@ function PlayerList({gid}) {
                         .catch(function(){
                             console.log('getByPlayerID didn\'t work ' + filteredPlayers[i]);
                         });
-                    console.log(response.data);
                     names.push(response.data.playerName);
                     tokens.push(response.data.tokens);
                     bet.push(response.data.bet);

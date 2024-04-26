@@ -108,7 +108,7 @@ function PlayerList({gid}) {
                         </div>
                     </div>
                     <div style={{display: 'flex', alignItems: 'center'}}>
-                        <ColorfulText text={"Rounds Won: " + pRoundsWon[i]} />
+                        <ColorfulText text={"Wins against Luigi: " + pRoundsWon[i]} />
                     </div>
                     {pWaiting[i] === 0 && <ColorfulText text={"Tell this person to hurry up! "}/>}
                     <br/>
@@ -276,6 +276,7 @@ function EndOfRound({gid, turnEnd, showCards, gameUpdate}){
                 //Set a timer to go on to the next round after a while
                 setTimeout(() => {
                     nextRound(gid);
+                    setData(null); //this is so that we don't call this thing again
                     setDispResults(false);
                     gameUpdate(true);
                 }, 20000); // let the user bask in the results for like 20 seconds
@@ -297,6 +298,7 @@ function EndOfRound({gid, turnEnd, showCards, gameUpdate}){
             }
         }
     }
+
     //return nothing if we don't have anything
     return (
         <div>

@@ -35,6 +35,11 @@ function joinGame(gid, navigate) {
     }
 }
 const ImageComponent = () => {
+    const navigate = useNavigate();
+
+    //boot players out if they haven't logged in.
+    if (sessionStorage.getItem('userID') === null)
+        navigate('/');
 
     const [gid, setGid] = useState(0);
     //quick check to see if the player is in an active game right now
@@ -51,7 +56,6 @@ const ImageComponent = () => {
         inGame();
     }, []);
 
-    const navigate = useNavigate();
 
 
     return (

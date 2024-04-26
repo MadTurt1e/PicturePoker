@@ -52,6 +52,10 @@ function CreateGame(){
     const [message, setMessage] = useState("");
     const navigate = useNavigate();
 
+    //boot players out if they haven't logged in.
+    if (sessionStorage.getItem('userID') === null)
+        navigate('/');
+
     const [reason, setReason] = useState("");
     const checkIfGood = async () => {
         const response = await axios.get(`http://localhost:8080/getByPlayerID/${sessionStorage.getItem('userID')}`)

@@ -328,6 +328,12 @@ function Game() {
 
     const pid = sessionStorage.getItem('userID');
 
+    const navigate = useNavigate();
+
+    //boot players out if they haven't logged in.
+    if (sessionStorage.getItem('userID') === null)
+        navigate('/');
+
     //startup stuff - we first get the game id and stuff
     useEffect(() => {
         setGID(location.state.gameId);

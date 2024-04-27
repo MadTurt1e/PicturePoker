@@ -6,4 +6,4 @@ RUN npm install
 COPY . .
 RUN npm run build
 EXPOSE 80
-CMD serve -s build -l 80
+CMD ["serve", "-s", "build", "-l", "80"]

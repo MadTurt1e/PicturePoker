@@ -16,7 +16,7 @@ function joinGame(gid, navigate) {
     //we need to check if the game has started
     if (gid !== 0) {
         async function isInGame() {
-            const response = await axios.get(`/api/getByGameID/` + gid)
+            const response = await axios.get(`${sessionStorage.getItem('host')}/getByGameID/` + gid)
                 .catch(function () {
                     console.log("GetbyGameID didn't work. ");
                 });
@@ -46,7 +46,7 @@ const ImageComponent = () => {
             navigate('/');
 
         const inGame = async () => {
-            const response = await axios.get(`/api/getPlayerActiveGame/${sessionStorage.getItem('userID')}`)
+            const response = await axios.get(`${sessionStorage.getItem('host')}/getPlayerActiveGame/${sessionStorage.getItem('userID')}`)
                 .catch(function(){
                     console.log("getByPlayerID API call did not work" + sessionStorage.getItem('userID'));
                 });

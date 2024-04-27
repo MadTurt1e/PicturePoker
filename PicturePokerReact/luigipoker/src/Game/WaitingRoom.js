@@ -26,7 +26,7 @@ function PlayerList() {
                     navigate('/menu')
             }
 
-            const response = await axios.get(`/api/getByGameID/` + gid)
+            const response = await axios.get(`${sessionStorage.getItem('host')}/getByGameID/` + gid)
                 .catch(function () {
                     console.log("GetbyGameID didn't work. ");
                 });
@@ -38,7 +38,7 @@ function PlayerList() {
                 const filteredPlayers = players.filter(player => player !== 0);
                 let newPNames = [];
                 for (let i = 0; i < filteredPlayers.length; i++) {
-                    let response = await axios.get(`/api/getByPlayerID/${filteredPlayers[i]}`)
+                    let response = await axios.get(`${sessionStorage.getItem('host')}/getByPlayerID/${filteredPlayers[i]}`)
                         .catch(function () {
                             console.log('getByPlayerID didn\'t work');
                         });
@@ -85,13 +85,13 @@ function WaitingRoom(){
     //we have a function to check if a player is allowed to leave.
     const exitGame = async() => {
         //leave game
-        let response = await axios.delete(`/api/leaveCurrentGame/${sessionStorage.getItem('userID')}`)
+        let response = await axios.delete(`${sessionStorage.getItem('host')}/leaveCurrentGame/${sessionStorage.getItem('userID')}`)
             .catch(function(){
                 console.log("leaveCurrentGame didn\'t work. ");
             });
         if (response.status === 200){
             //if we actually leave, go to the menu
-            let response2 = await axios.get(`/api/getPlayerActiveGame/${sessionStorage.getItem('userID')}`)
+            let response2 = await axios.get(`${sessionStorage.getItem('host')}/getPlayerActiveGame/${sessionStorage.getItem('userID')}`)
                 .catch(function(){
                     console.log("GetPlayerActiveGame didn\'t work. ");
                 });

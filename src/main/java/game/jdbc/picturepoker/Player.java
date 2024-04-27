@@ -249,7 +249,6 @@ public class Player implements DataTransferObject, Comparable<Player> {
             }
             else{
                 // Tiebreaker: Lowest Player ID
-                // TODO: Make final tiebreaker based on position in game
                 return (int)(this.p_ID - p2.getID());
 
             }

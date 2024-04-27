@@ -8,7 +8,6 @@ public class ShowdownInfo {
     private ArrayList<PlayerShowdownInfo> playerShowdownInfos;
     private Card[] luigiHand;
     private String luigiHandType;
-    // TODO: Implement array to track swapped cards
 
     public ArrayList<PlayerShowdownInfo> getPlayerShowdownInfos() {
         return playerShowdownInfos;

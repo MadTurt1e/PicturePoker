@@ -4,6 +4,7 @@ import {useNavigate, useLocation} from "react-router-dom";
 
 import ColorfulText from "../index"
 import backdrop from "../resources/menuIcons/luigisCasino.jpg";
+import './WaitingRoom.css'; 
 
 function PlayerList() {
     const [players, setPlayers] = useState(null);
@@ -67,7 +68,7 @@ function PlayerList() {
 
 function WaitingRoom(){
     const navigate = useNavigate();
-    const [message, setMessage] = useState("Welcome to the Waiting Room. Enjoy your stay!");
+    const [message, setMessage] = useState("Welcome to the Waiting Room");
     //we have a function to check if a player is allowed to leave.
     const exitGame = async() => {
         //leave game

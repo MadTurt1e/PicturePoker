@@ -19,7 +19,7 @@ function Stats(){
 
         const loadGame = async () => {
             // Replace this with the updated API call
-            const response = await axios.get(`http://localhost:8080/getByPlayerID/` + sessionStorage.getItem('userID'))
+            const response = await axios.get(`/api/getByPlayerID/` + sessionStorage.getItem('userID'))
                 .catch(function(){
                     console.log("getByPlayerID didn't work. ");
                 });

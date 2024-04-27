@@ -442,7 +442,7 @@ function Game() {
 
     const handleBetClick = async() => {
         if (bet < 5) {
-            const response = await axios.put("${sessionStorage.getItem('host')}/raise/" + pid)
+            const response = await axios.put(`${sessionStorage.getItem('host')}/raise/` + pid)
                 .catch(function () {
                     console.log("raise API call didn't work. ")
                 });
@@ -470,7 +470,7 @@ function Game() {
             }, 5310);
 
             //show luigi's hand (as of the turn end)
-            const response = await axios.get("${sessionStorage.getItem('host')}/getByGameID/" + gid)
+            const response = await axios.get(`${sessionStorage.getItem('host')}/getByGameID/` + gid)
                 .catch(function () {
                     console.log("getByGameID API call didn't work. ")
                 });

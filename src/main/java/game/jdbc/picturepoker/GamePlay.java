@@ -128,24 +128,17 @@ public class GamePlay {
 
     public void executeLuigi() {
         // Luigi is an external game force.
-        Card[] luigiHand = new Card[5];
-        //initialize values
-        for (int i = 0; i < luigiHand.length; ++i) {
-            luigiHand[i] = new Card();
-        }
-        //updates the game with luigi's hand
-        curGame.setHand(luigiHand);
-
+        Card[] luigiHand = curGame.getHand();
 
         // step 1: Get cards at random
-        // This is already done by the card class.
+        // This is already done by the card class, and hand is reset beforehand.
         System.out.println("Luigi Turn! ");
         for (int i = 0; i < luigiHand.length; ++i) {
             System.out.println("Card " + i + ": " + luigiHand[i]);
         }
         // Step 2: Calculate current score and change out cards if needed
         int luigiScore = playerScore(luigiHand);
-        if (luigiScore > 1000000) {
+        if (luigiScore >= 10000000) {
             System.out.println("Luigi is happy with his hand! ");
             return;
         } else {

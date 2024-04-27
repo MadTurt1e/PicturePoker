@@ -61,7 +61,7 @@ const Login = () => {
 
             if (response.status === 200) {
                 const newUser = response.data;
-                console.log("Successfully created account for", newUser);
+                console.log("Successfully created account for", newUser.playerName);
 
                 sessionStorage.setItem('userID', response.data.id);
                 sessionStorage.setItem('username', response.data.playerName);

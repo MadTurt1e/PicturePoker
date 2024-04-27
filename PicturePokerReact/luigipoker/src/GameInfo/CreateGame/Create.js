@@ -82,7 +82,6 @@ function CreateGame(){
                     setReason("In a game already. ");
                 }
                 else {
-                    console.log(response2);
                     await axios.delete(`${sessionStorage.getItem('host')}/leaveCurrentGame/${sessionStorage.getItem('userID')}`)
                         .catch(function() {
                             console.log("Error with leaveCurrentGame API call");

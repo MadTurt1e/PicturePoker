@@ -41,7 +41,6 @@ const ImageComponent = () => {
     //quick check to see if the player is in an active game right now
     useEffect(() => {
         //boot players out if they haven't logged in.
-        console.log(sessionStorage.getItem('userID'));
         if (sessionStorage.getItem('userID') === null)
             navigate('/');
 

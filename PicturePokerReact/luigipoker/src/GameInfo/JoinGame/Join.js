@@ -88,7 +88,6 @@ function JoinGame() {
         if (isUserInGame(response.data.players)) {
             navigate(`/WaitingRoom`, { state: { gameId: gameId } });
         } else {
-            console.log(response.data.players);
             setMessage("You can't join this game. Try getting better?");
         }
     }

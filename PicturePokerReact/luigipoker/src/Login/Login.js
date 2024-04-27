@@ -22,7 +22,7 @@ const Login = () => {
         setError(null);
 
         try {
-            const serverHost = '/api';
+            const serverHost = '/api/';
             const response = await axios.get(`${serverHost}/getByPlayerName/` + loginUsername);
 
             if (response.status === 200) {
@@ -53,7 +53,7 @@ const Login = () => {
         e.preventDefault();
         // Save the user to the database
         try {
-            const serverHost = '/api';
+            const serverHost = '/api/';
             const response = await axios.post(`${serverHost}/createNewPlayer`, {
                 playerName: registerUsername,
                 password: registerPassword

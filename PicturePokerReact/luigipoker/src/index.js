@@ -38,6 +38,9 @@ const ColorfulText = ({text}) => {
 };
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+
+
+
 /// This now sends the user to the login page first, and only after logging in can they access the menu
 root.render(
     <BrowserRouter>

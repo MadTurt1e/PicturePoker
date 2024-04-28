@@ -6,7 +6,7 @@
 }
 
 .message, .input-container, .game-id-list {
-    margin-bottom: 20px;
+    margin-bottom: 1vh;
 }
 
 .message {
@@ -19,11 +19,12 @@
     font-family: "MarioFont", sans-serif;
     font-size: 5vh;
     color: red;
-    margin-top: 20px;
+    margin-top: 1vh;
     padding: 1vh;
     border: 2px solid #FFFFFF;
     border-radius: 5px; 
     background: rgba(255, 255, 255, 0.5);
+    max-height: 3vh;
 }
 
 .game-id-list {
@@ -35,8 +36,7 @@
     background: rgba(255, 255, 255, 0.2); /* Semi-transparent background */
     box-shadow: 0 0 10px rgba(0,0,0,0.75); /* Shadow for depth */
     overflow: hidden;
-    max-height: 30vh;
-    font-size: 5vh;
+    font-size: 2.9vh;
 }
 
 .message2 {

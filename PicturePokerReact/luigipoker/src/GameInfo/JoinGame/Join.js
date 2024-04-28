@@ -34,7 +34,7 @@ function GameList({joinFxn}) {
                 {games.map((value) =>
                     <div onClick={() => joinFxn(value.id)}>
                         {/*TODO: Make the value.buyin thing look a little nicer. */}
-                        <ColorfulText text={JSON.stringify(value.id, null, 2) + ", $" + value.buyIn}/>
+                        <ColorfulText text={JSON.stringify(value.id, null, 2) + ": $" + value.buyIn + " ENTRY, \r" + (4 - value.activePlayers) + "P TO START"}/>
                     </div>
                 )}
             </div>

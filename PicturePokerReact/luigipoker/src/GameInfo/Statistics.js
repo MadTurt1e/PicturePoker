@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import axios from "axios";
 import ColorfulText from "../index";
 import statsIcon from "../resources/menuIcons/statistics.png";
@@ -9,10 +9,14 @@ import back from "../resources/misIcons/back.png";
 
 function Stats() {
   const [data, setData] = useState(null);
+  const navigate = useNavigate();
   const [reload, setReload] = useState(false);
 
   // the call to get the game info
   useEffect(() => {
+      if (sessionStorage.getItem('userID') === null)
+          navigate('/')
+
     const loadGame = async () => {
       // Replace this with the updated API call
       const response = await axios
@@ -20,7 +24,8 @@ function Stats() {
         .catch(function (error) {
           console.log("GetbyGameID didn't work.");
         });
-      setData(response.data);
+        if (response !== undefined)
+            setData(response.data);
     };
     loadGame();
   }, [reload]);
@@ -37,7 +42,7 @@ function Stats() {
   console.log(data);
 
   return (
-    <div className="stats-container">
+    <div className="stats-container bordering">
       <div className="player-info">
             <ColorfulText text={"Username: " + data.playerName} />
             <ColorfulText text={"Dollars: " + data.dollars} />
@@ -88,7 +93,7 @@ function Statistics() {
         </Link>
       </div>
       <Stats />
-      <div className="player-footer">
+      <div className="player-footer bordering">
         <ColorfulText text={"Player: " + sessionStorage.getItem('username')} />
       </div>
     </div>

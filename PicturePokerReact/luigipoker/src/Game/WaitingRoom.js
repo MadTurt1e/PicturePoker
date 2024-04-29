@@ -55,9 +55,9 @@ function PlayerList() {
         doStuff();
         const interval = setInterval(async () => {
             doStuff();
-        }, 10000);
-        //TIME: for debugging purposes. Set to 10 seconds in real life.
-        console.log(pNames);
+        }, 5000);
+        //TIME: We should probably change this out.
+
         // Leave the waiting room immediately after we hit 4 players.
         if (pNames.length === 4) {
             navigate(`/Game`, { state: { gameId: gid } });

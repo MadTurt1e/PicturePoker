@@ -289,6 +289,7 @@ function EndOfRound({gid, turnEnd, showCards, gameUpdate}){
                                 <ColorfulText text = {"You drew: " + (data.playerShowdownInfos[i].handType)}/>
                                 <ColorfulText text = {"Luigi drew: " + data.luigiHandType}></ColorfulText>
                                 <ColorfulText text = {"You are " + (data.playerShowdownInfos[i].winLossAmount > 0 ? "up " : "down ") + Math.abs(data.playerShowdownInfos[i].winLossAmount) + " tokens"} />
+                                <br />
                                 <ColorfulText text={"Current standings: "}/>
                                 <EndOfRoundList info = {data.playerShowdownInfos} />
                             </div>

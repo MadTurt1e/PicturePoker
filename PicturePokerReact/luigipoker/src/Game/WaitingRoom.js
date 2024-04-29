@@ -46,6 +46,9 @@ function PlayerList() {
                     newPNames.push(response.data.playerName);
                 }
                 setPNames(newPNames);
+                if (filteredPlayers.length === 4) {
+                    navigate(`/Game`, { state: { gameId: gid } });
+                }
             }
         }
 

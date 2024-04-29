@@ -10,24 +10,37 @@ function PlayerList() {
     const [players, setPlayers] = useState(null);
     const [pNames, setPNames] = useState([]);
     const location = useLocation();
-    const gid = location.state.gameId;
+    let gid = 0;
     const navigate = useNavigate();
 
     useEffect(() => {
         //this should be on an interval - it runs once, then it runs every 10 seconds.
         async function doStuff () {
+
+            if (location.state !== null)
+                gid = location.state.gameId;
+
+            //boot bad players out
+            if (gid === 0) {
+                if (sessionStorage.getItem('userID') === null)
+                    navigate('/');
+                else
+                    navigate('/menu')
+            }
+
             const response = await axios.get(`http://localhost:8080/getByGameID/` + gid)
                 .catch(function () {
                     console.log("GetbyGameID didn't work. ");
                 });
-            setPlayers(response.data.players);
+            const players = response.data.players;
+            setPlayers(players);
 
             if (players) {
                 const filteredPlayers = players.filter(player => player !== 0);
                 let newPNames = [];
                 for (let i = 0; i < filteredPlayers.length; i++) {
                     let response = await axios.get(`http://localhost:8080/getByPlayerID/${filteredPlayers[i]}`)
-                        .catch(function (error) {
+                        .catch(function () {
                             console.log('getByPlayerID didn\'t work');
                         });
                     newPNames.push(response.data.playerName);
@@ -35,12 +48,13 @@ function PlayerList() {
                 setPNames(newPNames);
             }
         }
+
         doStuff();
         const interval = setInterval(async () => {
             doStuff();
         }, 10000);
         //TIME: for debugging purposes. Set to 10 seconds in real life.
-
+        console.log(pNames);
         // Leave the waiting room immediately after we hit 4 players.
         if (pNames.length === 4) {
             navigate(`/Game`, { state: { gameId: gid } });

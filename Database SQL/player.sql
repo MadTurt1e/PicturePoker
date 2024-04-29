@@ -27,8 +27,8 @@ CREATE TABLE player
     lifetime_total_bet int NOT NULL DEFAULT 0,
 
     --Per game info - Zeroed out, and refreshed upon each new game
-    tokens int NOT NULL DEFAULT 10,
-    bet int NOT NULL DEFAULT 0,
+    tokens int NOT NULL DEFAULT 9,
+    bet int NOT NULL DEFAULT 1,
     rounds_won int NOT NULL DEFAULT 0,
     finished_round int NOT NULL DEFAULT 0, -- Players can only input when this is zero
 

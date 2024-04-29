@@ -4,7 +4,7 @@ INSERT INTO player (p_id, p_name, passcode) VALUES (3, 'JeffreyW', 'securepasswo
 INSERT INTO player (p_id, p_name, passcode) VALUES (4, 'Richard', 'insecurepassword');
 INSERT INTO player (p_id, p_name, passcode) VALUES (5, 'Malek', 'password123');
 INSERT INTO player (p_id, p_name, passcode) VALUES (6, 'Annie', 'passwordinkcherry');
-INSERT INTO player (p_id, p_name, passcode) VALUES (7, 'Chris', 'passwordthaiicedtea');
+INSERT INTO player (p_id, p_name, passcode) VALUES (7, 'Fawful', 'mustardofyourdoom');
 INSERT INTO player (p_id, p_name, passcode) VALUES (8, 'Bowser', 'kingofkoopas');
 
 -- Pre-seed some player information
@@ -16,6 +16,9 @@ UPDATE player SET third_places = 1, lifetime_tokens = 30, full_houses = 2,
 two_pairs = 3, cards_changed = 10, lifetime_rounds_won = 3, dollars = 63 WHERE p_id = 4;
 UPDATE player SET fourth_places = 1, lifetime_tokens = 25, full_houses = 2, triples = 1,
 two_pairs = 2, cards_changed = 10, lifetime_rounds_won = 3, dollars = 46 WHERE p_id = 1;
+UPDATE player SET fourth_places = 1, third_places = 2, second_places = 2, first_places = 6,
+                  lifetime_tokens = 244, flushes = 1, quads = 3, full_houses = 3, triples = 6,
+                  two_pairs = 7, one_pairs = 3, cards_changed = 59, lifetime_rounds_won = 15, dollars = 69 WHERE p_id = 3;
 
 INSERT INTO game (g_id, num_rounds, active_players, buy_in, difficulty) VALUES (14, 5, 4, 10, 1);
 INSERT INTO game (g_id, cur_round, num_rounds, active_players, buy_in, difficulty) VALUES (45, 7, 7, 4, 100, 0);

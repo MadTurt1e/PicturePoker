@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>Coverage Report > DataAccessObject</title>
+  <title>Coverage Report > ShowdownInfo</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope:     <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">game.jdbc.picturepoker.util</a>
+    <a href="../index.html">game.jdbc.picturepoker</a>
 </div>
 
-<h1>Coverage Summary for Class: DataAccessObject (game.jdbc.picturepoker.util)</h1>
+<h1>Coverage Summary for Class: ShowdownInfo (game.jdbc.picturepoker)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -41,7 +41,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 </th>
 </tr>
 <tr>
-  <td class="name">DataAccessObject</td>
+  <td class="name">ShowdownInfo</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -55,7 +55,7 @@ Current scope:     <a href="../../index.html">all classes</a>
     100%
   </span>
   <span class="absValue">
-    (1/1)
+    (7/7)
   </span>
 </td>
 <td class="coverageStat">
@@ -63,7 +63,7 @@ Current scope:     <a href="../../index.html">all classes</a>
     100%
   </span>
   <span class="absValue">
-    (2/2)
+    (7/7)
   </span>
 </td>
 </tr>
@@ -75,28 +75,40 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package game.jdbc.picturepoker.util;
+<code class="sourceCode" id="sourceCode">&nbsp;package game.jdbc.picturepoker;
 &nbsp;
-&nbsp;import java.sql.*;
+&nbsp;import java.util.ArrayList;
 &nbsp;
-&nbsp;public abstract class DataAccessObject &lt;T extends DataTransferObject&gt; {
+&nbsp;// Carrier class for end of round information for all players and Luigi
 &nbsp;
-&nbsp;    protected final Connection connection;
-&nbsp;    protected final static String LAST_VAL = &quot;SELECT last_value FROM &quot;;
-&nbsp;    protected final static String PLAYER_SEQUENCE = &quot;player_seq&quot;;
+<b class="fc">&nbsp;public class ShowdownInfo {</b>
+&nbsp;    private ArrayList&lt;PlayerShowdownInfo&gt; playerShowdownInfos;
+&nbsp;    private Card[] luigiHand;
+&nbsp;    private String luigiHandType;
 &nbsp;
-&nbsp;    public DataAccessObject(Connection connection) {
-<b class="fc">&nbsp;        super();</b>
-<b class="fc">&nbsp;        this.connection = connection;</b>
+&nbsp;    public ArrayList&lt;PlayerShowdownInfo&gt; getPlayerShowdownInfos() {
+<b class="fc">&nbsp;        return playerShowdownInfos;</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    public abstract T findById(long dto);
+&nbsp;    public void setPlayerShowdownInfos(ArrayList&lt;PlayerShowdownInfo&gt; pSD) {
+<b class="fc">&nbsp;        this.playerShowdownInfos = pSD;</b>
+&nbsp;    }
 &nbsp;
-&nbsp;    public abstract T create(T dto);
+&nbsp;    public Card[] getLuigiHand() {
+<b class="fc">&nbsp;        return luigiHand;</b>
+&nbsp;    }
 &nbsp;
-&nbsp;    public abstract T update_long(String attribute, long value, T dto);
+&nbsp;    public void setLuigiHand(Card[] luigiHand) {
+<b class="fc">&nbsp;        this.luigiHand = luigiHand;</b>
+&nbsp;    }
 &nbsp;
-&nbsp;    public abstract T update_string(String attribute, String data, T dto);
+&nbsp;    public String getLuigiHandType() {
+<b class="fc">&nbsp;        return luigiHandType;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setLuigiHandType(String luigiHandType) {
+<b class="fc">&nbsp;        this.luigiHandType = luigiHandType;</b>
+&nbsp;    }
 &nbsp;}
 </code>
 </pre>

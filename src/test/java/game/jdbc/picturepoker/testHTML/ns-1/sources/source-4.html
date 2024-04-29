@@ -60,10 +60,10 @@ Current scope:     <a href="../../index.html">all classes</a>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    88.5%
+    85.4%
   </span>
   <span class="absValue">
-    (185/209)
+    (169/198)
   </span>
 </td>
 </tr>
@@ -132,7 +132,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="fc">&nbsp;        } catch (SQLException e) {</b>
 <b class="fc">&nbsp;            e.printStackTrace();</b>
 <b class="fc">&nbsp;            throw new RuntimeException(e);</b>
-<b class="fc">&nbsp;        }</b>
+&nbsp;        }
 <b class="fc">&nbsp;        return game;</b>
 &nbsp;    }
 &nbsp;
@@ -155,11 +155,11 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="fc">&nbsp;                game = getHand(game);</b>
 &nbsp;
 <b class="fc">&nbsp;                allGames.add(game);</b>
-<b class="fc">&nbsp;            }</b>
+&nbsp;            }
 <b class="fc">&nbsp;        } catch (SQLException e) {</b>
 <b class="nc">&nbsp;            e.printStackTrace();</b>
 <b class="nc">&nbsp;            throw new RuntimeException(e);</b>
-<b class="fc">&nbsp;        }</b>
+&nbsp;        }
 <b class="fc">&nbsp;        return allGames;</b>
 &nbsp;    }
 &nbsp;
@@ -172,7 +172,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="fc">&nbsp;            while (rs.next()) {</b>
 <b class="fc">&nbsp;                long cur_pid = rs.getLong(&quot;p_id&quot;);</b>
 <b class="fc">&nbsp;                result[i++] = cur_pid;</b>
-<b class="fc">&nbsp;            }</b>
+&nbsp;            }
 <b class="fc">&nbsp;            return result;</b>
 <b class="fc">&nbsp;        } catch (SQLException e) {</b>
 <b class="fc">&nbsp;            e.printStackTrace();</b>
@@ -195,7 +195,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="fc">&nbsp;            catch (SQLException e) {</b>
 <b class="fc">&nbsp;                e.printStackTrace();</b>
 <b class="fc">&nbsp;                throw new RuntimeException(e);</b>
-<b class="fc">&nbsp;            }</b>
+&nbsp;            }
 &nbsp;        }
 <b class="fc">&nbsp;        dto.setHand(result);</b>
 <b class="fc">&nbsp;        return dto;</b>
@@ -275,7 +275,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;
 <b class="fc">&nbsp;        } catch (SQLException e) {</b>
 <b class="fc">&nbsp;            System.out.println(&quot;joinGame: It doesn&#39;t look like the player is in any game.&quot;);</b>
-<b class="nc">&nbsp;        }</b>
+&nbsp;        }
 &nbsp;
 &nbsp;        //update that one table for each player.
 <b class="fc">&nbsp;        try (PreparedStatement statement2 = this.connection.prepareStatement(ADD_PLAYER_TO_GAME);) {</b>
@@ -285,7 +285,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="fc">&nbsp;        } catch (SQLException e) {</b>
 <b class="nc">&nbsp;            e.printStackTrace();</b>
 <b class="nc">&nbsp;            throw new RuntimeException(e);</b>
-<b class="fc">&nbsp;        }</b>
+&nbsp;        }
 &nbsp;
 &nbsp;        //if we get here, the player has been inserted so we can update the game table accordingly.
 <b class="fc">&nbsp;        return update_int(&quot;active_players&quot;, dto.getActivePlayers() + 1, dto);</b>
@@ -303,7 +303,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="fc">&nbsp;            } catch (SQLException e) {</b>
 <b class="nc">&nbsp;                e.printStackTrace();</b>
 <b class="nc">&nbsp;                throw new RuntimeException(e);</b>
-<b class="fc">&nbsp;            }</b>
+&nbsp;            }
 &nbsp;        }
 <b class="fc">&nbsp;        dto.setHand(newHand);</b>
 <b class="fc">&nbsp;        return dto;</b>
@@ -345,16 +345,16 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="fc">&nbsp;        for (int i = 0; i &lt; 5; i++) {</b>
 <b class="fc">&nbsp;            try (PreparedStatement statement = this.connection.prepareStatement(UPDATE_CARD);) {</b>
 <b class="fc">&nbsp;                statement.setString(1, dto.getHand()[i].toString());</b>
-<b class="fc">&nbsp;                statement.setBoolean(2, dto.getHand()[i].getToChange());</b>
-<b class="fc">&nbsp;                statement.setLong(3, dto.getID());</b>
-<b class="fc">&nbsp;                statement.setInt(4, i);</b>
-<b class="fc">&nbsp;                statement.execute();</b>
-<b class="fc">&nbsp;            } catch (SQLException e) {</b>
+<b class="nc">&nbsp;                statement.setBoolean(2, dto.getHand()[i].getToChange());</b>
+<b class="nc">&nbsp;                statement.setLong(3, dto.getID());</b>
+<b class="nc">&nbsp;                statement.setInt(4, i);</b>
+<b class="nc">&nbsp;                statement.execute();</b>
+<b class="nc">&nbsp;            } catch (SQLException e) {</b>
 <b class="nc">&nbsp;                e.printStackTrace();</b>
 <b class="nc">&nbsp;                throw new RuntimeException(e);</b>
-<b class="fc">&nbsp;            }</b>
+&nbsp;            }
 &nbsp;        }
-<b class="fc">&nbsp;        return dto;</b>
+<b class="nc">&nbsp;        return dto;</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    //one part of CRUD - honestly this is not necessary, but it must be done.
@@ -378,7 +378,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="fc">&nbsp;        } catch (SQLException e) {</b>
 <b class="nc">&nbsp;            e.printStackTrace();</b>
 <b class="nc">&nbsp;            throw new RuntimeException(e);</b>
-<b class="fc">&nbsp;        }</b>
+&nbsp;        }
 <b class="fc">&nbsp;        return update_int(&quot;active_players&quot;, dto.getActivePlayers() - 1, dto);</b>
 &nbsp;    }
 &nbsp;
@@ -392,7 +392,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="fc">&nbsp;        } catch (SQLException e) {</b>
 <b class="nc">&nbsp;            e.printStackTrace();</b>
 <b class="nc">&nbsp;            throw new RuntimeException(e);</b>
-<b class="fc">&nbsp;        }</b>
+&nbsp;        }
 <b class="fc">&nbsp;        return game;</b>
 &nbsp;    }
 &nbsp;}
@@ -419,7 +419,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2024-04-16 21:55</div>
+    <div style="float:right;">generated on 2024-04-29 14:24</div>
 </div>
 </body>
 </html>

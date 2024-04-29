@@ -1,0 +1,33 @@
+.header2 {
+    font-size: 1.5em;
+    color: #fff;
+    text-align: center;
+    font-family: 'Press Start 2P', cursive;
+    padding-top: 40px;
+}
+
+/* Style player list */
+.bordering3 {
+    background-color: rgba(0, 0, 0, 0.75); /* Darker background for contrast */
+    border-radius: 10px;
+    padding: 20px;
+    width: 60%; /* Control width */
+    box-sizing: border-box;
+    /* Center the text */
+    text-align: center;
+    /* Center the box */
+    margin: 0 auto;
+    /* Add space between elements */
+    margin-top: 100px;
+}
+
+.escapeGame1 {
+    font-size: 1.5em;
+    color: #fff;
+    text-align: center;
+    font-family: 'Press Start 2P', cursive;
+    margin-left: 40%;
+    box-shadow: 0 0 10px rgba(0,0,0,1);
+    width: 20%;
+
+}

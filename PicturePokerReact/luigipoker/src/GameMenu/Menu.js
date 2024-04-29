@@ -16,7 +16,7 @@ function joinGame(gid, navigate) {
     //we need to check if the game has started
     if (gid !== 0) {
         async function isInGame() {
-            const response = await axios.get(`http://localhost:8080/getByGameID/` + gid)
+            const response = await axios.get(`${sessionStorage.getItem('host')}/getByGameID/` + gid)
                 .catch(function () {
                     console.log("GetbyGameID didn't work. ");
                 });
@@ -41,12 +41,11 @@ const ImageComponent = () => {
     //quick check to see if the player is in an active game right now
     useEffect(() => {
         //boot players out if they haven't logged in.
-        console.log(sessionStorage.getItem('userID'));
         if (sessionStorage.getItem('userID') === null)
             navigate('/');
 
         const inGame = async () => {
-            const response = await axios.get(`http://localhost:8080/getPlayerActiveGame/${sessionStorage.getItem('userID')}`)
+            const response = await axios.get(`${sessionStorage.getItem('host')}/getPlayerActiveGame/${sessionStorage.getItem('userID')}`)
                 .catch(function(){
                     console.log("getByPlayerID API call did not work" + sessionStorage.getItem('userID'));
                 });

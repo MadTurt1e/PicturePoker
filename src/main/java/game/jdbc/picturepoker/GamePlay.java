@@ -63,7 +63,6 @@ public class GamePlay {
         // Step 2: Take bets
         // I noticed there is a raise function just now. This will be useful for a GUI feature where you can spam a button.
         // Terminal inputs make it so that spamming a button is a bit hard, though.
-        // TODO: when we have GUI set up and everything.
         System.out.println("How much do you want to bet? ");
         Scanner scan = new Scanner(System.in);
         int betCount = 0;

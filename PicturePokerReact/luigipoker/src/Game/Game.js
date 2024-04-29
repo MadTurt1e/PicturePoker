@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
 import './Game.css'; 
 
+// various card symbols
 import cloud from "../resources/pokerSprites/cloud.png";
 import mushroom from "../resources/pokerSprites/mushroom.png";
 import fireflower from "../resources/pokerSprites/fireflower.png";
@@ -11,12 +12,18 @@ import star from "../resources/pokerSprites/star.png";
 import normalCard from "../resources/pokerSprites/normalCard.png";
 import proCard from "../resources/pokerSprites/proCards.png";
 
+// various buttons
 import betButton from "../resources/pokerSprites/bet.png";
 import draw from "../resources/pokerSprites/draw.png";
 import hold from "../resources/pokerSprites/hold.png";
 
+// various luigi sprites
 import luigiDefault from "../resources/luigi/soulread.jpg";
 import luigiShuffling  from "../resources/luigi/shuffling.gif";
+
+// game information images
+import handPowers from "../resources/misIcons/handPowers.png";
+import picturePowers from "../resources/misIcons/picturePowers.png";
 
 import token from "../resources/pokerSprites/token.png";
 
@@ -39,7 +46,7 @@ function PlayerList({gid}) {
 
     useEffect(() => {
         const loadGame = async () => {
-            const response = await axios.get(`http://localhost:8080/getByGameID/` + gid)
+            const response = await axios.get(`${sessionStorage.getItem('host')}/getByGameID/` + gid)
                 .catch(function () {
                     console.log("GetbyGameID didn't work. " + gid);
                 });
@@ -48,7 +55,7 @@ function PlayerList({gid}) {
             if (response.data.curRound > response.data.numRounds) {
                 setTimeout(() => {
                     navigate("/gameEnd", { state: { gameId: gid } });
-                }, 15000); // give it like 15 seconds
+                }, 5000); // give it like 5 seconds
             }
 
             setPlayers(response.data.players);
@@ -78,7 +85,7 @@ function PlayerList({gid}) {
                 const roundsWon = [];
 
                 for(let i=0; i < filteredPlayers.length; i++) {
-                    let response = await axios.get(`http://localhost:8080/getByPlayerID/${filteredPlayers[i]}`)
+                    let response = await axios.get(`${sessionStorage.getItem('host')}/getByPlayerID/${filteredPlayers[i]}`)
                         .catch(function(){
                             console.log('getByPlayerID didn\'t work ' + filteredPlayers[i]);
                         });
@@ -134,7 +141,7 @@ function RoundCount({gid, gameUpdate}) {
     const [curRound, setCurRounds] = useState(null);
     useEffect(() => {
         const loadGame = async () => {
-            const response = await axios.get(`http://localhost:8080/getByGameID/` + gid)
+            const response = await axios.get(`${sessionStorage.getItem('host')}/getByGameID/` + gid)
                 .catch(function(){
                     console.log("GetbyGameID didn't work. " + gid);
                 });
@@ -212,7 +219,7 @@ function EndOfRoundList({info}) {
             const names = [];
 
             for(let i=0; i < info.length; i++) {
-                let response = await axios.get(`http://localhost:8080/getByPlayerID/${info[i].pID}`)
+                let response = await axios.get(`${sessionStorage.getItem('host')}/getByPlayerID/${info[i].pID}`)
                     .catch(function(){
                         console.log('getByPlayerID didn\'t work ' + info[i].pID);
                     });
@@ -237,7 +244,7 @@ function EndOfRoundList({info}) {
 function nextRound(gid){
     const endRound = async () => {
         // api call once and done
-        await axios.get(`http://localhost:8080/getEndOfRoundInformation/${gid}/${true}`)
+        await axios.get(`${sessionStorage.getItem('host')}/getEndOfRoundInformation/${gid}/${true}`)
             .catch(function () {
                 console.log("GetEndOfRoundInformation didn't work. " + gid);
             });
@@ -252,7 +259,7 @@ function EndOfRound({gid, turnEnd, showCards, gameUpdate}){
         const endRound = async () => {
             //we only start API calling when our turn ends.
             if (turnEnd) {
-                const response = await axios.get(`http://localhost:8080/getEndOfRoundInformation/${gid}/${false}`)
+                const response = await axios.get(`${sessionStorage.getItem('host')}/getEndOfRoundInformation/${gid}/${false}`)
                     .catch(function () {
                         console.log("GetEndOfRoundInformation didn't work. " + gid);
                     });
@@ -356,7 +363,7 @@ function Game() {
         setTurnEnd(false);
         if (gid === 0 || gid !== null) {
             const inGame = async () => {
-                const response = await axios.get(`http://localhost:8080/getPlayerActiveGame/${pid}`)
+                const response = await axios.get(`${sessionStorage.getItem('host')}/getPlayerActiveGame/${pid}`)
                     .catch(function () {
                         console.log("getByPlayerID API call did not work");
                     });
@@ -374,7 +381,7 @@ function Game() {
     const [tokens, setTokens] = useState(10);
 
     const getPlayerData = async () => {
-        const response = await axios.get('http://localhost:8080/getByPlayerID/' + pid)
+        const response = await axios.get(`${sessionStorage.getItem('host')}/getByPlayerID/` + pid)
             .catch(function () {
                 console.log("getByPlayerID API call didn't work. ");
             });
@@ -424,7 +431,7 @@ function Game() {
 
 
     const finishRound = async (pid) => {
-        await axios.put('http://localhost:8080/finishRound/' + pid)
+        await axios.put(`${sessionStorage.getItem('host')}/finishRound/` + pid)
             .catch(function () {
                 console.log("finishRound API call didn't work. ");
             });
@@ -433,7 +440,7 @@ function Game() {
 
     const setToChange = async(index) => {
         //just set something to be changed out depending on if it has been clicked or not
-        await axios.put(`http://localhost:8080/changeCard/` + pid + '/' + index)
+        await axios.put(`${sessionStorage.getItem('host')}/changeCard/` + pid + '/' + index)
             .catch(function(){
                 console.log("changeCard API call didn't work. Card " + index);
             });
@@ -454,7 +461,7 @@ function Game() {
 
     const handleBetClick = async() => {
         if (bet < 5) {
-            const response = await axios.put("http://localhost:8080/raise/" + pid)
+            const response = await axios.put(`${sessionStorage.getItem('host')}/raise/` + pid)
                 .catch(function () {
                     console.log("raise API call didn't work. ")
                 });
@@ -482,7 +489,7 @@ function Game() {
             }, 5310);
 
             //show luigi's hand (as of the turn end)
-            const response = await axios.get("http://localhost:8080/getByGameID/" + gid)
+            const response = await axios.get(`${sessionStorage.getItem('host')}/getByGameID/` + gid)
                 .catch(function () {
                     console.log("getByGameID API call didn't work. ")
                 });
@@ -518,6 +525,16 @@ function Game() {
         setTimeout(() => {
             setDealerHand(eorData.luigiHand);
         }, 4000);
+    }
+
+    const [hoverState, setHoverState] = useState(false);
+
+    const handleMouseOver = () => {
+        setHoverState(true);
+    }
+
+    const handleMouseOut = () => {
+        setHoverState(false);
     }
 
     return (
@@ -566,7 +583,7 @@ function Game() {
             </div>
 
             <div
-                className="endTurnButton"
+                className="endTurnButton glow"
                 onClick={() => endTurnProcedure()}
             >
                 {selectedCards.some(el => el > -1) &&
@@ -586,6 +603,23 @@ function Game() {
                         <img src={images[cards[index]]} alt={`Card ${index + 1}`} className='crispImages'/>
                     </div>
                 ))}
+            </div>
+
+            <div>
+                <div
+                    className={`info bordering ${hoverState ? 'hover' : ''}`}
+                    onMouseOver={handleMouseOver}
+                    onMouseOut={handleMouseOut}
+                >
+                    <ColorfulText text={"?"}/>
+                </div>
+                <div className={`tooltip ${hoverState ? 'hover' : ''}`}>
+                    <div className={"bordering"}>
+                        <ColorfulText text={"Suits / Multipliers"}/>
+                    </div>
+                    <img src={picturePowers} alt="Powers of Pictures" className={"crispImages"}/>
+                    <img src={handPowers} alt="Powers of Hands" className={"crispImages"}/>
+                </div>
             </div>
         </div>
     );

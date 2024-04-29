@@ -24,7 +24,7 @@ function PlayerList({ gid }) {
             navigate('/');
 
         const loadGame = async () => {
-            const response = await axios.get(`http://localhost:8080/getGameEndDetails/${gid}`)
+            const response = await axios.get(`${sessionStorage.getItem('host')}/getGameEndDetails/${gid}`)
                 .catch(function () {
                     console.log("getGameEndDetails didn't work. " + gid);
                 });
@@ -47,7 +47,7 @@ function PlayerList({ gid }) {
                 const rounds_won = [];
 
                 for (let i = 0; i < filteredPlayers.length; i++) {
-                    let response = await axios.get(`http://localhost:8080/getByPlayerID/${filteredPlayers[i]}`)
+                    let response = await axios.get(`${sessionStorage.getItem('host')}/getByPlayerID/${filteredPlayers[i]}`)
                         .catch(function () {
                             console.log('getByPlayerID didn\'t work ' + filteredPlayers[i]);
                         });
@@ -86,7 +86,6 @@ function PlayerList({ gid }) {
 }
 
 function GameEnd() {
-    const navigate = useNavigate();
     let gid = 0;
     const location = useLocation();
 

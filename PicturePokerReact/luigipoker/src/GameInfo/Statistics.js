@@ -10,30 +10,23 @@ import back from "../resources/misIcons/back.png";
 function Stats() {
   const [data, setData] = useState(null);
   const navigate = useNavigate();
-  const [reload, setReload] = useState(false);
 
   // the call to get the game info
   useEffect(() => {
       if (sessionStorage.getItem('userID') === null)
           navigate('/')
 
-    const loadGame = async () => {
-      // Replace this with the updated API call
-      const response = await axios
-        .get(`http://localhost:8080/getByPlayerID/` + sessionStorage.getItem('userID'))
-        .catch(function (error) {
-          console.log("GetbyGameID didn't work.");
-        });
-        if (response !== undefined)
-            setData(response.data);
-    };
-    loadGame();
-  }, [reload]);
-
-  // for use if we want to reload the data
-  const handleReload = () => {
-    setReload(!reload);
-  };
+        const loadGame = async () => {
+            // Replace this with the updated API call
+            const response = await axios.get(`${sessionStorage.getItem('host')}/getByPlayerID/` + sessionStorage.getItem('userID'))
+                .catch(function(){
+                    console.log("getByPlayerID didn't work. ");
+                });
+            if (response !== undefined)
+                setData(response.data);
+        }
+        loadGame();
+    }, []);
 
   if (!data) {
     return <div>Loading...</div>;

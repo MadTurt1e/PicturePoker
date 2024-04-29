@@ -22,7 +22,7 @@ const Login = () => {
         setError(null);
 
         try {
-            const serverHost = 'http://localhost:8080';
+            const serverHost = sessionStorage.getItem('host');
             const response = await axios.get(`${serverHost}/getByPlayerName/` + loginUsername);
 
             if (response.status === 200) {
@@ -53,7 +53,7 @@ const Login = () => {
         e.preventDefault();
         // Save the user to the database
         try {
-            const serverHost = 'http://localhost:8080';
+            const serverHost = sessionStorage.getItem('host');
             const response = await axios.post(`${serverHost}/createNewPlayer`, {
                 playerName: registerUsername,
                 password: registerPassword
@@ -61,7 +61,7 @@ const Login = () => {
 
             if (response.status === 200) {
                 const newUser = response.data;
-                console.log("Successfully created account for", newUser);
+                console.log("Successfully created account for", newUser.playerName);
 
                 sessionStorage.setItem('userID', response.data.id);
                 sessionStorage.setItem('username', response.data.playerName);

@@ -23,12 +23,12 @@ function gameCreation(rounds, buyin, navigate, setReason){
             "difficulty": "1" // difficulty level
         };
 
-        const response = await axios.post('http://localhost:8080/createNewGame', gameDetails)
+        const response = await axios.post(`${sessionStorage.getItem('host')}/createNewGame`, gameDetails)
             .catch(function(){
                 console.log("Error with createNewGame");
             });
         //try joining the game we just made
-        let response2 = await axios.put(`http://localhost:8080/joinGame/${response.data.id}/${sessionStorage.getItem('userID')}`)
+        let response2 = await axios.put(`${sessionStorage.getItem('host')}/joinGame/${response.data.id}/${sessionStorage.getItem('userID')}`)
             .catch(function () {
                 console.log("joinGame didn't work. ");
             });
@@ -59,14 +59,14 @@ function CreateGame(){
             navigate('/')
     }, []);
     const checkIfGood = async () => {
-        const response = await axios.get(`http://localhost:8080/getByPlayerID/${sessionStorage.getItem('userID')}`)
+        const response = await axios.get(`${sessionStorage.getItem('host')}/getByPlayerID/${sessionStorage.getItem('userID')}`)
             .catch(function(){
                 console.log("Error with getByPlayerID");
             });
 
         // two checks - if the player can actually join a game, and if a player has enough cash to join
         if (response.status === 200) {
-            const response2 = await axios.get(`http://localhost:8080/getPlayerActiveGame/${sessionStorage.getItem('userID')}`)
+            const response2 = await axios.get(`${sessionStorage.getItem('host')}/getPlayerActiveGame/${sessionStorage.getItem('userID')}`)
                 .catch(function () {
                     console.log("Error with getByPlayerID");
                 });
@@ -82,8 +82,7 @@ function CreateGame(){
                     setReason("In a game already. ");
                 }
                 else {
-                    console.log(response2);
-                    await axios.delete(`http://localhost:8080/leaveCurrentGame/${sessionStorage.getItem('userID')}`)
+                    await axios.delete(`${sessionStorage.getItem('host')}/leaveCurrentGame/${sessionStorage.getItem('userID')}`)
                         .catch(function() {
                             console.log("Error with leaveCurrentGame API call");
                     });

@@ -15,10 +15,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.swing.plaf.metal.MetalBorders;
 
-// @RequestMapping("/api") We will shift most of the functionality here to be hidden under /api
+
 @SpringBootApplication
 @CrossOrigin // This is for the front end to be able to access the backend
 @RestController
+@RequestMapping("/api") // this is so we know what is and is not API
 public class PicturePokerGame {
 
     // Set the hostname as a pseudo global so that we can change it later

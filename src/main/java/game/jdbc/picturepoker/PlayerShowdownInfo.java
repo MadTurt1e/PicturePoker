@@ -26,7 +26,6 @@ public class PlayerShowdownInfo implements Comparable<PlayerShowdownInfo>{
             }
             else{
                 // Tiebreaker: Lowest Player ID
-                // TODO: Make final tiebreaker based on position in game
                 return (int)(this.pID - pSD2.getpID());
 
             }

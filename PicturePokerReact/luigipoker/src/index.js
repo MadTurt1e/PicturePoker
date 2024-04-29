@@ -39,7 +39,9 @@ const ColorfulText = ({text}) => {
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
-
+//save hostname and protocol for later
+sessionStorage.setItem("host", window.location.protocol + "//" + window.location.hostname + ":8080/api");
+console.log(sessionStorage.getItem('host'));
 
 /// This now sends the user to the login page first, and only after logging in can they access the menu
 root.render(

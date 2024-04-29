@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {Link, useLocation, useNavigate} from 'react-router-dom';
-import './Game.css';
+import './GameEnd.css';
 
 
 import backdrop from "../resources/menuIcons/luigisCasinoBright.jpg"
@@ -69,7 +69,7 @@ function PlayerList({ gid }) {
 
     const winnings = [0.55, 0.3, 0.15, 0];
     return (
-        <div style={{ fontSize: "3vh" }} className={"bordering"}>
+        <div style={{ fontSize: "3vh" }} className={"bordering5"}>
             {pNames.map((value, i) => (
                 <React.Fragment key={i}>
                     <ColorfulText text={(i+1) + ": \t\t" + pNames[i]} />
@@ -77,7 +77,7 @@ function PlayerList({ gid }) {
                         <ColorfulText text={"Tokens: \t" + pTokens[i]} />
                     </div>
                     <ColorfulText text={"Rounds Won: \t" + pRoundsWon[i]} />
-                    <ColorfulText text={"Winnings: $" + (winnings[i] * (buyIn*4))} />
+                    <ColorfulText text={"Winnings: $" + Math.round(winnings[i] * (buyIn*4))} />
                     <br/>
                 </React.Fragment>
             ))}
@@ -92,27 +92,19 @@ function GameEnd() {
     if (location.state !== null)
         gid = (location.state.gameId);
     return (
-        <div style={{
-            backgroundImage: `url(${backdrop})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            height: '100vh',
-            width: '100vw'
-        }}>
-            <div style={{fontSize: "4vh"}} className= {'bordering'}>
+        <div className="game-end-container">
+            <div className="bordering6">
                 <ColorfulText text={"Game over! Placements: "} />
             </div>
-            <br />
             
-            <PlayerList gid={gid} />
-            <Link to="/menu" className="glow">
-                <div className={"bordering"} style={{fontSize: "3vh"}}>
-                    <ColorfulText text={"Go to Menu!"} />
-                </div>
-                <img src={leave} alt="" style={{ transform: [{ rotateY: '90deg' }], height: '10vh', width:"10vh", marginBottom: '10px' }} />
-            </Link>
+                <PlayerList gid={gid} />
+            <div className="menu-button-container">
+                <Link to="/menu" className="glow5">
+                    <img src={leave} alt="Leave" className="glow5" />
+                </Link>
+            </div>
         </div>
-    );
+  );
 }
 
 export default GameEnd;

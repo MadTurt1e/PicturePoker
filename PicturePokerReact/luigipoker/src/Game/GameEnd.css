@@ -1,0 +1,72 @@
+.game-end-container {
+    background-image: url('../resources/menuIcons/luigisCasinoBright.jpg');
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-family: 'Arial', sans-serif;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  }
+  
+  .bordering5 {
+    background-color: rgba(0, 0, 0, 0.75);
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px 0;
+    width: 50%;
+    box-sizing: border-box;
+  }
+  
+  .glow5 {
+    text-decoration: none;
+    font-weight: bold;
+    color: #ffcc00;
+    transition: transform 0.2s, text-shadow 0.2s;
+  }
+  
+  .glow5:hover {
+    transform: scale(1.05);
+    text-shadow: 0 0 8px #ffcc00, 0 0 10px #ffcc00, 0 0 12px #ffcc00;
+  }
+  
+  .glow5 img {
+    height: 5vh;
+    transition: transform 0.3s ease;
+  }
+  
+  .glow5 img:hover {
+    transform: rotate(90deg);
+  }
+  
+  .player-list {
+    font-size: 3vh;
+    text-align: center;
+  }
+  
+
+    .player-list img {
+        height: 5vh;
+        margin: 0 10px;
+    }
+  
+  * {
+    margin: 0;
+    padding: 0;
+  }
+
+    /* Style the header */
+.bordering6 {
+    background-color: rgba(0, 0, 0, 0.75);
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px 0;
+    width: 50%;
+    box-sizing: border-box;
+    text-align: center;
+    font-size: 4vh;
+  }

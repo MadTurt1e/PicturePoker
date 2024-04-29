@@ -4,6 +4,7 @@ import {useNavigate, useLocation} from "react-router-dom";
 
 import ColorfulText from "../index"
 import backdrop from "../resources/menuIcons/luigisCasino.jpg";
+import "./WaitingRoom.css";
 
 function PlayerList() {
     const [players, setPlayers] = useState([]);
@@ -18,6 +19,10 @@ function PlayerList() {
     useEffect(() => {
         //this should be on an interval - it runs once, then it runs every 10 seconds.
         async function doStuff () {
+
+            if (location.state !== null)
+                gid = location.state.gameId;
+
             //boot bad players out
             if (gid === 0) {
                 if (sessionStorage.getItem('userID') === null)
@@ -30,7 +35,6 @@ function PlayerList() {
                 .catch(function () {
                     console.log("GetbyGameID didn't work. ");
                 });
-
             const players = response.data.players;
             setPlayers(players);
 
@@ -53,11 +57,15 @@ function PlayerList() {
         }
 
         doStuff();
-
         const interval = setInterval(async () => {
             doStuff();
-        }, 3000);
-        //TIME: Set to 3 second delay because we're not really expecting people to stay here for long.
+        }, 5000);
+        //TIME: We should probably change this out.
+
+        // Leave the waiting room immediately after we hit 4 players.
+        if (pNames.length === 4) {
+            navigate(`/Game`, { state: { gameId: gid } });
+        }
 
         // Cleanup interval on unmount
         return () => clearInterval(interval);
@@ -67,10 +75,10 @@ function PlayerList() {
 
     return (
         <div>
-            <div style={{fontSize:"5vh"}} className={"bordering"}>
+            <div style={{fontSize:"5vh"}} className={"bordering3"}>
                 <ColorfulText text={"Game  ID: " + gid.toString() + " Players required: " + (4 - pNames.length)} />
             </div>
-            <div style={{fontSize:"3vh"}} className={"bordering"}>
+            <div style={{fontSize:"3vh"}} className={"bordering3"}>
                 {pNames.map((value) =>
                     <ColorfulText text={value}/>
                 )}
@@ -109,13 +117,11 @@ function WaitingRoom(){
             height: '100vh',
             width: '100vw'
         }}>
-            <div style={{fontSize: "4vh"}} className={"bordering"}>
+            <div style={{fontSize: "4vh"}} className={"header2"}>
                 <ColorfulText text={message}/>
             </div>
-            <PlayerList/>
-            <br/>
-
-            <button className="escapeGame bordering glow" style={{fontSize:"3vh"}} onClick={() => exitGame()}>
+                <PlayerList/>
+            <button className="escapeGame1 bordering3 glow" style={{fontSize:"3vh"}}onClick={() => exitGame()}>
                 <ColorfulText text={"Leave Game?  "}/>
             </button>
 

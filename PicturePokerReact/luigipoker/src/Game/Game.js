@@ -35,12 +35,22 @@ function PlayerList({gid}) {
     const [pRoundsWon, setPRoundsWon] = useState([]);
     useLocation();
 
+    const navigate = useNavigate();
+
     useEffect(() => {
         const loadGame = async () => {
             const response = await axios.get(`${sessionStorage.getItem('host')}/getByGameID/` + gid)
                 .catch(function () {
                     console.log("GetbyGameID didn't work. " + gid);
                 });
+
+            //extra check to ensure that the game has not finished.
+            if (response.data.curRound > response.data.numRounds) {
+                setTimeout(() => {
+                    navigate("/gameEnd", { state: { gameId: gid } });
+                }, 15000); // give it like 15 seconds
+            }
+
             setPlayers(response.data.players);
         }
 
@@ -289,6 +299,7 @@ function EndOfRound({gid, turnEnd, showCards, gameUpdate}){
                                 <ColorfulText text = {"You drew: " + (data.playerShowdownInfos[i].handType)}/>
                                 <ColorfulText text = {"Luigi drew: " + data.luigiHandType}></ColorfulText>
                                 <ColorfulText text = {"You are " + (data.playerShowdownInfos[i].winLossAmount > 0 ? "up " : "down ") + Math.abs(data.playerShowdownInfos[i].winLossAmount) + " tokens"} />
+                                <br />
                                 <ColorfulText text={"Current standings: "}/>
                                 <EndOfRoundList info = {data.playerShowdownInfos} />
                             </div>
@@ -339,6 +350,7 @@ function Game() {
             setGID(location.state.gameId);
 
         setGameUpdate(true);
+
 
         // set turn end to false for when we update it later
         setTurnEnd(false);

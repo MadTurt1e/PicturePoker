@@ -48,7 +48,7 @@ function PlayerList({gid}) {
             if (response.data.curRound > response.data.numRounds) {
                 setTimeout(() => {
                     navigate("/gameEnd", { state: { gameId: gid } });
-                }, 15000); // give it like 15 seconds
+                }, 5000); // give it like 5 seconds
             }
 
             setPlayers(response.data.players);

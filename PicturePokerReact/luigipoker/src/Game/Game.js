@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
 import './Game.css'; 
 
+// various card symbols
 import cloud from "../resources/pokerSprites/cloud.png";
 import mushroom from "../resources/pokerSprites/mushroom.png";
 import fireflower from "../resources/pokerSprites/fireflower.png";
@@ -11,12 +12,18 @@ import star from "../resources/pokerSprites/star.png";
 import normalCard from "../resources/pokerSprites/normalCard.png";
 import proCard from "../resources/pokerSprites/proCards.png";
 
+// various buttons
 import betButton from "../resources/pokerSprites/bet.png";
 import draw from "../resources/pokerSprites/draw.png";
 import hold from "../resources/pokerSprites/hold.png";
 
+// various luigi sprites
 import luigiDefault from "../resources/luigi/soulread.jpg";
 import luigiShuffling  from "../resources/luigi/shuffling.gif";
+
+// game information images
+import handPowers from "../resources/misIcons/handPowers.png";
+import picturePowers from "../resources/misIcons/picturePowers.png";
 
 import token from "../resources/pokerSprites/token.png";
 
@@ -520,6 +527,16 @@ function Game() {
         }, 4000);
     }
 
+    const [hoverState, setHoverState] = useState(false);
+
+    const handleMouseOver = () => {
+        setHoverState(true);
+    }
+
+    const handleMouseOut = () => {
+        setHoverState(false);
+    }
+
     return (
         <div style={{
             backgroundImage: `url(${backdrop})`,
@@ -566,7 +583,7 @@ function Game() {
             </div>
 
             <div
-                className="endTurnButton"
+                className="endTurnButton glow"
                 onClick={() => endTurnProcedure()}
             >
                 {selectedCards.some(el => el > -1) &&
@@ -586,6 +603,23 @@ function Game() {
                         <img src={images[cards[index]]} alt={`Card ${index + 1}`} className='crispImages'/>
                     </div>
                 ))}
+            </div>
+
+            <div>
+                <div
+                    className={`info bordering ${hoverState ? 'hover' : ''}`}
+                    onMouseOver={handleMouseOver}
+                    onMouseOut={handleMouseOut}
+                >
+                    <ColorfulText text={"?"}/>
+                </div>
+                <div className={`tooltip ${hoverState ? 'hover' : ''}`}>
+                    <div className={"bordering"}>
+                        <ColorfulText text={"Suits / Multipliers"}/>
+                    </div>
+                    <img src={picturePowers} alt="Powers of Pictures" className={"crispImages"}/>
+                    <img src={handPowers} alt="Powers of Hands" className={"crispImages"}/>
+                </div>
             </div>
         </div>
     );

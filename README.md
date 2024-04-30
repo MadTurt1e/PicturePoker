@@ -24,7 +24,7 @@ Database\ SQL/databaseCreation.py
 
 **Testing**
 
-Note that as seen in the report, we have achieved the mandatory test coverage - 50% of the lines have been covered by 
+Note that as seen in the report, we have achieved the mandatory test coverage - 60% of the lines have been covered by 
 tests, which is enough for our purposes. 
 ![img.png](report.png)
 

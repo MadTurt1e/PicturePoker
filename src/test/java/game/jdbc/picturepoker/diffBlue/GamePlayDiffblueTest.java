@@ -1,24 +1,26 @@
 package game.jdbc.picturepoker.diffBlue;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.InputMismatchException;
 
 import game.jdbc.picturepoker.*;
 import org.junit.jupiter.api.Test;
@@ -29,38 +31,19 @@ class GamePlayDiffblueTest {
      * Method under test: {@link GamePlay#executeLuigi()}
      */
     @Test
-    void testExecuteLuigi() throws SQLException {
+    void testExecuteLuigi() {
         // Arrange
-        ResultSet resultSet = mock(ResultSet.class);
-        when(resultSet.getInt(Mockito.<String>any())).thenReturn(1);
-        when(resultSet.getLong(Mockito.<String>any())).thenReturn(1L);
-        when(resultSet.next()).thenReturn(true).thenReturn(true).thenReturn(false);
-        PreparedStatement preparedStatement = mock(PreparedStatement.class);
-        when(preparedStatement.execute()).thenReturn(true);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
-        doNothing().when(preparedStatement).setInt(anyInt(), anyInt());
-        doNothing().when(preparedStatement).setLong(anyInt(), anyLong());
-        doNothing().when(preparedStatement).close();
-        Connection connection = mock(Connection.class);
-        when(connection.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement);
-        GameDAO gameDAO = new GameDAO(connection);
-
-        GamePlay gamePlay = new GamePlay(new Game(), new Player[]{});
-        gamePlay.showdownResolution(gameDAO, new PlayerDAO(mock(Connection.class)), true);
+        Game game = new Game();
+        game.setHand(new Card[]{new Card()});
+        GamePlay gamePlay = new GamePlay(game, new Player[]{new Player()});
 
         // Act
         gamePlay.executeLuigi();
 
         // Assert
-        verify(connection, atLeast(1)).prepareStatement(Mockito.<String>any());
-        verify(preparedStatement, atLeast(1)).execute();
-        verify(preparedStatement, atLeast(1)).executeQuery();
-        verify(preparedStatement, atLeast(1)).setInt(anyInt(), anyInt());
-        verify(preparedStatement, atLeast(1)).setLong(anyInt(), anyLong());
-        verify(resultSet, atLeast(1)).getInt(Mockito.<String>any());
-        verify(resultSet, atLeast(1)).getLong(Mockito.<String>any());
-        verify(resultSet, atLeast(1)).next();
-        verify(preparedStatement, atLeast(1)).close();
+        Game curGame = gamePlay.getCurGame();
+        assertEquals(1, curGame.getLuigiFinished());
+        assertFalse((curGame.getHand()[0]).getToChange());
     }
 
     /**
@@ -69,36 +52,304 @@ class GamePlayDiffblueTest {
     @Test
     void testExecuteLuigi2() throws SQLException {
         // Arrange
-        ResultSet resultSet = mock(ResultSet.class);
-        when(resultSet.getInt(Mockito.<String>any())).thenReturn(1);
-        when(resultSet.getLong(Mockito.<String>any())).thenReturn(5L);
-        when(resultSet.next()).thenReturn(true).thenReturn(true).thenReturn(false);
+        Game game = new Game();
+        game.setHand(new Card[]{new Card()});
         PreparedStatement preparedStatement = mock(PreparedStatement.class);
         when(preparedStatement.execute()).thenReturn(true);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
         doNothing().when(preparedStatement).setInt(anyInt(), anyInt());
         doNothing().when(preparedStatement).setLong(anyInt(), anyLong());
         doNothing().when(preparedStatement).close();
         Connection connection = mock(Connection.class);
         when(connection.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement);
         GameDAO gameDAO = new GameDAO(connection);
+        PreparedStatement preparedStatement2 = mock(PreparedStatement.class);
+        when(preparedStatement2.execute()).thenReturn(true);
+        doNothing().when(preparedStatement2).setInt(anyInt(), anyInt());
+        doNothing().when(preparedStatement2).setLong(anyInt(), anyLong());
+        doNothing().when(preparedStatement2).close();
+        Connection connection2 = mock(Connection.class);
+        when(connection2.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement2);
+        PlayerDAO playerDAO = new PlayerDAO(connection2);
 
-        GamePlay gamePlay = new GamePlay(new Game(), new Player[]{});
-        gamePlay.showdownResolution(gameDAO, new PlayerDAO(mock(Connection.class)), true);
+        GamePlay gamePlay = new GamePlay(game, new Player[]{new Player()});
+        gamePlay.gameEndResolution(gameDAO, playerDAO);
 
         // Act
         gamePlay.executeLuigi();
 
         // Assert
-        verify(connection, atLeast(1)).prepareStatement(Mockito.<String>any());
-        verify(preparedStatement, atLeast(1)).execute();
-        verify(preparedStatement, atLeast(1)).executeQuery();
-        verify(preparedStatement, atLeast(1)).setInt(anyInt(), anyInt());
-        verify(preparedStatement, atLeast(1)).setLong(anyInt(), anyLong());
-        verify(resultSet, atLeast(1)).getInt(Mockito.<String>any());
-        verify(resultSet, atLeast(1)).getLong(Mockito.<String>any());
-        verify(resultSet, atLeast(1)).next();
-        verify(preparedStatement, atLeast(1)).close();
+        verify(connection2, atLeast(1)).prepareStatement(Mockito.<String>any());
+        verify(connection).prepareStatement(eq(
+                "UPDATE game SET cur_round = ?, num_rounds = ?, active_players = ?, buy_in = ?, pot_quantity = ?, difficulty = ?, players_finished = ?, luigi_finished = ? WHERE g_id = ?"));
+        verify(preparedStatement).execute();
+        verify(preparedStatement2, atLeast(1)).execute();
+        verify(preparedStatement, atLeast(1)).setInt(anyInt(), eq(0));
+        verify(preparedStatement2, atLeast(1)).setInt(eq(1), anyInt());
+        verify(preparedStatement2, atLeast(1)).setLong(anyInt(), eq(0L));
+        verify(preparedStatement).setLong(eq(9), eq(0L));
+        verify(preparedStatement).close();
+        verify(preparedStatement2, atLeast(1)).close();
+        Game curGame = gamePlay.getCurGame();
+        assertEquals(1, curGame.getLuigiFinished());
+        assertFalse((curGame.getHand()[0]).getToChange());
+    }
+
+    /**
+     * Method under test: {@link GamePlay#executeLuigi()}
+     */
+    @Test
+    void testExecuteLuigi3() throws SQLException {
+        // Arrange
+        Game game = new Game();
+        game.setHand(new Card[]{new Card(Card.Suit.CLOUD)});
+        PreparedStatement preparedStatement = mock(PreparedStatement.class);
+        when(preparedStatement.execute()).thenReturn(true);
+        doNothing().when(preparedStatement).setInt(anyInt(), anyInt());
+        doNothing().when(preparedStatement).setLong(anyInt(), anyLong());
+        doNothing().when(preparedStatement).close();
+        Connection connection = mock(Connection.class);
+        when(connection.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement);
+        GameDAO gameDAO = new GameDAO(connection);
+        PreparedStatement preparedStatement2 = mock(PreparedStatement.class);
+        when(preparedStatement2.execute()).thenReturn(true);
+        doNothing().when(preparedStatement2).setInt(anyInt(), anyInt());
+        doNothing().when(preparedStatement2).setLong(anyInt(), anyLong());
+        doNothing().when(preparedStatement2).close();
+        Connection connection2 = mock(Connection.class);
+        when(connection2.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement2);
+        PlayerDAO playerDAO = new PlayerDAO(connection2);
+
+        GamePlay gamePlay = new GamePlay(game, new Player[]{new Player()});
+        gamePlay.gameEndResolution(gameDAO, playerDAO);
+
+        // Act
+        gamePlay.executeLuigi();
+
+        // Assert
+        verify(connection2, atLeast(1)).prepareStatement(Mockito.<String>any());
+        verify(connection).prepareStatement(eq(
+                "UPDATE game SET cur_round = ?, num_rounds = ?, active_players = ?, buy_in = ?, pot_quantity = ?, difficulty = ?, players_finished = ?, luigi_finished = ? WHERE g_id = ?"));
+        verify(preparedStatement).execute();
+        verify(preparedStatement2, atLeast(1)).execute();
+        verify(preparedStatement, atLeast(1)).setInt(anyInt(), eq(0));
+        verify(preparedStatement2, atLeast(1)).setInt(eq(1), anyInt());
+        verify(preparedStatement2, atLeast(1)).setLong(anyInt(), eq(0L));
+        verify(preparedStatement).setLong(eq(9), eq(0L));
+        verify(preparedStatement).close();
+        verify(preparedStatement2, atLeast(1)).close();
+        Game curGame = gamePlay.getCurGame();
+        assertEquals(1, curGame.getLuigiFinished());
+        assertFalse((curGame.getHand()[0]).getToChange());
+    }
+
+    /**
+     * Method under test: {@link GamePlay#executeLuigi()}
+     */
+    @Test
+    void testExecuteLuigi4() throws SQLException {
+        // Arrange
+        Game game = new Game();
+        Card card = new Card();
+        game.setHand(new Card[]{card, new Card()});
+        PreparedStatement preparedStatement = mock(PreparedStatement.class);
+        when(preparedStatement.execute()).thenReturn(true);
+        doNothing().when(preparedStatement).setInt(anyInt(), anyInt());
+        doNothing().when(preparedStatement).setLong(anyInt(), anyLong());
+        doNothing().when(preparedStatement).close();
+        Connection connection = mock(Connection.class);
+        when(connection.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement);
+        GameDAO gameDAO = new GameDAO(connection);
+        PreparedStatement preparedStatement2 = mock(PreparedStatement.class);
+        when(preparedStatement2.execute()).thenReturn(true);
+        doNothing().when(preparedStatement2).setInt(anyInt(), anyInt());
+        doNothing().when(preparedStatement2).setLong(anyInt(), anyLong());
+        doNothing().when(preparedStatement2).close();
+        Connection connection2 = mock(Connection.class);
+        when(connection2.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement2);
+        PlayerDAO playerDAO = new PlayerDAO(connection2);
+
+        GamePlay gamePlay = new GamePlay(game, new Player[]{new Player()});
+        gamePlay.gameEndResolution(gameDAO, playerDAO);
+
+        // Act
+        gamePlay.executeLuigi();
+
+        // Assert
+        verify(connection2, atLeast(1)).prepareStatement(Mockito.<String>any());
+        verify(connection).prepareStatement(eq(
+                "UPDATE game SET cur_round = ?, num_rounds = ?, active_players = ?, buy_in = ?, pot_quantity = ?, difficulty = ?, players_finished = ?, luigi_finished = ? WHERE g_id = ?"));
+        verify(preparedStatement).execute();
+        verify(preparedStatement2, atLeast(1)).execute();
+        verify(preparedStatement, atLeast(1)).setInt(anyInt(), eq(0));
+        verify(preparedStatement2, atLeast(1)).setInt(eq(1), anyInt());
+        verify(preparedStatement2, atLeast(1)).setLong(anyInt(), eq(0L));
+        verify(preparedStatement).setLong(eq(9), eq(0L));
+        verify(preparedStatement).close();
+        verify(preparedStatement2, atLeast(1)).close();
+        Game curGame = gamePlay.getCurGame();
+        assertEquals(1, curGame.getLuigiFinished());
+        Card[] hand = curGame.getHand();
+        assertFalse((hand[0]).getToChange());
+        assertFalse((hand[1]).getToChange());
+    }
+
+    /**
+     * Method under test: {@link GamePlay#executeLuigi()}
+     */
+    @Test
+    void testExecuteLuigi5() throws SQLException {
+        // Arrange
+        Game game = new Game();
+        Card card = new Card();
+        Card card2 = new Card();
+        game.setHand(new Card[]{card, card2, new Card()});
+        PreparedStatement preparedStatement = mock(PreparedStatement.class);
+        when(preparedStatement.execute()).thenReturn(true);
+        doNothing().when(preparedStatement).setInt(anyInt(), anyInt());
+        doNothing().when(preparedStatement).setLong(anyInt(), anyLong());
+        doNothing().when(preparedStatement).close();
+        Connection connection = mock(Connection.class);
+        when(connection.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement);
+        GameDAO gameDAO = new GameDAO(connection);
+        PreparedStatement preparedStatement2 = mock(PreparedStatement.class);
+        when(preparedStatement2.execute()).thenReturn(true);
+        doNothing().when(preparedStatement2).setInt(anyInt(), anyInt());
+        doNothing().when(preparedStatement2).setLong(anyInt(), anyLong());
+        doNothing().when(preparedStatement2).close();
+        Connection connection2 = mock(Connection.class);
+        when(connection2.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement2);
+        PlayerDAO playerDAO = new PlayerDAO(connection2);
+
+        GamePlay gamePlay = new GamePlay(game, new Player[]{new Player()});
+        gamePlay.gameEndResolution(gameDAO, playerDAO);
+
+        // Act
+        gamePlay.executeLuigi();
+
+        // Assert
+        verify(connection2, atLeast(1)).prepareStatement(Mockito.<String>any());
+        verify(connection).prepareStatement(eq(
+                "UPDATE game SET cur_round = ?, num_rounds = ?, active_players = ?, buy_in = ?, pot_quantity = ?, difficulty = ?, players_finished = ?, luigi_finished = ? WHERE g_id = ?"));
+        verify(preparedStatement).execute();
+        verify(preparedStatement2, atLeast(1)).execute();
+        verify(preparedStatement, atLeast(1)).setInt(anyInt(), eq(0));
+        verify(preparedStatement2, atLeast(1)).setInt(eq(1), anyInt());
+        verify(preparedStatement2, atLeast(1)).setLong(anyInt(), eq(0L));
+        verify(preparedStatement).setLong(eq(9), eq(0L));
+        verify(preparedStatement).close();
+        verify(preparedStatement2, atLeast(1)).close();
+        Game curGame = gamePlay.getCurGame();
+        assertEquals(1, curGame.getLuigiFinished());
+        Card[] hand = curGame.getHand();
+        assertFalse((hand[0]).getToChange());
+        assertFalse((hand[1]).getToChange());
+        assertFalse((hand[2]).getToChange());
+    }
+
+    /**
+     * Method under test: {@link GamePlay#executeLuigi()}
+     */
+    @Test
+    void testExecuteLuigi6() throws SQLException {
+        // Arrange
+        Game game = new Game();
+        Card card = new Card(Card.Suit.CLOUD);
+        game.setHand(new Card[]{card, new Card()});
+        PreparedStatement preparedStatement = mock(PreparedStatement.class);
+        when(preparedStatement.execute()).thenReturn(true);
+        doNothing().when(preparedStatement).setInt(anyInt(), anyInt());
+        doNothing().when(preparedStatement).setLong(anyInt(), anyLong());
+        doNothing().when(preparedStatement).close();
+        Connection connection = mock(Connection.class);
+        when(connection.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement);
+        GameDAO gameDAO = new GameDAO(connection);
+        PreparedStatement preparedStatement2 = mock(PreparedStatement.class);
+        when(preparedStatement2.execute()).thenReturn(true);
+        doNothing().when(preparedStatement2).setInt(anyInt(), anyInt());
+        doNothing().when(preparedStatement2).setLong(anyInt(), anyLong());
+        doNothing().when(preparedStatement2).close();
+        Connection connection2 = mock(Connection.class);
+        when(connection2.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement2);
+        PlayerDAO playerDAO = new PlayerDAO(connection2);
+
+        GamePlay gamePlay = new GamePlay(game, new Player[]{new Player()});
+        gamePlay.gameEndResolution(gameDAO, playerDAO);
+
+        // Act
+        gamePlay.executeLuigi();
+
+        // Assert
+        verify(connection2, atLeast(1)).prepareStatement(Mockito.<String>any());
+        verify(connection).prepareStatement(eq(
+                "UPDATE game SET cur_round = ?, num_rounds = ?, active_players = ?, buy_in = ?, pot_quantity = ?, difficulty = ?, players_finished = ?, luigi_finished = ? WHERE g_id = ?"));
+        verify(preparedStatement).execute();
+        verify(preparedStatement2, atLeast(1)).execute();
+        verify(preparedStatement, atLeast(1)).setInt(anyInt(), eq(0));
+        verify(preparedStatement2, atLeast(1)).setInt(eq(1), anyInt());
+        verify(preparedStatement2, atLeast(1)).setLong(anyInt(), eq(0L));
+        verify(preparedStatement).setLong(eq(9), eq(0L));
+        verify(preparedStatement).close();
+        verify(preparedStatement2, atLeast(1)).close();
+        Game curGame = gamePlay.getCurGame();
+        assertEquals(1, curGame.getLuigiFinished());
+        Card[] hand = curGame.getHand();
+        assertFalse((hand[0]).getToChange());
+        assertFalse((hand[1]).getToChange());
+    }
+
+    /**
+     * Method under test: {@link GamePlay#executeLuigi()}
+     */
+    @Test
+    void testExecuteLuigi7() throws SQLException {
+        // Arrange
+        Game game = new Game();
+        Card card = new Card();
+        Card card2 = new Card();
+        game.setHand(new Card[]{card, card2, new Card()});
+
+        Player player = new Player();
+        player.setCardsChanged(3);
+        PreparedStatement preparedStatement = mock(PreparedStatement.class);
+        when(preparedStatement.execute()).thenReturn(true);
+        doNothing().when(preparedStatement).setInt(anyInt(), anyInt());
+        doNothing().when(preparedStatement).setLong(anyInt(), anyLong());
+        doNothing().when(preparedStatement).close();
+        Connection connection = mock(Connection.class);
+        when(connection.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement);
+        GameDAO gameDAO = new GameDAO(connection);
+        PreparedStatement preparedStatement2 = mock(PreparedStatement.class);
+        when(preparedStatement2.execute()).thenReturn(true);
+        doNothing().when(preparedStatement2).setInt(anyInt(), anyInt());
+        doNothing().when(preparedStatement2).setLong(anyInt(), anyLong());
+        doNothing().when(preparedStatement2).close();
+        Connection connection2 = mock(Connection.class);
+        when(connection2.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement2);
+        PlayerDAO playerDAO = new PlayerDAO(connection2);
+
+        GamePlay gamePlay = new GamePlay(game, new Player[]{player});
+        gamePlay.gameEndResolution(gameDAO, playerDAO);
+
+        // Act
+        gamePlay.executeLuigi();
+
+        // Assert
+        verify(connection2, atLeast(1)).prepareStatement(Mockito.<String>any());
+        verify(connection).prepareStatement(eq(
+                "UPDATE game SET cur_round = ?, num_rounds = ?, active_players = ?, buy_in = ?, pot_quantity = ?, difficulty = ?, players_finished = ?, luigi_finished = ? WHERE g_id = ?"));
+        verify(preparedStatement).execute();
+        verify(preparedStatement2, atLeast(1)).execute();
+        verify(preparedStatement, atLeast(1)).setInt(anyInt(), eq(0));
+        verify(preparedStatement2, atLeast(1)).setInt(eq(1), anyInt());
+        verify(preparedStatement2, atLeast(1)).setLong(anyInt(), eq(0L));
+        verify(preparedStatement).setLong(eq(9), eq(0L));
+        verify(preparedStatement).close();
+        verify(preparedStatement2, atLeast(1)).close();
+        Game curGame = gamePlay.getCurGame();
+        assertEquals(1, curGame.getLuigiFinished());
+        Card[] hand = curGame.getHand();
+        assertFalse((hand[0]).getToChange());
+        assertFalse((hand[1]).getToChange());
     }
 
     /**
@@ -115,52 +366,24 @@ class GamePlayDiffblueTest {
      * {@link GamePlay#showdownResolution(GameDAO, PlayerDAO, boolean)}
      */
     @Test
-    void testShowdownResolution() throws SQLException {
+    void testShowdownResolution() {
         // Arrange
-        GamePlay gamePlay = new GamePlay(new Game(), new Player[]{});
-        ResultSet resultSet = mock(ResultSet.class);
-        when(resultSet.getInt(Mockito.<String>any())).thenReturn(1);
-        when(resultSet.getLong(Mockito.<String>any())).thenReturn(1L);
-        when(resultSet.next()).thenReturn(true).thenReturn(true).thenReturn(false);
-        PreparedStatement preparedStatement = mock(PreparedStatement.class);
-        when(preparedStatement.execute()).thenReturn(true);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
-        doNothing().when(preparedStatement).setInt(anyInt(), anyInt());
-        doNothing().when(preparedStatement).setLong(anyInt(), anyLong());
-        doNothing().when(preparedStatement).close();
-        Connection connection = mock(Connection.class);
-        when(connection.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement);
-        GameDAO gameDAO = new GameDAO(connection);
-
-        // Act
-        ArrayList<PlayerShowdownInfo> actualShowdownResolutionResult = gamePlay.showdownResolution(gameDAO,
-                new PlayerDAO(mock(Connection.class)), true);
-
-        // Assert
-        verify(connection, atLeast(1)).prepareStatement(Mockito.<String>any());
-        verify(preparedStatement, atLeast(1)).execute();
-        verify(preparedStatement, atLeast(1)).executeQuery();
-        verify(preparedStatement, atLeast(1)).setInt(anyInt(), anyInt());
-        verify(preparedStatement, atLeast(1)).setLong(anyInt(), anyLong());
-        verify(resultSet, atLeast(1)).getInt(Mockito.<String>any());
-        verify(resultSet, atLeast(1)).getLong(Mockito.<String>any());
-        verify(resultSet, atLeast(1)).next();
-        verify(preparedStatement, atLeast(1)).close();
-        assertTrue(actualShowdownResolutionResult.isEmpty());
-    }
-
-    /**
-     * Method under test:
-     * {@link GamePlay#showdownResolution(GameDAO, PlayerDAO, boolean)}
-     */
-    @Test
-    void testShowdownResolution2() {
-        // Arrange
-        GamePlay gamePlay = new GamePlay(new Game(), new Player[]{});
+        Game game = new Game();
+        game.setHand(new Card[]{new Card()});
+        GamePlay gamePlay = new GamePlay(game, new Player[]{});
         GameDAO gameDAO = new GameDAO(mock(Connection.class));
 
-        // Act and Assert
-        assertTrue(gamePlay.showdownResolution(gameDAO, new PlayerDAO(mock(Connection.class)), false).isEmpty());
+        // Act
+        ShowdownInfo actualShowdownResolutionResult = gamePlay.showdownResolution(gameDAO,
+                new PlayerDAO(mock(Connection.class)), false);
+
+        // Assert
+        assertEquals("High Card", actualShowdownResolutionResult.getLuigiHandType());
+        Game curGame = gamePlay.getCurGame();
+        assertEquals(0, curGame.getPlayersFinished());
+        assertEquals(1, curGame.getCurRound());
+        assertFalse((actualShowdownResolutionResult.getLuigiHand()[0]).getToChange());
+        assertTrue(actualShowdownResolutionResult.getPlayerShowdownInfos().isEmpty());
     }
 
     /**
@@ -202,6 +425,7 @@ class GamePlayDiffblueTest {
         verify(preparedStatement).setLong(eq(9), eq(0L));
         verify(preparedStatement).close();
         verify(preparedStatement2, atLeast(1)).close();
+        assertNull(gamePlay.getCurGame().getWinner());
     }
 
     /**
@@ -244,6 +468,7 @@ class GamePlayDiffblueTest {
         verify(preparedStatement).setLong(eq(9), eq(0L));
         verify(preparedStatement).close();
         verify(preparedStatement2, atLeast(1)).close();
+        assertNull(gamePlay.getCurGame().getWinner());
     }
 
     /**
@@ -287,6 +512,7 @@ class GamePlayDiffblueTest {
         verify(preparedStatement).setLong(eq(9), eq(0L));
         verify(preparedStatement).close();
         verify(preparedStatement2, atLeast(1)).close();
+        assertNull(gamePlay.getCurGame().getWinner());
     }
 
     /**
@@ -329,6 +555,7 @@ class GamePlayDiffblueTest {
         verify(preparedStatement).setLong(eq(9), eq(0L));
         verify(preparedStatement).close();
         verify(preparedStatement2, atLeast(1)).close();
+        assertNull(gamePlay.getCurGame().getWinner());
     }
 
     /**
@@ -371,472 +598,90 @@ class GamePlayDiffblueTest {
         verify(preparedStatement).setLong(eq(9), eq(0L));
         verify(preparedStatement).close();
         verify(preparedStatement2, atLeast(1)).close();
+        assertNull(gamePlay.getCurGame().getWinner());
     }
 
     /**
      * Method under test: {@link GamePlay#gameSeq(GameDAO, PlayerDAO)}
      */
     @Test
-    void testGameSeq() throws SQLException {
+    void testGameSeq() {
         // Arrange
-        GamePlay gamePlay = new GamePlay(new Game(), new Player[]{});
-        ResultSet resultSet = mock(ResultSet.class);
-        when(resultSet.getInt(Mockito.<String>any())).thenReturn(1);
-        when(resultSet.getLong(Mockito.<String>any())).thenReturn(1L);
-        when(resultSet.next()).thenReturn(true).thenReturn(true).thenReturn(false);
-        PreparedStatement preparedStatement = mock(PreparedStatement.class);
-        when(preparedStatement.execute()).thenReturn(true);
-        doNothing().when(preparedStatement).setBoolean(anyInt(), anyBoolean());
-        doNothing().when(preparedStatement).setString(anyInt(), Mockito.<String>any());
-        doNothing().when(preparedStatement).setInt(anyInt(), anyInt());
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
-        doNothing().when(preparedStatement).setLong(anyInt(), anyLong());
-        doNothing().when(preparedStatement).close();
-        Connection connection = mock(Connection.class);
-        when(connection.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement);
-        GameDAO gamedao = new GameDAO(connection);
-        ResultSet resultSet2 = mock(ResultSet.class);
-        when(resultSet2.getInt(Mockito.<String>any())).thenReturn(1);
-        when(resultSet2.getLong(Mockito.<String>any())).thenReturn(1L);
-        when(resultSet2.next()).thenReturn(true).thenReturn(true).thenReturn(false);
-        PreparedStatement preparedStatement2 = mock(PreparedStatement.class);
-        doNothing().when(preparedStatement2).setInt(anyInt(), anyInt());
-        when(preparedStatement2.executeQuery()).thenReturn(resultSet2);
-        doNothing().when(preparedStatement2).setLong(anyInt(), anyLong());
-        doNothing().when(preparedStatement2).close();
-        Connection connection2 = mock(Connection.class);
-        when(connection2.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement2);
+        Game game = mock(Game.class);
+        when(game.getID()).thenReturn(1L);
+        GamePlay gamePlay = new GamePlay(game, new Player[]{});
+        Game game2 = mock(Game.class);
+        doThrow(new InputMismatchException("0123456789ABCDEF")).when(game2).setHand(Mockito.<Card[]>any());
+        when(game2.getHand()).thenReturn(new Card[]{new Card()});
+        when(game2.getCurRound()).thenReturn(1);
+        when(game2.getNumRounds()).thenReturn(10);
+        when(game2.getPlayers()).thenReturn(new long[]{1L, -1L, 1L, -1L});
+        doNothing().when(game2).setPlayers(Mockito.<long[]>any());
+        GameDAO gamedao = mock(GameDAO.class);
+        when(gamedao.findById(anyLong())).thenReturn(game2);
+        when(gamedao.getPIDsByGame(Mockito.<Game>any())).thenReturn(new long[]{1L, 2L, 1L, 2L});
 
-        // Act
-        Game actualGameSeqResult = gamePlay.gameSeq(gamedao, new PlayerDAO(connection2));
-
-        // Assert
-        verify(connection, atLeast(1)).prepareStatement(Mockito.<String>any());
-        verify(preparedStatement, atLeast(1)).execute();
-        verify(preparedStatement, atLeast(1)).executeQuery();
-        verify(preparedStatement, atLeast(1)).setBoolean(eq(2), anyBoolean());
-        verify(preparedStatement, atLeast(1)).setInt(anyInt(), anyInt());
-        verify(preparedStatement, atLeast(1)).setLong(anyInt(), anyLong());
-        verify(preparedStatement, atLeast(1)).setString(eq(1), Mockito.<String>any());
-        verify(resultSet, atLeast(1)).getInt(Mockito.<String>any());
-        verify(resultSet, atLeast(1)).getLong(Mockito.<String>any());
-        verify(resultSet, atLeast(1)).next();
-        verify(preparedStatement, atLeast(1)).close();
-        assertEquals(0, actualGameSeqResult.getLuigiFinished());
-        assertEquals(0, actualGameSeqResult.getPlayersFinished());
-        assertEquals(1, actualGameSeqResult.getActivePlayers());
-        assertEquals(1, actualGameSeqResult.getBuyIn());
-        assertEquals(1, actualGameSeqResult.getDifficulty());
-        assertEquals(1, actualGameSeqResult.getNumRounds());
-        assertEquals(1, actualGameSeqResult.getPotQuantity());
-        assertEquals(1L, actualGameSeqResult.getID());
-        assertEquals(2, actualGameSeqResult.getCurRound());
-        assertEquals(5, actualGameSeqResult.getHand().length);
-        assertArrayEquals(new long[]{0L, 0L, 0L, 0L}, actualGameSeqResult.getPlayers());
+        // Act and Assert
+        assertThrows(InputMismatchException.class, () -> gamePlay.gameSeq(gamedao, new PlayerDAO(mock(Connection.class))));
+        verify(game2, atLeast(1)).getCurRound();
+        verify(game2).getHand();
+        verify(game).getID();
+        verify(game2).getNumRounds();
+        verify(game2).getPlayers();
+        verify(game2).setHand(isA(Card[].class));
+        verify(game2).setPlayers(isA(long[].class));
+        verify(gamedao).findById(eq(1L));
+        verify(gamedao).getPIDsByGame(isA(Game.class));
     }
 
     /**
      * Method under test: {@link GamePlay#gameSeq(GameDAO, PlayerDAO)}
      */
     @Test
-    void testGameSeq2() throws SQLException {
+    void testGameSeq2() {
         // Arrange
-        GamePlay gamePlay = new GamePlay(new Game(), new Player[]{});
-        ResultSet resultSet = mock(ResultSet.class);
-        when(resultSet.getInt(Mockito.<String>any())).thenReturn(1);
-        when(resultSet.getLong(Mockito.<String>any())).thenReturn(1L);
-        when(resultSet.next()).thenReturn(true).thenReturn(true).thenReturn(false);
-        PreparedStatement preparedStatement = mock(PreparedStatement.class);
-        when(preparedStatement.execute()).thenReturn(false);
-        doNothing().when(preparedStatement).setBoolean(anyInt(), anyBoolean());
-        doNothing().when(preparedStatement).setString(anyInt(), Mockito.<String>any());
-        doNothing().when(preparedStatement).setInt(anyInt(), anyInt());
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
-        doNothing().when(preparedStatement).setLong(anyInt(), anyLong());
-        doNothing().when(preparedStatement).close();
-        Connection connection = mock(Connection.class);
-        when(connection.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement);
-        GameDAO gamedao = new GameDAO(connection);
-        ResultSet resultSet2 = mock(ResultSet.class);
-        when(resultSet2.getInt(Mockito.<String>any())).thenReturn(1);
-        when(resultSet2.getLong(Mockito.<String>any())).thenReturn(1L);
-        when(resultSet2.next()).thenReturn(true).thenReturn(true).thenReturn(false);
-        PreparedStatement preparedStatement2 = mock(PreparedStatement.class);
-        doNothing().when(preparedStatement2).setInt(anyInt(), anyInt());
-        when(preparedStatement2.executeQuery()).thenReturn(resultSet2);
-        doNothing().when(preparedStatement2).setLong(anyInt(), anyLong());
-        doNothing().when(preparedStatement2).close();
-        Connection connection2 = mock(Connection.class);
-        when(connection2.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement2);
+        Game game = mock(Game.class);
+        when(game.getID()).thenReturn(1L);
+        GamePlay gamePlay = new GamePlay(game, new Player[]{});
+        Game game2 = mock(Game.class);
+        when(game2.getCurRound()).thenReturn(120);
+        when(game2.getNumRounds()).thenReturn(10);
+        when(game2.getPlayers()).thenReturn(new long[]{1L, -1L, 1L, -1L});
+        doNothing().when(game2).setPlayers(Mockito.<long[]>any());
+        GameDAO gamedao = mock(GameDAO.class);
+        when(gamedao.update_all(Mockito.<Game>any())).thenReturn(new Game());
+        when(gamedao.findById(anyLong())).thenReturn(game2);
+        when(gamedao.getPIDsByGame(Mockito.<Game>any())).thenReturn(new long[]{1L, 2L, 1L, 2L});
 
         // Act
-        Game actualGameSeqResult = gamePlay.gameSeq(gamedao, new PlayerDAO(connection2));
+        Game actualGameSeqResult = gamePlay.gameSeq(gamedao, new PlayerDAO(mock(Connection.class)));
 
         // Assert
-        verify(connection, atLeast(1)).prepareStatement(Mockito.<String>any());
-        verify(preparedStatement, atLeast(1)).execute();
-        verify(preparedStatement, atLeast(1)).executeQuery();
-        verify(preparedStatement, atLeast(1)).setBoolean(eq(2), anyBoolean());
-        verify(preparedStatement, atLeast(1)).setInt(anyInt(), anyInt());
-        verify(preparedStatement, atLeast(1)).setLong(anyInt(), anyLong());
-        verify(preparedStatement, atLeast(1)).setString(eq(1), Mockito.<String>any());
-        verify(resultSet, atLeast(1)).getInt(Mockito.<String>any());
-        verify(resultSet, atLeast(1)).getLong(Mockito.<String>any());
-        verify(resultSet, atLeast(1)).next();
-        verify(preparedStatement, atLeast(1)).close();
-        assertEquals(0, actualGameSeqResult.getLuigiFinished());
-        assertEquals(0, actualGameSeqResult.getPlayersFinished());
-        assertEquals(1, actualGameSeqResult.getActivePlayers());
-        assertEquals(1, actualGameSeqResult.getBuyIn());
-        assertEquals(1, actualGameSeqResult.getDifficulty());
-        assertEquals(1, actualGameSeqResult.getNumRounds());
-        assertEquals(1, actualGameSeqResult.getPotQuantity());
-        assertEquals(1L, actualGameSeqResult.getID());
-        assertEquals(2, actualGameSeqResult.getCurRound());
-        assertEquals(5, actualGameSeqResult.getHand().length);
-        assertArrayEquals(new long[]{0L, 0L, 0L, 0L}, actualGameSeqResult.getPlayers());
+        verify(game2, atLeast(1)).getCurRound();
+        verify(game).getID();
+        verify(game2).getNumRounds();
+        verify(game2).getPlayers();
+        verify(game2).setPlayers(isA(long[].class));
+        verify(gamedao).findById(eq(1L));
+        verify(gamedao).getPIDsByGame(isA(Game.class));
+        verify(gamedao).update_all(isA(Game.class));
+        assertSame(actualGameSeqResult, gamePlay.getCurGame());
     }
 
     /**
-     * Method under test: {@link GamePlay#gameSeq(GameDAO, PlayerDAO)}
+     * Methods under test:
+     *
+     * <ul>
+     *   <li>{@link GamePlay#GamePlay(Game, Player[])}
+     *   <li>{@link GamePlay#getCurGame()}
+     * </ul>
      */
     @Test
-    void testGameSeq3() throws SQLException {
-        // Arrange
-        GamePlay gamePlay = new GamePlay(new Game(), new Player[]{});
-        Connection connection = mock(Connection.class);
-        PreparedStatement preparedStatement = mock(PreparedStatement.class);
-        when(preparedStatement.execute()).thenReturn(true);
-        doNothing().when(preparedStatement).setBoolean(anyInt(), anyBoolean());
-        doNothing().when(preparedStatement).setString(anyInt(), Mockito.<String>any());
-        doNothing().when(preparedStatement).setInt(anyInt(), anyInt());
-        ResultSet resultSet = mock(ResultSet.class);
-        when(resultSet.getInt(Mockito.<String>any())).thenReturn(4);
-        when(resultSet.getLong(Mockito.<String>any())).thenReturn(1L);
-        when(resultSet.next()).thenReturn(true).thenReturn(true).thenReturn(false);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
-        doNothing().when(preparedStatement).setLong(anyInt(), anyLong());
-        doNothing().when(preparedStatement).close();
-        when(connection.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement);
-        GameDAO gamedao = new GameDAO(connection);
-        Connection connection2 = mock(Connection.class);
-        PreparedStatement preparedStatement2 = mock(PreparedStatement.class);
-        doNothing().when(preparedStatement2).setInt(anyInt(), anyInt());
-        ResultSet resultSet2 = mock(ResultSet.class);
-        when(resultSet2.getInt(Mockito.<String>any())).thenReturn(1);
-        when(resultSet2.getLong(Mockito.<String>any())).thenReturn(1L);
-        when(resultSet2.next()).thenReturn(true).thenReturn(true).thenReturn(false);
-        when(preparedStatement2.executeQuery()).thenReturn(resultSet2);
-        doNothing().when(preparedStatement2).setLong(anyInt(), anyLong());
-        doNothing().when(preparedStatement2).close();
-        when(connection2.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement2);
-
-        // Act
-        Game actualGameSeqResult = gamePlay.gameSeq(gamedao, new PlayerDAO(connection2));
-
-        // Assert
-        int actualActivePlayers = actualGameSeqResult.getActivePlayers();
-        verify(connection, atLeast(1)).prepareStatement(Mockito.<String>any());
-        verify(preparedStatement, atLeast(1)).execute();
-        verify(preparedStatement, atLeast(1)).executeQuery();
-        verify(preparedStatement, atLeast(1)).setBoolean(eq(2), anyBoolean());
-        verify(preparedStatement, atLeast(1)).setInt(anyInt(), anyInt());
-        verify(preparedStatement, atLeast(1)).setLong(anyInt(), anyLong());
-//        verify(preparedStatement, atLeast(1)).setString(eq(1), eq("LUIGI"));
-        verify(resultSet, atLeast(1)).getInt(Mockito.<String>any());
-        verify(resultSet, atLeast(1)).getLong(Mockito.<String>any());
-        verify(resultSet, atLeast(1)).next();
-        verify(preparedStatement, atLeast(1)).close();
-        assertEquals(0, actualGameSeqResult.getLuigiFinished());
-        assertEquals(0, actualGameSeqResult.getPlayersFinished());
-        assertEquals(1L, actualGameSeqResult.getID());
-        assertEquals(4, actualActivePlayers);
-        assertEquals(4, actualGameSeqResult.getBuyIn());
-        assertEquals(4, actualGameSeqResult.getDifficulty());
-        assertEquals(4, actualGameSeqResult.getNumRounds());
-        assertEquals(4, actualGameSeqResult.getPotQuantity());
-        assertEquals(5, actualGameSeqResult.getCurRound());
-        assertFalse((actualGameSeqResult.getHand()[4]).getToChange());
-        assertArrayEquals(new long[]{0L, 0L, 0L, 0L}, actualGameSeqResult.getPlayers());
-    }
-
-    /**
-     * Method under test: {@link GamePlay#gameSeq(GameDAO, PlayerDAO)}
-     */
-    @Test
-    void testGameSeq4() throws SQLException {
-        // Arrange
-        GamePlay gamePlay = new GamePlay(new Game(), new Player[]{});
-        ResultSet resultSet = mock(ResultSet.class);
-        when(resultSet.getInt(Mockito.<String>any())).thenReturn(5);
-        when(resultSet.getLong(Mockito.<String>any())).thenReturn(1L);
-        when(resultSet.next()).thenReturn(true).thenReturn(true).thenReturn(false);
-        PreparedStatement preparedStatement = mock(PreparedStatement.class);
-        when(preparedStatement.execute()).thenReturn(true);
-        doNothing().when(preparedStatement).setBoolean(anyInt(), anyBoolean());
-        doNothing().when(preparedStatement).setString(anyInt(), Mockito.<String>any());
-        doNothing().when(preparedStatement).setInt(anyInt(), anyInt());
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
-        doNothing().when(preparedStatement).setLong(anyInt(), anyLong());
-        doNothing().when(preparedStatement).close();
-        Connection connection = mock(Connection.class);
-        when(connection.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement);
-        GameDAO gamedao = new GameDAO(connection);
-        ResultSet resultSet2 = mock(ResultSet.class);
-        when(resultSet2.getInt(Mockito.<String>any())).thenReturn(1);
-        when(resultSet2.getLong(Mockito.<String>any())).thenReturn(1L);
-        when(resultSet2.next()).thenReturn(true).thenReturn(true).thenReturn(false);
-        PreparedStatement preparedStatement2 = mock(PreparedStatement.class);
-        doNothing().when(preparedStatement2).setInt(anyInt(), anyInt());
-        when(preparedStatement2.executeQuery()).thenReturn(resultSet2);
-        doNothing().when(preparedStatement2).setLong(anyInt(), anyLong());
-        doNothing().when(preparedStatement2).close();
-        Connection connection2 = mock(Connection.class);
-        when(connection2.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement2);
-
-        // Act
-        Game actualGameSeqResult = gamePlay.gameSeq(gamedao, new PlayerDAO(connection2));
-
-        // Assert
-        verify(connection, atLeast(1)).prepareStatement(Mockito.<String>any());
-        verify(preparedStatement, atLeast(1)).execute();
-        verify(preparedStatement, atLeast(1)).executeQuery();
-        verify(preparedStatement, atLeast(1)).setBoolean(eq(2), anyBoolean());
-        verify(preparedStatement, atLeast(1)).setInt(anyInt(), anyInt());
-        verify(preparedStatement, atLeast(1)).setLong(anyInt(), anyLong());
-        verify(preparedStatement, atLeast(1)).setString(eq(1), Mockito.<String>any());
-        verify(resultSet, atLeast(1)).getInt(Mockito.<String>any());
-        verify(resultSet, atLeast(1)).getLong(Mockito.<String>any());
-        verify(resultSet, atLeast(1)).next();
-        verify(preparedStatement, atLeast(1)).close();
-        assertEquals(0, actualGameSeqResult.getLuigiFinished());
-        assertEquals(0, actualGameSeqResult.getPlayersFinished());
-        assertEquals(1L, actualGameSeqResult.getID());
-        assertEquals(5, actualGameSeqResult.getActivePlayers());
-        assertEquals(5, actualGameSeqResult.getBuyIn());
-        assertEquals(5, actualGameSeqResult.getDifficulty());
-        assertEquals(5, actualGameSeqResult.getNumRounds());
-        assertEquals(5, actualGameSeqResult.getPotQuantity());
-        assertEquals(5, actualGameSeqResult.getHand().length);
-        assertEquals(6, actualGameSeqResult.getCurRound());
-        assertArrayEquals(new long[]{0L, 0L, 0L, 0L}, actualGameSeqResult.getPlayers());
-    }
-
-    /**
-     * Method under test: {@link GamePlay#gameSeq(GameDAO, PlayerDAO)}
-     */
-    @Test
-    void testGameSeq5() throws SQLException {
-        // Arrange
-        GamePlay gamePlay = new GamePlay(new Game(), new Player[]{});
-        ResultSet resultSet = mock(ResultSet.class);
-        when(resultSet.getInt(Mockito.<String>any())).thenReturn(1);
-        when(resultSet.getLong(Mockito.<String>any())).thenReturn(5L);
-        when(resultSet.next()).thenReturn(true).thenReturn(true).thenReturn(false);
-        PreparedStatement preparedStatement = mock(PreparedStatement.class);
-        when(preparedStatement.execute()).thenReturn(true);
-        doNothing().when(preparedStatement).setBoolean(anyInt(), anyBoolean());
-        doNothing().when(preparedStatement).setString(anyInt(), Mockito.<String>any());
-        doNothing().when(preparedStatement).setInt(anyInt(), anyInt());
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
-        doNothing().when(preparedStatement).setLong(anyInt(), anyLong());
-        doNothing().when(preparedStatement).close();
-        Connection connection = mock(Connection.class);
-        when(connection.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement);
-        GameDAO gamedao = new GameDAO(connection);
-        ResultSet resultSet2 = mock(ResultSet.class);
-        when(resultSet2.getInt(Mockito.<String>any())).thenReturn(1);
-        when(resultSet2.getLong(Mockito.<String>any())).thenReturn(1L);
-        when(resultSet2.next()).thenReturn(true).thenReturn(true).thenReturn(false);
-        PreparedStatement preparedStatement2 = mock(PreparedStatement.class);
-        doNothing().when(preparedStatement2).setInt(anyInt(), anyInt());
-        when(preparedStatement2.executeQuery()).thenReturn(resultSet2);
-        doNothing().when(preparedStatement2).setLong(anyInt(), anyLong());
-        doNothing().when(preparedStatement2).close();
-        Connection connection2 = mock(Connection.class);
-        when(connection2.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement2);
-
-        // Act
-        Game actualGameSeqResult = gamePlay.gameSeq(gamedao, new PlayerDAO(connection2));
-
-        // Assert
-        verify(connection, atLeast(1)).prepareStatement(Mockito.<String>any());
-        verify(preparedStatement, atLeast(1)).execute();
-        verify(preparedStatement, atLeast(1)).executeQuery();
-        verify(preparedStatement, atLeast(1)).setBoolean(eq(2), anyBoolean());
-        verify(preparedStatement, atLeast(1)).setInt(anyInt(), anyInt());
-        verify(preparedStatement, atLeast(1)).setLong(anyInt(), anyLong());
-        verify(preparedStatement, atLeast(1)).setString(eq(1), Mockito.<String>any());
-        verify(resultSet, atLeast(1)).getInt(Mockito.<String>any());
-        verify(resultSet, atLeast(1)).getLong(Mockito.<String>any());
-        verify(resultSet, atLeast(1)).next();
-        verify(preparedStatement, atLeast(1)).close();
-        assertEquals(0, actualGameSeqResult.getLuigiFinished());
-        assertEquals(0, actualGameSeqResult.getPlayersFinished());
-        assertEquals(1, actualGameSeqResult.getActivePlayers());
-        assertEquals(1, actualGameSeqResult.getBuyIn());
-        assertEquals(1, actualGameSeqResult.getDifficulty());
-        assertEquals(1, actualGameSeqResult.getNumRounds());
-        assertEquals(1, actualGameSeqResult.getPotQuantity());
-        assertEquals(2, actualGameSeqResult.getCurRound());
-        assertEquals(5, actualGameSeqResult.getHand().length);
-        assertEquals(5L, actualGameSeqResult.getID());
-        assertArrayEquals(new long[]{0L, 0L, 0L, 0L}, actualGameSeqResult.getPlayers());
-    }
-
-    /**
-     * Method under test: {@link GamePlay#gameSeq(GameDAO, PlayerDAO)}
-     */
-    @Test
-    void testGameSeq6() throws SQLException {
-        // Arrange
-        GamePlay gamePlay = new GamePlay(new Game(), new Player[]{});
-        ResultSet resultSet = mock(ResultSet.class);
-        when(resultSet.getInt(Mockito.<String>any())).thenReturn(1);
-        when(resultSet.getLong(Mockito.<String>any())).thenReturn(3L);
-        when(resultSet.next()).thenReturn(true).thenReturn(true).thenReturn(false);
-        PreparedStatement preparedStatement = mock(PreparedStatement.class);
-        when(preparedStatement.execute()).thenReturn(true);
-        doNothing().when(preparedStatement).setBoolean(anyInt(), anyBoolean());
-        doNothing().when(preparedStatement).setString(anyInt(), Mockito.<String>any());
-        doNothing().when(preparedStatement).setInt(anyInt(), anyInt());
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
-        doNothing().when(preparedStatement).setLong(anyInt(), anyLong());
-        doNothing().when(preparedStatement).close();
-        Connection connection = mock(Connection.class);
-        when(connection.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement);
-        GameDAO gamedao = new GameDAO(connection);
-        ResultSet resultSet2 = mock(ResultSet.class);
-        when(resultSet2.getInt(Mockito.<String>any())).thenReturn(1);
-        when(resultSet2.getLong(Mockito.<String>any())).thenReturn(1L);
-        when(resultSet2.next()).thenReturn(true).thenReturn(true).thenReturn(false);
-        PreparedStatement preparedStatement2 = mock(PreparedStatement.class);
-        doNothing().when(preparedStatement2).setInt(anyInt(), anyInt());
-        when(preparedStatement2.executeQuery()).thenReturn(resultSet2);
-        doNothing().when(preparedStatement2).setLong(anyInt(), anyLong());
-        doNothing().when(preparedStatement2).close();
-        Connection connection2 = mock(Connection.class);
-        when(connection2.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement2);
-
-        // Act
-        Game actualGameSeqResult = gamePlay.gameSeq(gamedao, new PlayerDAO(connection2));
-
-        // Assert
-        verify(connection, atLeast(1)).prepareStatement(Mockito.<String>any());
-        verify(preparedStatement, atLeast(1)).execute();
-        verify(preparedStatement, atLeast(1)).executeQuery();
-        verify(preparedStatement, atLeast(1)).setBoolean(eq(2), anyBoolean());
-        verify(preparedStatement, atLeast(1)).setInt(anyInt(), anyInt());
-        verify(preparedStatement, atLeast(1)).setLong(anyInt(), anyLong());
-        verify(preparedStatement, atLeast(1)).setString(eq(1), Mockito.<String>any());
-        verify(resultSet, atLeast(1)).getInt(Mockito.<String>any());
-        verify(resultSet, atLeast(1)).getLong(Mockito.<String>any());
-        verify(resultSet, atLeast(1)).next();
-        verify(preparedStatement, atLeast(1)).close();
-        assertEquals(0, actualGameSeqResult.getLuigiFinished());
-        assertEquals(0, actualGameSeqResult.getPlayersFinished());
-        assertEquals(1, actualGameSeqResult.getActivePlayers());
-        assertEquals(1, actualGameSeqResult.getBuyIn());
-        assertEquals(1, actualGameSeqResult.getDifficulty());
-        assertEquals(1, actualGameSeqResult.getNumRounds());
-        assertEquals(1, actualGameSeqResult.getPotQuantity());
-        assertEquals(2, actualGameSeqResult.getCurRound());
-        assertEquals(3L, actualGameSeqResult.getID());
-        assertEquals(5, actualGameSeqResult.getHand().length);
-        assertArrayEquals(new long[]{0L, 0L, 0L, 0L}, actualGameSeqResult.getPlayers());
-    }
-
-    /**
-     * Method under test: {@link GamePlay#gameSeq(GameDAO, PlayerDAO)}
-     */
-    @Test
-    void testGameSeq7() throws SQLException {
-        // Arrange
-        GamePlay gamePlay = new GamePlay(new Game(), new Player[]{});
-        ResultSet resultSet = mock(ResultSet.class);
-        when(resultSet.getInt(Mockito.<String>any())).thenReturn(1);
-        when(resultSet.getLong(Mockito.<String>any())).thenReturn(1L);
-        when(resultSet.next()).thenReturn(true).thenReturn(true).thenReturn(false);
-        PreparedStatement preparedStatement = mock(PreparedStatement.class);
-        when(preparedStatement.execute()).thenReturn(true);
-        doNothing().when(preparedStatement).setBoolean(anyInt(), anyBoolean());
-        doNothing().when(preparedStatement).setString(anyInt(), Mockito.<String>any());
-        doNothing().when(preparedStatement).setInt(anyInt(), anyInt());
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
-        doNothing().when(preparedStatement).setLong(anyInt(), anyLong());
-        doNothing().when(preparedStatement).close();
-        Connection connection = mock(Connection.class);
-        when(connection.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement);
-        GameDAO gamedao = new GameDAO(connection);
-        ResultSet resultSet2 = mock(ResultSet.class);
-        when(resultSet2.getInt(Mockito.<String>any())).thenReturn(2);
-        when(resultSet2.getLong(Mockito.<String>any())).thenReturn(1L);
-        when(resultSet2.next()).thenReturn(true).thenReturn(true).thenReturn(false);
-        PreparedStatement preparedStatement2 = mock(PreparedStatement.class);
-        doNothing().when(preparedStatement2).setInt(anyInt(), anyInt());
-        when(preparedStatement2.executeQuery()).thenReturn(resultSet2);
-        doNothing().when(preparedStatement2).setLong(anyInt(), anyLong());
-        doNothing().when(preparedStatement2).close();
-        Connection connection2 = mock(Connection.class);
-        when(connection2.prepareStatement(Mockito.<String>any())).thenReturn(preparedStatement2);
-
-        // Act
-        Game actualGameSeqResult = gamePlay.gameSeq(gamedao, new PlayerDAO(connection2));
-
-        // Assert
-        verify(connection, atLeast(1)).prepareStatement(Mockito.<String>any());
-        verify(preparedStatement, atLeast(1)).execute();
-        verify(preparedStatement, atLeast(1)).executeQuery();
-        verify(preparedStatement, atLeast(1)).setBoolean(eq(2), anyBoolean());
-        verify(preparedStatement, atLeast(1)).setInt(anyInt(), anyInt());
-        verify(preparedStatement, atLeast(1)).setLong(anyInt(), anyLong());
-        verify(preparedStatement, atLeast(1)).setString(eq(1), Mockito.<String>any());
-        verify(resultSet, atLeast(1)).getInt(Mockito.<String>any());
-        verify(resultSet, atLeast(1)).getLong(Mockito.<String>any());
-        verify(resultSet, atLeast(1)).next();
-        verify(preparedStatement, atLeast(1)).close();
-        assertEquals(0, actualGameSeqResult.getLuigiFinished());
-        assertEquals(0, actualGameSeqResult.getPlayersFinished());
-        assertEquals(1, actualGameSeqResult.getActivePlayers());
-        assertEquals(1, actualGameSeqResult.getBuyIn());
-        assertEquals(1, actualGameSeqResult.getDifficulty());
-        assertEquals(1, actualGameSeqResult.getNumRounds());
-        assertEquals(1, actualGameSeqResult.getPotQuantity());
-        assertEquals(1L, actualGameSeqResult.getID());
-        assertEquals(2, actualGameSeqResult.getCurRound());
-        assertEquals(5, actualGameSeqResult.getHand().length);
-        assertArrayEquals(new long[]{0L, 0L, 0L, 0L}, actualGameSeqResult.getPlayers());
-    }
-
-    /**
-     * Method under test: {@link GamePlay#GamePlay(Game, Player[])}
-     */
-    @Test
-    void testNewGamePlay() {
-        // TODO: Diffblue Cover was only able to create a partial test for this method:
-        //   Reason: Missing observers.
-        //   Diffblue Cover was unable to create an assertion.
-        //   Add getters for the following fields or make them package-private:
-        //     GamePlay.curGame
-        //     GamePlay.playerList
-
+    void testGettersAndSetters() {
         // Arrange
         Game game = new Game();
-        game.setActivePlayers(1);
-        game.setBuyIn(1);
-        game.setCurRound(1);
-        game.setDifficulty(1);
-        game.setHand(new Card[]{new Card()});
-        game.setID(1L);
-        game.setLuigiFinished(1);
-        game.setNumRounds(10);
-        game.setPlayers(new long[]{1L, -1L, 1L, -1L});
-        game.setPlayersFinished(1);
-        game.setPotQuantity(1);
-        game.setWinner("Winner");
 
-        // Act
-        new GamePlay(game, new Player[]{new Player()});
-
+        // Act and Assert
+        assertSame(game, (new GamePlay(game, new Player[]{new Player()})).getCurGame());
     }
 }

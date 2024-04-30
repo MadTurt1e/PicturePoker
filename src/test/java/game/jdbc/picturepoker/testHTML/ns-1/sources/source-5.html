@@ -41,18 +41,18 @@ Current scope:     <a href="../../index.html">all classes</a>
   <td class="name">GamePlay</td>
 <td class="coverageStat">
   <span class="percent">
-    72.7%
+    83.3%
   </span>
   <span class="absValue">
-    (8/11)
+    (10/12)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    50.7%
+    44.9%
   </span>
   <span class="absValue">
-    (153/302)
+    (141/314)
   </span>
 </td>
 </tr>
@@ -98,18 +98,18 @@ Current scope:     <a href="../../index.html">all classes</a>
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    81.2%
+    88.2%
   </span>
   <span class="absValue">
-    (13/16)
+    (15/17)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    52.5%
+    46.9%
   </span>
   <span class="absValue">
-    (165/314)
+    (153/326)
   </span>
 </td>
 </tr>
@@ -151,6 +151,10 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="fc">&nbsp;        this.playerList = playerList;</b>
 &nbsp;    }
 &nbsp;
+&nbsp;    public Game getCurGame() {
+<b class="fc">&nbsp;        return curGame;</b>
+&nbsp;    }
+&nbsp;
 &nbsp;    private Player executeRoundFromTerminal(Player player, GameDAO gameDAO, PlayerDAO playerDAO) {
 <b class="nc">&nbsp;        System.out.println(&quot;\n&quot; + player.getPlayerName() + &quot;&#39;s Turn! &quot;);</b>
 <b class="nc">&nbsp;        System.out.println(player.getPlayerName() + &quot; has &quot; + player.getTokens() + &quot; tokens!&quot;);</b>
@@ -181,7 +185,6 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;        // Step 2: Take bets
 &nbsp;        // I noticed there is a raise function just now. This will be useful for a GUI feature where you can spam a button.
 &nbsp;        // Terminal inputs make it so that spamming a button is a bit hard, though.
-&nbsp;        // TODO: when we have GUI set up and everything.
 <b class="nc">&nbsp;        System.out.println(&quot;How much do you want to bet? &quot;);</b>
 <b class="nc">&nbsp;        Scanner scan = new Scanner(System.in);</b>
 <b class="nc">&nbsp;        int betCount = 0;</b>
@@ -246,24 +249,17 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;
 &nbsp;    public void executeLuigi() {
 &nbsp;        // Luigi is an external game force.
-<b class="fc">&nbsp;        Card[] luigiHand = new Card[5];</b>
-&nbsp;        //initialize values
-<b class="fc">&nbsp;        for (int i = 0; i &lt; luigiHand.length; ++i) {</b>
-<b class="fc">&nbsp;            luigiHand[i] = new Card();</b>
-&nbsp;        }
-&nbsp;        //updates the game with luigi&#39;s hand
-<b class="fc">&nbsp;        curGame.setHand(luigiHand);</b>
-&nbsp;
+<b class="fc">&nbsp;        Card[] luigiHand = curGame.getHand();</b>
 &nbsp;
 &nbsp;        // step 1: Get cards at random
-&nbsp;        // This is already done by the card class.
+&nbsp;        // This is already done by the card class, and hand is reset beforehand.
 <b class="fc">&nbsp;        System.out.println(&quot;Luigi Turn! &quot;);</b>
 <b class="fc">&nbsp;        for (int i = 0; i &lt; luigiHand.length; ++i) {</b>
 <b class="fc">&nbsp;            System.out.println(&quot;Card &quot; + i + &quot;: &quot; + luigiHand[i]);</b>
 &nbsp;        }
 &nbsp;        // Step 2: Calculate current score and change out cards if needed
 <b class="fc">&nbsp;        int luigiScore = playerScore(luigiHand);</b>
-<b class="fc">&nbsp;        if (luigiScore &gt; 1000000) {</b>
+<b class="fc">&nbsp;        if (luigiScore &gt;= 10000000) {</b>
 <b class="nc">&nbsp;            System.out.println(&quot;Luigi is happy with his hand! &quot;);</b>
 &nbsp;            return;
 &nbsp;        } else {
@@ -277,7 +273,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="fc">&nbsp;        for (int i = 0; i &lt; luigiHand.length; ++i) {</b>
 <b class="fc">&nbsp;            if (luigiHand[i].getToChange()) {</b>
 <b class="fc">&nbsp;                System.out.println(&quot;Luigi is changing out card &quot; + i + &quot;!&quot;);</b>
-<b class="fc">&nbsp;                luigiHand[i].setSuit(Card.Suit.values()[(int) (Math.random() * 6)]);</b>
+<b class="fc">&nbsp;                luigiHand[i].redrawSuit();</b>
 &nbsp;            }
 &nbsp;        }
 &nbsp;
@@ -287,6 +283,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="fc">&nbsp;            System.out.println(&quot;Card &quot; + i + &quot;: &quot; + luigiHand[i]);</b>
 &nbsp;        }
 &nbsp;
+<b class="fc">&nbsp;        curGame.setLuigiFinished(1);</b>
 &nbsp;        //no return needed.
 &nbsp;    }
 &nbsp;
@@ -319,24 +316,24 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;
 <b class="fc">&nbsp;        for (int i = 0; i &lt; suitCount.length; ++i) {</b>
 <b class="fc">&nbsp;            if (suitCount[i] == 3) {</b>
-<b class="fc">&nbsp;                threeOfAKind = true;</b>
-<b class="fc">&nbsp;                suitOfThree = i;</b>
+<b class="nc">&nbsp;                threeOfAKind = true;</b>
+<b class="nc">&nbsp;                suitOfThree = i;</b>
 &nbsp;            }
 &nbsp;        }
 &nbsp;
 <b class="fc">&nbsp;        if (threeOfAKind) {</b>
-<b class="fc">&nbsp;            for (int i = 0; i &lt; hand.length; ++i) {</b>
+<b class="nc">&nbsp;            for (int i = 0; i &lt; hand.length; ++i) {</b>
 &nbsp;                // Finds both cards that are not part of three of a kind, if they are a pair
 &nbsp;                // then dont change, else change the one with the lowest value according to
 &nbsp;                // ordinal
-<b class="fc">&nbsp;                if (!alreadyChosen[i] &amp;&amp; hand[i].getSuit().ordinal() != suitOfThree) {</b>
-<b class="fc">&nbsp;                    for (int j = i + 1; j &lt; hand.length; ++j) {</b>
-<b class="fc">&nbsp;                        if (!alreadyChosen[j] &amp;&amp; hand[j].getSuit().ordinal() != suitOfThree) {</b>
-<b class="fc">&nbsp;                            if (hand[i].getSuit().ordinal() != hand[j].getSuit().ordinal()) {</b>
+<b class="nc">&nbsp;                if (!alreadyChosen[i] &amp;&amp; hand[i].getSuit().ordinal() != suitOfThree) {</b>
+<b class="nc">&nbsp;                    for (int j = i + 1; j &lt; hand.length; ++j) {</b>
+<b class="nc">&nbsp;                        if (!alreadyChosen[j] &amp;&amp; hand[j].getSuit().ordinal() != suitOfThree) {</b>
+<b class="nc">&nbsp;                            if (hand[i].getSuit().ordinal() != hand[j].getSuit().ordinal()) {</b>
 &nbsp;                                // returns the index of whichever card has a lower suit
-<b class="fc">&nbsp;                                return (hand[i].getSuit().ordinal() &lt; hand[j].getSuit().ordinal()) ? i : j;</b>
+<b class="nc">&nbsp;                                return (hand[i].getSuit().ordinal() &lt; hand[j].getSuit().ordinal()) ? i : j;</b>
 &nbsp;                            } else {
-<b class="fc">&nbsp;                                return -1; // no change needed</b>
+<b class="nc">&nbsp;                                return -1; // no change needed</b>
 &nbsp;                            }
 &nbsp;                        }
 &nbsp;                    }
@@ -351,8 +348,8 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="fc">&nbsp;            if (!alreadyChosen[i]) {</b>
 <b class="fc">&nbsp;                for (int j = i + 1; j &lt; hand.length; j++) {</b>
 <b class="fc">&nbsp;                    if (!alreadyChosen[j] &amp;&amp; hand[i].getSuit().ordinal() == hand[j].getSuit().ordinal()) {</b>
-<b class="fc">&nbsp;                        isPair[i] = true;</b>
-<b class="fc">&nbsp;                        isPair[j] = true;</b>
+<b class="nc">&nbsp;                        isPair[i] = true;</b>
+<b class="nc">&nbsp;                        isPair[j] = true;</b>
 &nbsp;                    }
 &nbsp;                }
 &nbsp;            }
@@ -442,14 +439,14 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="nc">&nbsp;                score += (i + 1) * 1000000;</b>
 &nbsp;            }
 <b class="fc">&nbsp;            if (suitCount[i] == 3) {</b>
-<b class="fc">&nbsp;                score += (i + 1) * 100000; // pairs start mattering from here</b>
+<b class="nc">&nbsp;                score += (i + 1) * 100000; // pairs start mattering from here</b>
 &nbsp;            }
 <b class="fc">&nbsp;            if (suitCount[i] == 2) {</b>
-<b class="fc">&nbsp;                if (!pairFound) {</b>
-<b class="fc">&nbsp;                    score += (i + 1) * 10000; //Double pair is 11000, single triple becomes 100000, and full house is 110000.</b>
-<b class="fc">&nbsp;                    pairFound = true;</b>
+<b class="nc">&nbsp;                if (!pairFound) {</b>
+<b class="nc">&nbsp;                    score += (i + 1) * 10000; //Double pair is 11000, single triple becomes 100000, and full house is 110000.</b>
+<b class="nc">&nbsp;                    pairFound = true;</b>
 &nbsp;                } else {
-<b class="fc">&nbsp;                    score += (i + 1) * 1000; // There should only ever be up to two pairs at once.</b>
+<b class="nc">&nbsp;                    score += (i + 1) * 1000; // There should only ever be up to two pairs at once.</b>
 &nbsp;                }
 &nbsp;
 &nbsp;            }
@@ -473,20 +470,20 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;
 &nbsp;    // This function converts a calculated score to a hand name.
 &nbsp;    private PokerHand scoreToHand(int playerScore){
-<b class="nc">&nbsp;        if (playerScore &gt;= 10000000) {</b>
+<b class="fc">&nbsp;        if (playerScore &gt;= 10000000) {</b>
 <b class="nc">&nbsp;            return PokerHand.FLUSH;</b>
 &nbsp;        }
-<b class="nc">&nbsp;        if (playerScore &gt;= 1000000) {</b>
+<b class="fc">&nbsp;        if (playerScore &gt;= 1000000) {</b>
 <b class="nc">&nbsp;            return PokerHand.FOUR_OF_A_KIND;</b>
 &nbsp;        }
-<b class="nc">&nbsp;        if (playerScore &gt;= 100000) {</b>
+<b class="fc">&nbsp;        if (playerScore &gt;= 100000) {</b>
 &nbsp;            // If 10^4 digit is nonzero the two remaining cards are a pair, otherwise kickers
 <b class="nc">&nbsp;            if((playerScore % 100000) / 10000 &gt; 0){</b>
 <b class="nc">&nbsp;                return PokerHand.FULL_HOUSE;</b>
 &nbsp;            }
 <b class="nc">&nbsp;            return PokerHand.THREE_OF_A_KIND;</b>
 &nbsp;        }
-<b class="nc">&nbsp;        if (playerScore &gt;= 10000) {</b>
+<b class="fc">&nbsp;        if (playerScore &gt;= 10000) {</b>
 &nbsp;            // If 10^3 digit is nonzero there is a second pair, otherwise three kickers
 <b class="nc">&nbsp;            if((playerScore % 10000) / 1000 &gt; 0){</b>
 <b class="nc">&nbsp;                return PokerHand.TWO_PAIR;</b>
@@ -494,7 +491,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="nc">&nbsp;            return PokerHand.ONE_PAIR;</b>
 &nbsp;        }
 &nbsp;        else {
-<b class="nc">&nbsp;            return PokerHand.HIGH_CARD;</b>
+<b class="fc">&nbsp;            return PokerHand.HIGH_CARD;</b>
 &nbsp;        }
 &nbsp;    }
 &nbsp;
@@ -556,7 +553,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;    }
 &nbsp;
 &nbsp;    // If commitResults is false, the results of the showdown will not be recorded in the database
-&nbsp;    public ArrayList&lt;PlayerShowdownInfo&gt; showdownResolution(GameDAO gameDAO, PlayerDAO playerDAO, boolean commitResults){
+&nbsp;    public ShowdownInfo showdownResolution(GameDAO gameDAO, PlayerDAO playerDAO, boolean commitResults){
 <b class="fc">&nbsp;        System.out.println(&quot;Showdown time!&quot;);</b>
 &nbsp;
 &nbsp;        // We want to track the players that ran out of tokens so we can just skip their turns
@@ -564,11 +561,20 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;
 &nbsp;        // Begin tracking players&#39; end of round information
 &nbsp;
+<b class="fc">&nbsp;        ShowdownInfo sdInfo = new ShowdownInfo();</b>
+<b class="fc">&nbsp;        sdInfo.setLuigiHand(curGame.getHand());</b>
+<b class="fc">&nbsp;        sdInfo.setLuigiHandType(scoreToHand(playerScore(curGame.getHand())).getHandName());</b>
 <b class="fc">&nbsp;        ArrayList&lt;PlayerShowdownInfo&gt; pSDList = new ArrayList&lt;PlayerShowdownInfo&gt;();</b>
 &nbsp;
 &nbsp;        //Now we run a function which pays out tokens compared to Luigi
 <b class="fc">&nbsp;        for (Player player : playerList) {</b>
 <b class="nc">&nbsp;            PlayerShowdownInfo pSD = new PlayerShowdownInfo(player);</b>
+&nbsp;            // Need to create a deep copy of hand so that resetting cards does not affect returned info
+<b class="nc">&nbsp;            Card[] dupHand = new Card[5];</b>
+<b class="nc">&nbsp;            for(int i = 0; i &lt; 5; i++){</b>
+<b class="nc">&nbsp;                dupHand[i] = new Card(player.getHand()[i].getSuit());</b>
+&nbsp;            }
+<b class="nc">&nbsp;            pSD.setHand(dupHand);</b>
 <b class="nc">&nbsp;            int coinsWon = determinePayout(player);</b>
 <b class="nc">&nbsp;            if(coinsWon &gt; 0){</b>
 <b class="nc">&nbsp;                System.out.println(player.getPlayerName() + &quot; won &quot; + coinsWon + &quot; tokens!&quot;);</b>
@@ -588,21 +594,23 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;
 <b class="nc">&nbsp;            System.out.println(player.getPlayerName() + &quot; now has &quot; + player.getTokens() + &quot; tokens. &quot;);</b>
 <b class="nc">&nbsp;            pSD.setNewTokens(player.getTokens());</b>
+<b class="nc">&nbsp;            pSD.setRoundsWon(player.getRoundsWon());</b>
 <b class="nc">&nbsp;            if(commitResults) {</b>
 <b class="nc">&nbsp;                playerDAO.update_long(&quot;tokens&quot;, player.getTokens(), player);</b>
 <b class="nc">&nbsp;                playerDAO.update_int(&quot;rounds_won&quot;, player.getRoundsWon(), player);</b>
 &nbsp;            }
 &nbsp;
 &nbsp;            //a new bit to reset the player&#39;s hand at the end of each round
-<b class="nc">&nbsp;            player.resetHand();</b>
-<b class="nc">&nbsp;            if(commitResults)</b>
+<b class="nc">&nbsp;            if(commitResults) {</b>
+<b class="nc">&nbsp;                player.resetHand();</b>
 <b class="nc">&nbsp;                playerDAO.updateHand(player);</b>
+&nbsp;            }
 &nbsp;
 &nbsp;            // Handle bankruptcy logic here
 <b class="nc">&nbsp;            playersBankrupted += (player.getTokens() &gt; 0 ? 0 : 1);</b>
 <b class="nc">&nbsp;            player.setFinishedRound(player.getTokens() &gt; 0 ? 0 : 1);</b>
 <b class="nc">&nbsp;            player.setBet(player.getTokens() &gt; 0 ? 1 : 0);</b>
-<b class="nc">&nbsp;            player.setTokens(player.getTokens() &gt; 0 ? player.getTokens() - 1: 0);</b>
+<b class="nc">&nbsp;            player.setTokens(player.getTokens() &gt; 0 ? player.getTokens() - 1 : 0);</b>
 <b class="nc">&nbsp;            if (commitResults) {</b>
 <b class="nc">&nbsp;                playerDAO.update_int(&quot;finished_round&quot;, player.getFinishedRound(), player);</b>
 <b class="nc">&nbsp;                playerDAO.update_int(&quot;bet&quot;, player.getBet(), player);</b>
@@ -617,11 +625,15 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="fc">&nbsp;        curGame.setPlayersFinished(playersBankrupted);</b>
 &nbsp;        //update the game at this point to the database, and reenable Luigi to act.
 <b class="fc">&nbsp;        if(commitResults) {</b>
-<b class="fc">&nbsp;            curGame.setLuigiFinished(0);</b>
-<b class="fc">&nbsp;            gameDAO.update_int(&quot;luigi_finished&quot;, 0, curGame);</b>
-<b class="fc">&nbsp;            gameDAO.update_all(curGame);</b>
+<b class="nc">&nbsp;            curGame.setLuigiFinished(0);</b>
+<b class="nc">&nbsp;            gameDAO.update_int(&quot;luigi_finished&quot;, 0, curGame);</b>
+<b class="nc">&nbsp;            gameDAO.update_all(curGame);</b>
+<b class="nc">&nbsp;            curGame.resetHand();</b>
+<b class="nc">&nbsp;            gameDAO.updateHand(curGame);</b>
 &nbsp;        }
-<b class="fc">&nbsp;        return pSDList;</b>
+<b class="fc">&nbsp;        Collections.sort(pSDList);</b>
+<b class="fc">&nbsp;        sdInfo.setPlayerShowdownInfos(pSDList);</b>
+<b class="fc">&nbsp;        return sdInfo;</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    public void gameEndResolution(GameDAO gameDAO, PlayerDAO playerDAO){
@@ -719,10 +731,11 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="nc">&nbsp;            }</b>
 &nbsp;            // this is where we&#39;d execute Luigi&#39;s turn.
 <b class="fc">&nbsp;            executeLuigi();</b>
-<b class="fc">&nbsp;            gamedao.updateHand(curGame);</b>
+<b class="nc">&nbsp;            gamedao.updateHand(curGame);</b>
+<b class="nc">&nbsp;            gamedao.update_int(&quot;luigi_finished&quot;, 1, curGame);</b>
 &nbsp;
 &nbsp;            // Runs Luigi logic then pays out to players
-<b class="fc">&nbsp;            showdownResolution(gamedao, playerdao, true);</b>
+<b class="nc">&nbsp;            showdownResolution(gamedao, playerdao, true);</b>
 &nbsp;        }
 &nbsp;
 &nbsp;        //once we break out of the loop, all rounds are over and we can determine the winner.
@@ -755,7 +768,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2024-04-16 21:55</div>
+    <div style="float:right;">generated on 2024-04-29 14:24</div>
 </div>
 </body>
 </html>

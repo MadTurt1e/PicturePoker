@@ -60,10 +60,10 @@ Current scope:     <a href="../../index.html">all classes</a>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    82.9%
+    81.9%
   </span>
   <span class="absValue">
-    (68/82)
+    (68/83)
   </span>
 </td>
 </tr>
@@ -326,7 +326,6 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;            }
 &nbsp;            else{
 &nbsp;                // Tiebreaker: Lowest Player ID
-&nbsp;                // TODO: Make final tiebreaker based on position in game
 <b class="fc">&nbsp;                return (int)(this.p_ID - p2.getID());</b>
 &nbsp;
 &nbsp;            }
@@ -363,7 +362,9 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="nc">&nbsp;            if(hand[i].getToChange()){</b>
 <b class="nc">&nbsp;                cardsChanged++;</b>
 &nbsp;            }
+&nbsp;            //redraw, and than indicate that we probably don&#39;t want to redraw anymore.
 <b class="nc">&nbsp;            hand[i].redrawSuit();</b>
+<b class="nc">&nbsp;            hand[i].setToChange(false);</b>
 &nbsp;        }
 &nbsp;    }
 &nbsp;
@@ -454,7 +455,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2024-04-16 21:55</div>
+    <div style="float:right;">generated on 2024-04-29 14:24</div>
 </div>
 </body>
 </html>

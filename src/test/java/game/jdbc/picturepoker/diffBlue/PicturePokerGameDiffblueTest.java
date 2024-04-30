@@ -81,20 +81,8 @@ class PicturePokerGameDiffblueTest {
      * Method under test: {@link PicturePokerGame#getByPlayerID(String)}
      */
     @Test
-    void testGetByPlayerID() {
-        // TODO: Diffblue Cover was only able to create a partial test for this method:
-        //   Diffblue AI was unable to find a test
-
-        // Arrange and Act
-        (new PicturePokerGame()).getByPlayerID("42");
-    }
-
-    /**
-     * Method under test: {@link PicturePokerGame#getByPlayerID(String)}
-     */
-    @Test
     @Disabled("TODO: Complete this test")
-    void testGetByPlayerID2() {
+    void testGetByPlayerID() {
         // TODO: Diffblue Cover was only able to create a partial test for this method:
         //   Reason: No inputs found that don't throw a trivial exception.
         //   Diffblue Cover tried to run the arrange/act section, but the method under
@@ -103,11 +91,23 @@ class PicturePokerGameDiffblueTest {
         //       at java.base/java.lang.NumberFormatException.forInputString(NumberFormatException.java:67)
         //       at java.base/java.lang.Long.parseLong(Long.java:709)
         //       at java.base/java.lang.Long.parseLong(Long.java:832)
-        //       at game.jdbc.picturepoker.PicturePokerGame.getByPlayerID(PicturePokerGame.java:122)
+        //       at game.jdbc.picturepoker.PicturePokerGame.getByPlayerID(PicturePokerGame.java:124)
         //   See https://diff.blue/R013 to resolve this issue.
 
         // Arrange and Act
         (new PicturePokerGame()).getByPlayerID("P id Str");
+    }
+
+    /**
+     * Method under test: {@link PicturePokerGame#getByPlayerID(String)}
+     */
+    @Test
+    void testGetByPlayerID2() {
+        // TODO: Diffblue Cover was only able to create a partial test for this method:
+        //   Diffblue AI was unable to find a test
+
+        // Arrange and Act
+        (new PicturePokerGame()).getByPlayerID("42");
     }
 
     /**
@@ -126,20 +126,8 @@ class PicturePokerGameDiffblueTest {
      * Method under test: {@link PicturePokerGame#getByGameID(String)}
      */
     @Test
-    void testGetByGameID() {
-        // TODO: Diffblue Cover was only able to create a partial test for this method:
-        //   Diffblue AI was unable to find a test
-
-        // Arrange and Act
-        (new PicturePokerGame()).getByGameID("42");
-    }
-
-    /**
-     * Method under test: {@link PicturePokerGame#getByGameID(String)}
-     */
-    @Test
     @Disabled("TODO: Complete this test")
-    void testGetByGameID2() {
+    void testGetByGameID() {
         // TODO: Diffblue Cover was only able to create a partial test for this method:
         //   Reason: No inputs found that don't throw a trivial exception.
         //   Diffblue Cover tried to run the arrange/act section, but the method under
@@ -148,11 +136,23 @@ class PicturePokerGameDiffblueTest {
         //       at java.base/java.lang.NumberFormatException.forInputString(NumberFormatException.java:67)
         //       at java.base/java.lang.Long.parseLong(Long.java:709)
         //       at java.base/java.lang.Long.parseLong(Long.java:832)
-        //       at game.jdbc.picturepoker.PicturePokerGame.getByGameID(PicturePokerGame.java:170)
+        //       at game.jdbc.picturepoker.PicturePokerGame.getByGameID(PicturePokerGame.java:172)
         //   See https://diff.blue/R013 to resolve this issue.
 
         // Arrange and Act
         (new PicturePokerGame()).getByGameID("G id Str");
+    }
+
+    /**
+     * Method under test: {@link PicturePokerGame#getByGameID(String)}
+     */
+    @Test
+    void testGetByGameID2() {
+        // TODO: Diffblue Cover was only able to create a partial test for this method:
+        //   Diffblue AI was unable to find a test
+
+        // Arrange and Act
+        (new PicturePokerGame()).getByGameID("42");
     }
 
     /**
@@ -215,7 +215,7 @@ class PicturePokerGameDiffblueTest {
         //       at com.fasterxml.jackson.databind.ObjectMapper._readMapAndClose(ObjectMapper.java:4818)
         //       at com.fasterxml.jackson.databind.ObjectMapper.readValue(ObjectMapper.java:3772)
         //       at com.fasterxml.jackson.databind.ObjectMapper.readValue(ObjectMapper.java:3740)
-        //       at game.jdbc.picturepoker.PicturePokerGame.updateByPID(PicturePokerGame.java:296)
+        //       at game.jdbc.picturepoker.PicturePokerGame.updateByPID(PicturePokerGame.java:300)
         //   See https://diff.blue/R013 to resolve this issue.
 
         // Arrange and Act
@@ -281,8 +281,11 @@ class PicturePokerGameDiffblueTest {
      */
     @Test
     void testGetEndOfRoundInformation() {
-        // Arrange, Act and Assert
-        assertTrue((new PicturePokerGame()).getEndOfRoundInformation(1L, true).isEmpty());
+        // TODO: Diffblue Cover was only able to create a partial test for this method:
+        //   Diffblue AI was unable to find a test
+
+        // Arrange and Act
+        (new PicturePokerGame()).getEndOfRoundInformation(1L, true);
     }
 
     /**

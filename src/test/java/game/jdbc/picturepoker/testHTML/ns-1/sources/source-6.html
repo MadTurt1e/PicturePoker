@@ -60,10 +60,10 @@ Current scope:     <a href="../../index.html">all classes</a>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    36%
+    35.8%
   </span>
   <span class="absValue">
-    (151/419)
+    (152/424)
   </span>
 </td>
 </tr>
@@ -92,10 +92,11 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;
 &nbsp;import javax.swing.plaf.metal.MetalBorders;
 &nbsp;
-&nbsp;// @RequestMapping(&quot;/api&quot;) We will shift most of the functionality here to be hidden under /api
+&nbsp;
 &nbsp;@SpringBootApplication
 &nbsp;@CrossOrigin // This is for the front end to be able to access the backend
 &nbsp;@RestController
+&nbsp;@RequestMapping(&quot;/api&quot;) // this is so we know what is and is not API
 <b class="fc">&nbsp;public class PicturePokerGame {</b>
 &nbsp;
 &nbsp;    // Set the hostname as a pseudo global so that we can change it later
@@ -127,7 +128,8 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;        try {
 <b class="fc">&nbsp;            Connection connection = dcm.getConnection();</b>
 <b class="nc">&nbsp;            PlayerDAO playerdao = new PlayerDAO(connection);</b>
-&nbsp;            // essentially, a (new) player consists of a player name and a password, and that is it.
+&nbsp;            // essentially, a (new) player consists of a player name and a password, and
+&nbsp;            // that is it.
 <b class="nc">&nbsp;            player.setPlayerName(inputMap.get(&quot;playerName&quot;));</b>
 <b class="nc">&nbsp;            player.setPasscode(inputMap.get(&quot;password&quot;));</b>
 <b class="nc">&nbsp;            player = playerdao.create(player);</b>
@@ -193,7 +195,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="fc">&nbsp;        return player;</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    //READ Operation - Read a player&#39;s full details
+&nbsp;    // READ Operation - Read a player&#39;s full details
 &nbsp;    @GetMapping(&quot;/getByPlayerID/{p_idStr}&quot;)
 &nbsp;    public Player getByPlayerID(@PathVariable(&quot;p_idStr&quot;) String p_idStr) {
 <b class="fc">&nbsp;        long p_id = Long.parseLong(p_idStr);</b>
@@ -214,7 +216,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="fc">&nbsp;        return player;</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    //READ Operation - Read a player&#39;s full details
+&nbsp;    // READ Operation - Read a player&#39;s full details
 &nbsp;    @GetMapping(&quot;/getPlayerActiveGame/{pid}&quot;)
 &nbsp;    public Game getPlayerActiveGame(@PathVariable(&quot;pid&quot;) long pid) {
 <b class="fc">&nbsp;        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,</b>
@@ -226,7 +228,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="nc">&nbsp;            GameDAO gameDAO = new GameDAO(connection);</b>
 <b class="nc">&nbsp;            Player p = playerDAO.findById(pid);</b>
 <b class="nc">&nbsp;            long gid = playerDAO.getCurrentGame(p);</b>
-<b class="nc">&nbsp;            if(gid &lt; 0){</b>
+<b class="nc">&nbsp;            if (gid &lt; 0) {</b>
 <b class="nc">&nbsp;                System.out.println(&quot;Player is not in any games!&quot;);</b>
 <b class="nc">&nbsp;                return null;</b>
 &nbsp;            }
@@ -240,7 +242,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="fc">&nbsp;        return game;</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    //READ Operation - Read a game&#39;s full details
+&nbsp;    // READ Operation - Read a game&#39;s full details
 &nbsp;    @GetMapping(&quot;/getByGameID/{g_id}&quot;)
 &nbsp;    public Game getByGameID(@PathVariable(&quot;g_id&quot;) String g_idStr) {
 <b class="fc">&nbsp;        System.out.println(g_idStr);</b>
@@ -252,7 +254,8 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="fc">&nbsp;            Connection connection = dcm.getConnection();</b>
 <b class="nc">&nbsp;            GameDAO gamedao = new GameDAO(connection);</b>
 <b class="nc">&nbsp;            game = gamedao.findById(g_id);</b>
-&nbsp;            //we need a separate function to get pids because the database is structured poorly
+&nbsp;            // we need a separate function to get pids because the database is structured
+&nbsp;            // poorly
 <b class="nc">&nbsp;            game.setPlayers(gamedao.getPIDsByGame(game));</b>
 <b class="nc">&nbsp;            System.out.println(game);</b>
 <b class="nc">&nbsp;            connection.close();</b>
@@ -262,7 +265,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="fc">&nbsp;        return game;</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    //READ Operation - Read a game&#39;s full details
+&nbsp;    // READ Operation - Read a game&#39;s full details
 &nbsp;    @GetMapping(&quot;/getGameEndDetails/{g_id}&quot;)
 &nbsp;    public Game getGameEndDetails(@PathVariable(&quot;g_id&quot;) long g_id) {
 <b class="fc">&nbsp;        System.out.println(g_id);</b>
@@ -274,18 +277,18 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="nc">&nbsp;            GameDAO gamedao = new GameDAO(connection);</b>
 <b class="nc">&nbsp;            PlayerDAO playerDAO = new PlayerDAO(connection);</b>
 <b class="nc">&nbsp;            game = gamedao.findById(g_id);</b>
-<b class="nc">&nbsp;            if(game.getCurRound() &lt;= game.getNumRounds()){</b>
+<b class="nc">&nbsp;            if (game.getCurRound() &lt;= game.getNumRounds()) {</b>
 &nbsp;                // Game is not yet complete, do not calculate anything
 <b class="nc">&nbsp;                return null;</b>
 &nbsp;            }
 &nbsp;            // Sort array of player IDs
 <b class="nc">&nbsp;            long[] pidsInGame = gamedao.getPIDsByGame(game);</b>
 <b class="nc">&nbsp;            ArrayList&lt;Player&gt; playersInGame = new ArrayList&lt;Player&gt;();</b>
-<b class="nc">&nbsp;            for(int i = 0; i &lt; 4; i++){</b>
+<b class="nc">&nbsp;            for (int i = 0; i &lt; 4; i++) {</b>
 <b class="nc">&nbsp;                playersInGame.add(playerDAO.findById(pidsInGame[i]));</b>
 &nbsp;            }
 <b class="nc">&nbsp;            Collections.sort(playersInGame);</b>
-<b class="nc">&nbsp;            for(int i = 0; i &lt; 4; i++){</b>
+<b class="nc">&nbsp;            for (int i = 0; i &lt; 4; i++) {</b>
 <b class="nc">&nbsp;                pidsInGame[i] = playersInGame.get(i).getID();</b>
 &nbsp;            }
 <b class="nc">&nbsp;            game.setPlayers(pidsInGame);</b>
@@ -297,24 +300,25 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="fc">&nbsp;        return game;</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    //READ Operation - Reads players from a game
+&nbsp;    // READ Operation - Reads players from a game
 &nbsp;    @GetMapping(&quot;/getPlayersByGame/{g_id}&quot;)
 &nbsp;    public ArrayList&lt;Player&gt; getPlayersByGame(@PathVariable(&quot;g_id&quot;) String g_idStr) {
 <b class="fc">&nbsp;        System.out.println(g_idStr);</b>
 <b class="fc">&nbsp;        long g_id = Long.parseLong(g_idStr);</b>
 <b class="fc">&nbsp;        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,</b>
 &nbsp;                &quot;picturepoker&quot;, &quot;postgres&quot;, &quot;password&quot;);
-<b class="fc">&nbsp;        ArrayList&lt;Player&gt; playersInGame = new ArrayList&lt;Player&gt;();Game game = new Game();</b>
+<b class="fc">&nbsp;        ArrayList&lt;Player&gt; playersInGame = new ArrayList&lt;Player&gt;();</b>
+<b class="fc">&nbsp;        Game game = new Game();</b>
 &nbsp;        try {
 <b class="fc">&nbsp;            Connection connection = dcm.getConnection();</b>
 <b class="nc">&nbsp;            GameDAO gamedao = new GameDAO(connection);</b>
 <b class="nc">&nbsp;            PlayerDAO playerDAO = new PlayerDAO(connection);</b>
 <b class="nc">&nbsp;            game = gamedao.findById(g_id);</b>
 <b class="nc">&nbsp;            long[] gamePIDs = gamedao.getPIDsByGame(game);</b>
-<b class="nc">&nbsp;            for(int i = 0; i &lt; 4; i++){</b>
+<b class="nc">&nbsp;            for (int i = 0; i &lt; 4; i++) {</b>
 <b class="nc">&nbsp;                playersInGame.add(playerDAO.findById(gamePIDs[i]));</b>
 &nbsp;            }
-<b class="nc">&nbsp;            for(Player p : playersInGame){</b>
+<b class="nc">&nbsp;            for (Player p : playersInGame) {</b>
 <b class="nc">&nbsp;                System.out.println(p);</b>
 <b class="nc">&nbsp;            }</b>
 <b class="nc">&nbsp;            System.out.println(game);</b>
@@ -325,7 +329,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="fc">&nbsp;        return playersInGame;</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    //READ Operation - Reads all players
+&nbsp;    // READ Operation - Reads all players
 &nbsp;    @GetMapping(&quot;/getAllPlayers&quot;)
 &nbsp;    public ArrayList&lt;Player&gt; getAllPlayers() {
 <b class="fc">&nbsp;        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,</b>
@@ -401,7 +405,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="nc">&nbsp;            updatedPlayer.setLifetimeRoundsWon(Integer.parseInt(inputMap.get(&quot;lifetime_rounds_won&quot;)));</b>
 <b class="nc">&nbsp;            updatedPlayer.setLifetimeTotalBet(Integer.parseInt(inputMap.get(&quot;lifetime_total_bet&quot;)));</b>
 &nbsp;
-&nbsp;            //update everything
+&nbsp;            // update everything
 <b class="nc">&nbsp;            playerdao.updateAttributes(updatedPlayer);</b>
 <b class="nc">&nbsp;            System.out.println(updatedPlayer);</b>
 <b class="nc">&nbsp;            connection.close();</b>
@@ -451,9 +455,9 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="fc">&nbsp;        return updatedGame;</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    //UPDATE Operation - Raise player bet
+&nbsp;    // UPDATE Operation - Raise player bet
 &nbsp;    @PutMapping(&quot;/raise/{p_id}&quot;)
-&nbsp;    public Player raiseBet(@PathVariable long p_id){
+&nbsp;    public Player raiseBet(@PathVariable long p_id) {
 <b class="fc">&nbsp;        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,</b>
 &nbsp;                &quot;picturepoker&quot;, &quot;postgres&quot;, &quot;password&quot;);
 <b class="fc">&nbsp;        Player player = new Player();</b>
@@ -462,11 +466,11 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="nc">&nbsp;            PlayerDAO playerDAO = new PlayerDAO(connection);</b>
 &nbsp;
 <b class="nc">&nbsp;            player = playerDAO.findById(p_id);</b>
-<b class="nc">&nbsp;            if(player.getFinishedRound() &gt; 0){</b>
+<b class="nc">&nbsp;            if (player.getFinishedRound() &gt; 0) {</b>
 <b class="nc">&nbsp;                System.out.println(&quot;Could not raise: Finished round.&quot;);</b>
 <b class="nc">&nbsp;                return player;</b>
 &nbsp;            }
-<b class="nc">&nbsp;            if(player.raise() &lt; 0){</b>
+<b class="nc">&nbsp;            if (player.raise() &lt; 0) {</b>
 <b class="nc">&nbsp;                System.out.println(&quot;Could not raise: Not enough tokens.&quot;);</b>
 <b class="nc">&nbsp;                return player;</b>
 &nbsp;            }
@@ -482,9 +486,9 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="fc">&nbsp;        return player;</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    //UPDATE Operation - Toggle whether to change out card
+&nbsp;    // UPDATE Operation - Toggle whether to change out card
 &nbsp;    @PutMapping(&quot;/changeCard/{p_id}/{pos}&quot;)
-&nbsp;    public Player toggleToChange(@PathVariable long p_id, @PathVariable int pos){
+&nbsp;    public Player toggleToChange(@PathVariable long p_id, @PathVariable int pos) {
 <b class="fc">&nbsp;        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,</b>
 &nbsp;                &quot;picturepoker&quot;, &quot;postgres&quot;, &quot;password&quot;);
 <b class="fc">&nbsp;        Player player = new Player();</b>
@@ -493,10 +497,10 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="nc">&nbsp;            PlayerDAO playerDAO = new PlayerDAO(connection);</b>
 &nbsp;
 <b class="nc">&nbsp;            player = playerDAO.findById(p_id);</b>
-<b class="nc">&nbsp;            if(player.getFinishedRound() &gt; 0){</b>
+<b class="nc">&nbsp;            if (player.getFinishedRound() &gt; 0) {</b>
 <b class="nc">&nbsp;                System.out.println(&quot;Could not toggle Card: Finished round.&quot;);</b>
 &nbsp;            }
-<b class="nc">&nbsp;            if(pos &lt; 0 || pos &gt; 4){</b>
+<b class="nc">&nbsp;            if (pos &lt; 0 || pos &gt; 4) {</b>
 <b class="nc">&nbsp;                System.out.println(&quot;Could not toggle Card: Hand position out of bounds.&quot;);</b>
 <b class="nc">&nbsp;                return player;</b>
 &nbsp;            }
@@ -512,7 +516,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;    }
 &nbsp;
 &nbsp;    @PutMapping(&quot;/finishRound/{p_id}&quot;)
-&nbsp;    public Player finishRound(@PathVariable long p_id){
+&nbsp;    public Player finishRound(@PathVariable long p_id) {
 <b class="fc">&nbsp;        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,</b>
 &nbsp;                &quot;picturepoker&quot;, &quot;postgres&quot;, &quot;password&quot;);
 <b class="fc">&nbsp;        Player player = new Player();</b>
@@ -522,7 +526,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="nc">&nbsp;            GameDAO gameDAO = new GameDAO(connection);</b>
 &nbsp;
 <b class="nc">&nbsp;            player = playerDAO.findById(p_id);</b>
-<b class="nc">&nbsp;            if(player.getFinishedRound() &gt; 0){</b>
+<b class="nc">&nbsp;            if (player.getFinishedRound() &gt; 0) {</b>
 <b class="nc">&nbsp;                System.out.println(&quot;Could not finish round: You have already finished the current round.&quot;);</b>
 <b class="nc">&nbsp;                return player;</b>
 &nbsp;            }
@@ -531,35 +535,35 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;
 <b class="nc">&nbsp;            long curGameID = playerDAO.getCurrentGame(player);</b>
 <b class="nc">&nbsp;            Game curGame = gameDAO.findById(curGameID);</b>
-<b class="nc">&nbsp;            if(curGame.getCurRound() &gt; curGame.getNumRounds()) {</b>
+<b class="nc">&nbsp;            if (curGame.getCurRound() &gt; curGame.getNumRounds()) {</b>
 <b class="nc">&nbsp;                System.out.println(&quot;Could not finish round: Game is already over.&quot;);</b>
 &nbsp;            }
-<b class="nc">&nbsp;                player.setFinishedRound(1);</b>
+<b class="nc">&nbsp;            player.setFinishedRound(1);</b>
 <b class="nc">&nbsp;            playerDAO.update_int(&quot;finished_round&quot;, 1, player);</b>
 <b class="nc">&nbsp;            curGame.setPlayersFinished(curGame.getPlayersFinished() + 1);</b>
 <b class="nc">&nbsp;            gameDAO.update_int(&quot;players_finished&quot;, curGame.getPlayersFinished(), curGame);</b>
 &nbsp;            /*
-&nbsp;            if(curGame.getPlayersFinished() &gt;= 4){
-&nbsp;                // Do round stuff
-&nbsp;                Player[] playerList = new Player[4];
-&nbsp;                long[] playerIDList = curGame.getPlayers();
-&nbsp;
-&nbsp;                //we get the list of all the players, so it is iterable.
-&nbsp;                for (int i = 0; i &lt; 4; i++) {
-&nbsp;                    playerList[i] = playerDAO.findById(playerIDList[i]);
-&nbsp;                    playerList[i].redrawHand();
-&nbsp;                    playerDAO.updateHand(playerList[i]);
-&nbsp;                }
-&nbsp;                GamePlay gp = new GamePlay(curGame, playerList);
-&nbsp;
-&nbsp;                gp.showdownResolution(gameDAO, playerDAO, true);
-&nbsp;                if(curGame.getCurRound() &gt; curGame.getNumRounds()){
-&nbsp;                    // Do end of game stuff
-&nbsp;                    gp.gameEndResolution(gameDAO, playerDAO);
-&nbsp;                }
-&nbsp;            }
-&nbsp;            connection.close();
-&nbsp;            */
+&nbsp;             * if(curGame.getPlayersFinished() &gt;= 4){
+&nbsp;             * // Do round stuff
+&nbsp;             * Player[] playerList = new Player[4];
+&nbsp;             * long[] playerIDList = curGame.getPlayers();
+&nbsp;             * 
+&nbsp;             * //we get the list of all the players, so it is iterable.
+&nbsp;             * for (int i = 0; i &lt; 4; i++) {
+&nbsp;             * playerList[i] = playerDAO.findById(playerIDList[i]);
+&nbsp;             * playerList[i].redrawHand();
+&nbsp;             * playerDAO.updateHand(playerList[i]);
+&nbsp;             * }
+&nbsp;             * GamePlay gp = new GamePlay(curGame, playerList);
+&nbsp;             * 
+&nbsp;             * gp.showdownResolution(gameDAO, playerDAO, true);
+&nbsp;             * if(curGame.getCurRound() &gt; curGame.getNumRounds()){
+&nbsp;             * // Do end of game stuff
+&nbsp;             * gp.gameEndResolution(gameDAO, playerDAO);
+&nbsp;             * }
+&nbsp;             * }
+&nbsp;             */
+<b class="nc">&nbsp;            connection.close();</b>
 <b class="fc">&nbsp;        } catch (SQLException e) {</b>
 <b class="fc">&nbsp;            e.printStackTrace();</b>
 <b class="nc">&nbsp;        }</b>
@@ -567,46 +571,52 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;    }
 &nbsp;
 &nbsp;    @GetMapping(&quot;/getEndOfRoundInformation/{g_id}/{commit_results}&quot;)
-&nbsp;    public ArrayList&lt;PlayerShowdownInfo&gt; getEndOfRoundInformation(@PathVariable long g_id, @PathVariable boolean commit_results){
+&nbsp;    public ShowdownInfo getEndOfRoundInformation(@PathVariable long g_id, @PathVariable boolean commit_results) {
 <b class="fc">&nbsp;        DatabaseConnectionManager dcm = new DatabaseConnectionManager(hostname,</b>
 &nbsp;                &quot;picturepoker&quot;, &quot;postgres&quot;, &quot;password&quot;);
-<b class="fc">&nbsp;        ArrayList&lt;PlayerShowdownInfo&gt; pSDInfo = new ArrayList&lt;PlayerShowdownInfo&gt;();</b>
+<b class="fc">&nbsp;        ShowdownInfo sdInfo = new ShowdownInfo();</b>
 <b class="fc">&nbsp;        Game game = new Game();</b>
 &nbsp;        try {
 <b class="fc">&nbsp;            Connection connection = dcm.getConnection();</b>
 <b class="nc">&nbsp;            PlayerDAO playerDAO = new PlayerDAO(connection);</b>
 <b class="nc">&nbsp;            GameDAO gameDAO = new GameDAO(connection);</b>
 <b class="nc">&nbsp;            game = gameDAO.findById(g_id);</b>
-<b class="nc">&nbsp;            if(game.getCurRound() &lt;= game.getNumRounds() &amp;&amp; game.getPlayersFinished() &gt;= 4){</b>
+<b class="nc">&nbsp;            if (game.getCurRound() &lt;= game.getNumRounds() &amp;&amp; game.getPlayersFinished() &gt;= 4) {</b>
 &nbsp;                // Do round stuff
 <b class="nc">&nbsp;                Player[] playerList = new Player[4];</b>
 <b class="nc">&nbsp;                long[] playerIDList = game.getPlayers();</b>
 &nbsp;
-&nbsp;                //we get the list of all the players, so it is iterable.
+&nbsp;                // we get the list of all the players, so it is iterable.
 <b class="nc">&nbsp;                for (int i = 0; i &lt; 4; i++) {</b>
 <b class="nc">&nbsp;                    playerList[i] = playerDAO.findById(playerIDList[i]);</b>
+&nbsp;                    // Well actually we assume that all players have already finished the round
+&nbsp;                    // before entering so no need to check
 <b class="nc">&nbsp;                    playerList[i].redrawHand();</b>
 <b class="nc">&nbsp;                    playerDAO.updateHand(playerList[i]);</b>
 <b class="nc">&nbsp;                    playerDAO.updateAttributes(playerList[i]);</b>
+<b class="nc">&nbsp;                    System.out.println(playerList[i]);</b>
 &nbsp;                }
 <b class="nc">&nbsp;                GamePlay gp = new GamePlay(game, playerList);</b>
-<b class="nc">&nbsp;                if(game.getLuigiFinished() &lt; 1) {</b>
+<b class="nc">&nbsp;                if (game.getLuigiFinished() &lt; 1) {</b>
 <b class="nc">&nbsp;                    gp.executeLuigi();</b>
-<b class="nc">&nbsp;                    gameDAO.updateHand(game);</b>
+<b class="nc">&nbsp;                    gameDAO.updateHand(gp.getCurGame());</b>
+<b class="nc">&nbsp;                    gameDAO.update_int(&quot;luigi_finished&quot;, 1, gp.getCurGame());</b>
 &nbsp;                }
-<b class="nc">&nbsp;                pSDInfo = gp.showdownResolution(gameDAO, playerDAO, commit_results);</b>
-<b class="nc">&nbsp;                if(game.getCurRound() &gt; game.getNumRounds()){</b>
+<b class="nc">&nbsp;                sdInfo = gp.showdownResolution(gameDAO, playerDAO, commit_results);</b>
+&nbsp;                // Only end the game in the case that everybody is done with the game.
+<b class="nc">&nbsp;                if (commit_results &amp;&amp; game.getCurRound() &gt; game.getNumRounds()) {</b>
 &nbsp;                    // Do end of game stuff
 <b class="nc">&nbsp;                    gp.gameEndResolution(gameDAO, playerDAO);</b>
 &nbsp;                }
 &nbsp;            }
+<b class="nc">&nbsp;            connection.close();</b>
 <b class="fc">&nbsp;        } catch (SQLException e) {</b>
 <b class="fc">&nbsp;            e.printStackTrace();</b>
 <b class="nc">&nbsp;        }</b>
-<b class="fc">&nbsp;        return pSDInfo;</b>
+<b class="fc">&nbsp;        return sdInfo;</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    //DELETE Operation - Delete a player
+&nbsp;    // DELETE Operation - Delete a player
 &nbsp;    @DeleteMapping(&quot;/deletePlayer/{p_id}&quot;)
 &nbsp;    public Player deleteByPID(@PathVariable long p_id) {
 <b class="fc">&nbsp;        System.out.println(p_id);</b>
@@ -646,7 +656,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="fc">&nbsp;        return game;</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    //DELETE OPERATION - Remove a player from a game
+&nbsp;    // DELETE OPERATION - Remove a player from a game
 &nbsp;    @DeleteMapping(&quot;/leaveCurrentGame/{p_id}&quot;)
 &nbsp;    public Game leaveGame(@PathVariable long p_id) {
 <b class="fc">&nbsp;        System.out.println(p_id);</b>
@@ -669,7 +679,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="nc">&nbsp;            playerDAO.updateAttributes(p);</b>
 <b class="nc">&nbsp;            playerDAO.updateHand(p);</b>
 &nbsp;            // Clean up once all players leave.
-<b class="nc">&nbsp;            if(game.getActivePlayers() == 0){</b>
+<b class="nc">&nbsp;            if (game.getActivePlayers() == 0) {</b>
 <b class="nc">&nbsp;                game = gameDAO.deleteGame(game.getID());</b>
 &nbsp;            }
 <b class="nc">&nbsp;            System.out.println(game);</b>
@@ -680,7 +690,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="fc">&nbsp;        return game;</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    //Actually play the game
+&nbsp;    // Actually play the game
 &nbsp;    @GetMapping(&quot;/playGame/{g_id}&quot;)
 &nbsp;    public Game playGame(@PathVariable long g_id) {
 <b class="fc">&nbsp;        System.out.println(g_id);</b>
@@ -702,7 +712,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;            }
 <b class="nc">&nbsp;            Player[] playerList = new Player[4];</b>
 <b class="nc">&nbsp;            long[] playerIDList = game.getPlayers();</b>
-&nbsp;            //we get the list of all the players, so it is iterable.
+&nbsp;            // we get the list of all the players, so it is iterable.
 <b class="nc">&nbsp;            for (int i = 0; i &lt; 4; i++) {</b>
 <b class="nc">&nbsp;                playerList[i] = playerDAO.findById(playerIDList[i]);</b>
 &nbsp;            }
@@ -723,7 +733,8 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;                &quot;picturepoker&quot;, &quot;postgres&quot;, &quot;password&quot;);
 <b class="fc">&nbsp;        Game game = new Game();</b>
 &nbsp;        try {
-&nbsp;            //Makes a connection, gets a player and the game ID, and tries adding the player to the game.
+&nbsp;            // Makes a connection, gets a player and the game ID, and tries adding the
+&nbsp;            // player to the game.
 <b class="fc">&nbsp;            Connection connection = dcm.getConnection();</b>
 <b class="nc">&nbsp;            GameDAO gamedao = new GameDAO(connection);</b>
 <b class="nc">&nbsp;            PlayerDAO playerDAO = new PlayerDAO(connection);</b>
@@ -731,14 +742,15 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="nc">&nbsp;            game = gamedao.findById(g_id);</b>
 &nbsp;
 <b class="nc">&nbsp;            int players_before = game.getActivePlayers();</b>
-&nbsp;            //stick the player into the game (or at least, it tries)
+&nbsp;            // stick the player into the game (or at least, it tries)
 <b class="nc">&nbsp;            game = gamedao.joinGame(game, player);</b>
-&nbsp;            // Once everyone joins, start the game and take away money from players&#39; balances
-<b class="nc">&nbsp;            if(game.getActivePlayers() &gt;= 4 &amp;&amp; players_before == 3){</b>
+&nbsp;            // Once everyone joins, start the game and take away money from players&#39;
+&nbsp;            // balances
+<b class="nc">&nbsp;            if (game.getActivePlayers() &gt;= 4 &amp;&amp; players_before == 3) {</b>
 <b class="nc">&nbsp;                Player[] playerList = new Player[4];</b>
 <b class="nc">&nbsp;                long[] playerIDList = game.getPlayers();</b>
 &nbsp;
-&nbsp;                //we get the list of all the players, so it is iterable.
+&nbsp;                // we get the list of all the players, so it is iterable.
 <b class="nc">&nbsp;                for (int i = 0; i &lt; 4; i++) {</b>
 <b class="nc">&nbsp;                    playerList[i] = playerDAO.findById(playerIDList[i]);</b>
 &nbsp;                }
@@ -750,7 +762,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="nc">&nbsp;                    playerDAO.update_int(&quot;finished_round&quot;, 0, p);</b>
 <b class="nc">&nbsp;                    playerDAO.updateHand(p);</b>
 &nbsp;
-&nbsp;                    //drain people&#39;s bank accounts and add to pot
+&nbsp;                    // drain people&#39;s bank accounts and add to pot
 <b class="nc">&nbsp;                    p.setDollars(p.getDollars() - game.getBuyIn());</b>
 <b class="nc">&nbsp;                    playerDAO.updateAttributes(p);</b>
 <b class="nc">&nbsp;                    game.setPotQuantity(game.getPotQuantity() + game.getBuyIn());</b>
@@ -758,7 +770,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;            }
 <b class="nc">&nbsp;            gamedao.update_all(game);</b>
 <b class="nc">&nbsp;            connection.close();</b>
-<b class="fc">&nbsp;        }catch (SQLException e) {</b>
+<b class="fc">&nbsp;        } catch (SQLException e) {</b>
 <b class="fc">&nbsp;            e.printStackTrace();</b>
 <b class="nc">&nbsp;        }</b>
 &nbsp;
@@ -792,7 +804,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2024-04-16 21:55</div>
+    <div style="float:right;">generated on 2024-04-29 14:24</div>
 </div>
 </body>
 </html>
